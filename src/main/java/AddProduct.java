@@ -244,6 +244,7 @@ public class AddProduct extends javax.swing.JInternalFrame
                     else
                     {
                         int quant = Integer.parseInt(fieldInStock.getText());
+                        // Check quantity entered is not negative
                         if (quant >= 0)
                         {
                             sql = "INSERT INTO products (code, leather, style, colour, sales_price, purchase_price, SSAW, comments, in_stock, in_order, total) VALUES('" + fieldProdCode.getText() + "', '" + fieldLeather.getText() + "', '" + fieldStyle.getText() + "', '" + fieldColour.getText() + "', " + salesPrice + ", " + purchasePrice + ", '" + comboSSAW.getSelectedItem() + "', '" + fieldComments.getText() + "', " + quant + ", 0, " + fieldInStock.getText() + ")";
