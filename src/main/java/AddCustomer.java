@@ -427,6 +427,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
             fieldComments.setText(rs.getString("comments"));
             fieldInstructions.setText(rs.getString("delivery"));
 
+            // Mark customer as a proforma (Delivery between 10-4)
             if (rs.getBoolean("proforma"))
             {
                 checkPro.setSelected(true);
