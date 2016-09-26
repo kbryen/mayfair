@@ -1,16 +1,16 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Mayfair Stock Control.
+ *
  */
-package main.java;
+package main.java.customer;
 
-import static main.java.Main.seperator;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
+import main.java.Database;
+import main.java.MayfairConstants;
 
 /**
  *
@@ -24,12 +24,6 @@ public class AddCustomer extends javax.swing.JInternalFrame
     private final int custNum;
     private String sql;
 
-    /**
-     * Creates new form AddCustomer
-     *
-     * @param type Edit or Add
-     * @param num Customer Number
-     */
     public AddCustomer(String type, int num)
     {
         initComponents();
@@ -60,8 +54,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
-    {
+    private void initComponents() {
 
         labelCustomer = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
@@ -102,12 +95,12 @@ public class AddCustomer extends javax.swing.JInternalFrame
         jLabel19 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
         jSeparator4 = new javax.swing.JSeparator();
-        checkBill = new javax.swing.JCheckBox();
+        DifferentBillingAddress = new javax.swing.JCheckBox();
         btnSwitch = new javax.swing.JButton();
         fieldCountry = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
-        checkPro = new javax.swing.JCheckBox();
+        Proforma = new javax.swing.JCheckBox();
         jLabel21 = new javax.swing.JLabel();
         fieldComments = new javax.swing.JTextField();
         jLabel22 = new javax.swing.JLabel();
@@ -139,10 +132,8 @@ public class AddCustomer extends javax.swing.JInternalFrame
 
         jLabel11.setText("Telephone Number : ");
 
-        btnNext.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnNext.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnNextActionPerformed(evt);
             }
         });
@@ -161,20 +152,16 @@ public class AddCustomer extends javax.swing.JInternalFrame
 
         jLabel19.setText("Email Address : ");
 
-        checkBill.setText("Different Billing Address:");
-        checkBill.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                checkBillActionPerformed(evt);
+        DifferentBillingAddress.setText("Different Billing Address:");
+        DifferentBillingAddress.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DifferentBillingAddressActionPerformed(evt);
             }
         });
 
         btnSwitch.setText("<- Switch ->");
-        btnSwitch.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnSwitch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSwitchActionPerformed(evt);
             }
         });
@@ -223,12 +210,12 @@ public class AddCustomer extends javax.swing.JInternalFrame
                                                 .addComponent(jLabel20))
                                             .addGap(82, 82, 82)
                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addComponent(checkPro)
+                                                .addComponent(Proforma)
                                                 .addComponent(fieldContact, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                         .addGroup(layout.createSequentialGroup()
                                             .addComponent(jLabel5)
                                             .addGap(277, 277, 277)
-                                            .addComponent(checkBill))
+                                            .addComponent(DifferentBillingAddress))
                                         .addComponent(jLabel12)
                                         .addGroup(layout.createSequentialGroup()
                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -312,7 +299,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
                     .addComponent(fieldReference, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
                     .addComponent(jLabel20)
-                    .addComponent(checkPro))
+                    .addComponent(Proforma))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -326,7 +313,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
-                            .addComponent(checkBill))
+                            .addComponent(DifferentBillingAddress))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(fieldAdd1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -403,9 +390,6 @@ public class AddCustomer extends javax.swing.JInternalFrame
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /**
-     * Fill Labels
-     */
     private void FillLabels()
     {
         Connection con = db.getConnection();
@@ -430,7 +414,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
             // Mark customer as a proforma (Delivery between 10-4)
             if (rs.getBoolean("proforma"))
             {
-                checkPro.setSelected(true);
+                Proforma.setSelected(true);
             }
 
             String[] delAddress = rs.getString("del_address").split(", ");
@@ -458,7 +442,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
 
             if (!rs.getString("billing_address").equals(""))
             {
-                checkBill.setSelected(true);
+                DifferentBillingAddress.setSelected(true);
                 fieldBAdd1.setEnabled(true);
                 fieldBAdd2.setEnabled(true);
                 fieldBCity.setEnabled(true);
@@ -507,7 +491,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
 
         if (!fieldReference.getText().equals("") && !fieldName.getText().equals("") && !fieldAdd1.getText().equals("") && !fieldCounty.getText().equals("") && !fieldPostCode.getText().equals(""))
         {
-            if ((checkBill.isSelected() && !fieldBAdd1.getText().equals("") && !fieldBCounty.getText().equals("") && !fieldBPostCode.getText().equals("")) || !checkBill.isSelected())
+            if ((DifferentBillingAddress.isSelected() && !fieldBAdd1.getText().equals("") && !fieldBCounty.getText().equals("") && !fieldBPostCode.getText().equals("")) || !DifferentBillingAddress.isSelected())
             {
                 Connection con = db.getConnection();
                 try
@@ -524,7 +508,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
 
                     StringBuilder billAddress = new StringBuilder();
                     billAddress.append("");
-                    if (checkBill.isSelected())
+                    if (DifferentBillingAddress.isSelected())
                     {
                         addToAddress(billAddress, fieldBAdd1.getText());
                         addToAddress(billAddress, fieldBAdd2.getText());
@@ -547,19 +531,19 @@ public class AddCustomer extends javax.swing.JInternalFrame
                     {
                         case "Add":
                             db.writeToLog("ADD CUSTOMER");
-                            sql = "INSERT INTO customers (reference, name, contact, tel, del_address, billing_address, email, fax, country, comments, proforma, delivery) VALUES ('" + fieldReference.getText() + "', '" + fieldName.getText() + "', '" + fieldContact.getText() + "', '" + fieldTel.getText() + "', '" + delAddress.toString() + "', '" + billAddress.toString() + "', '" + fieldEmail.getText() + "', '" + fieldFax.getText() + "', '" + fieldCountry.getText() + "', '" + fieldComments.getText() + "', " + checkPro.isSelected() + ", '" + instructions + "')";
+                            sql = "INSERT INTO customers (reference, name, contact, tel, del_address, billing_address, email, fax, country, comments, proforma, delivery) VALUES ('" + fieldReference.getText() + "', '" + fieldName.getText() + "', '" + fieldContact.getText() + "', '" + fieldTel.getText() + "', '" + delAddress.toString() + "', '" + billAddress.toString() + "', '" + fieldEmail.getText() + "', '" + fieldFax.getText() + "', '" + fieldCountry.getText() + "', '" + fieldComments.getText() + "', " + Proforma.isSelected() + ", '" + instructions + "')";
                             JOptionPane.showMessageDialog(AddCustomer.this, "Customer Added");
                             break;
                         case "Edit":
                             db.writeToLog("EDIT CUSTOMER");
-                            sql = "UPDATE customers SET reference = '" + fieldReference.getText() + "', name = '" + fieldName.getText() + "', contact = '" + fieldContact.getText() + "', tel = '" + fieldTel.getText() + "', del_address = '" + delAddress.toString() + "', billing_address = '" + billAddress.toString() + "', email = '" + fieldEmail.getText() + "', fax = '" + fieldFax.getText() + "', country = '" + fieldCountry.getText() + "', comments = '" + fieldComments.getText() + "', proforma = " + checkPro.isSelected() + ", delivery = '" + instructions + "' WHERE cust_num = " + custNum;
+                            sql = "UPDATE customers SET reference = '" + fieldReference.getText() + "', name = '" + fieldName.getText() + "', contact = '" + fieldContact.getText() + "', tel = '" + fieldTel.getText() + "', del_address = '" + delAddress.toString() + "', billing_address = '" + billAddress.toString() + "', email = '" + fieldEmail.getText() + "', fax = '" + fieldFax.getText() + "', country = '" + fieldCountry.getText() + "', comments = '" + fieldComments.getText() + "', proforma = " + Proforma.isSelected() + ", delivery = '" + instructions + "' WHERE cust_num = " + custNum;
                             JOptionPane.showMessageDialog(AddCustomer.this, "Customer Updated");
                             break;
                     }
 
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
-                    db.writeToLog(seperator);
+                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
                     this.dispose();
                 }
                 catch (SQLException e)
@@ -596,8 +580,8 @@ public class AddCustomer extends javax.swing.JInternalFrame
         }
     }
 
-    private void checkBillActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkBillActionPerformed
-        if (checkBill.isSelected())
+    private void DifferentBillingAddressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DifferentBillingAddressActionPerformed
+        if (DifferentBillingAddress.isSelected())
         {
             this.enableButtons(true);
         }
@@ -605,7 +589,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
         {
             this.enableButtons(false);
         }
-    }//GEN-LAST:event_checkBillActionPerformed
+    }//GEN-LAST:event_DifferentBillingAddressActionPerformed
 
     private void btnSwitchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSwitchActionPerformed
         String ad1 = fieldAdd1.getText();
@@ -638,10 +622,10 @@ public class AddCustomer extends javax.swing.JInternalFrame
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox DifferentBillingAddress;
+    private javax.swing.JCheckBox Proforma;
     private javax.swing.JButton btnNext;
     private javax.swing.JButton btnSwitch;
-    private javax.swing.JCheckBox checkBill;
-    private javax.swing.JCheckBox checkPro;
     private javax.swing.JTextField fieldAdd1;
     private javax.swing.JTextField fieldAdd2;
     private javax.swing.JTextField fieldBAdd1;

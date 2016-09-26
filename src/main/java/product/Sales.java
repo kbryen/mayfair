@@ -1,9 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Mayfair Stock Control.
+ *
  */
-package main.java;
+package main.java.product;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -12,24 +11,19 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import main.java.Database;
 
 /**
  *
  * @author kian_bryen
  */
-public class ShowSales extends javax.swing.JInternalFrame
+public class Sales extends javax.swing.JInternalFrame
 {
     private final Database db = new Database();
     private final String prodCode;
     private final int prodNum;
-
-    /**
-     * Creates new form ShowSales
-     *
-     * @param code Product Code
-     * @param num Product Number
-     */
-    public ShowSales(String code, int num)
+    
+    public Sales(String code, int num)
     {
         initComponents();
         prodCode = code;
@@ -249,7 +243,7 @@ public class ShowSales extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(ShowSales.this, e.getMessage());
+                JOptionPane.showMessageDialog(Sales.this, e.getMessage());
             }
             finally
             {
@@ -263,7 +257,7 @@ public class ShowSales extends javax.swing.JInternalFrame
         }
         else
         {
-            JOptionPane.showMessageDialog(ShowSales.this, "Please select a start and end date");
+            JOptionPane.showMessageDialog(Sales.this, "Please select a start and end date");
         }
     }//GEN-LAST:event_btnShowActionPerformed
 

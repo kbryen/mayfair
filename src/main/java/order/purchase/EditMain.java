@@ -1,3 +1,7 @@
+/*
+ * Mayfair Stock Control.
+ *
+ */
 package main.java.order.purchase;
 
 import java.sql.Connection;
@@ -9,7 +13,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import static main.java.Main.seperator;
+import main.java.MayfairConstants;
 
 /**
  *
@@ -379,14 +383,14 @@ public class EditMain extends javax.swing.JInternalFrame
                 statement.executeUpdate(sql);
                 db.writeToLog(sql);
 
-                db.writeToLog(seperator);
+                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
                 FillLabels();
                 JOptionPane.showMessageDialog(EditMain.this, "Quantity Updated");
             }
             else
             {
                 db.writeToLog("UNABLE TO UPDATE QUANTITY");
-                db.writeToLog(seperator);
+                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
                 JOptionPane.showMessageDialog(EditMain.this, "New Quantity must be at least " + onOrder + " as there are Sales Orders for this product.");
             }
         }
@@ -459,7 +463,7 @@ public class EditMain extends javax.swing.JInternalFrame
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
 
-                    db.writeToLog(seperator);
+                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
                     FillLabels();
                     JOptionPane.showMessageDialog(EditMain.this, "Product Deleted");
                 }
@@ -475,7 +479,7 @@ public class EditMain extends javax.swing.JInternalFrame
                     });
 
                     db.writeToLog("UNABLE TO CANCEL ORDER" + message);
-                    db.writeToLog(seperator);
+                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
                     JOptionPane.showMessageDialog(EditMain.this, "Can not delete product " + prodCode + " due to being on the following Sales Orders:" + message);
                 }
             }
@@ -524,7 +528,7 @@ public class EditMain extends javax.swing.JInternalFrame
                 catch (Exception e)
                 { /* ignored */ }
             }
-            db.writeToLog(seperator);
+            db.writeToLog(MayfairConstants.LOG_SEPERATOR);
         }
     }//GEN-LAST:event_btnFinishActionPerformed
 

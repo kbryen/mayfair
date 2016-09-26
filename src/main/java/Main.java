@@ -1,30 +1,26 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Mayfair Stock Control.
+ *
  */
 package main.java;
 
+import main.java.customer.Customers;
+import main.java.product.Products;
 import java.beans.PropertyVetoException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import main.java.report.Reports;
 
 /**
- *
+ * 
  * @author kian_bryen
  */
 public class Main extends javax.swing.JFrame
 {
 
-    public static final String seperator = "-----------------------------";
-
-    /**
-     * Creates new form Home
-     */
     public Main()
     {
         initComponents();
-        setIcon();
         setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
     }
 
@@ -258,7 +254,7 @@ public class Main extends javax.swing.JFrame
     }//GEN-LAST:event_btnCurrentPOActionPerformed
 
     private void btnProductsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProductsActionPerformed
-        ViewEditProducts products = new ViewEditProducts(desktop);
+        Products products = new Products(desktop);
         desktop.add(products);
         try
         {
@@ -272,7 +268,7 @@ public class Main extends javax.swing.JFrame
     }//GEN-LAST:event_btnProductsActionPerformed
 
     private void btnCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomersActionPerformed
-        ViewEditCustomers customers = new ViewEditCustomers(desktop);
+        Customers customers = new Customers(desktop);
         desktop.add(customers);
         try
         {
@@ -298,7 +294,9 @@ public class Main extends javax.swing.JFrame
     }//GEN-LAST:event_btnPastPOActionPerformed
 
     private void btnReportsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportsActionPerformed
-        // TODO add your handling code here:
+        Reports reports = new Reports(desktop);
+        desktop.add(reports);
+        reports.show();
     }//GEN-LAST:event_btnReportsActionPerformed
 
     /**
@@ -371,8 +369,4 @@ public class Main extends javax.swing.JFrame
     private javax.swing.JPanel panelSelection;
     // End of variables declaration//GEN-END:variables
 
-    private void setIcon()
-    {
-        //com.apple.eawt.Application.getApplication().setDockIconImage( new ImageIcon(getClass().getResource( "icon.png" )).getImage());
-    }
 }

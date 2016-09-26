@@ -1,3 +1,7 @@
+/*
+ * Mayfair Stock Control.
+ *
+ */
 package main.java.order.sales;
 
 import java.sql.Connection;
@@ -16,7 +20,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import static main.java.Main.seperator;
+import main.java.MayfairConstants;
 
 /**
  *
@@ -549,7 +553,7 @@ public class EditMain extends javax.swing.JInternalFrame
                         sql = "UPDATE sales_order SET del_date = '" + date + "', comments = '" + fieldComments.getText() + "' WHERE ord_num = " + orderNum;
                         statement.executeUpdate(sql);
                         db.writeToLog(sql);
-                        db.writeToLog(seperator);
+                        db.writeToLog(MayfairConstants.LOG_SEPERATOR);
 
                         ViewSalesSummary salesOrder = new ViewSalesSummary(orderNum);
                         desktop.add(salesOrder);

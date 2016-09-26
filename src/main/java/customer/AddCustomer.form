@@ -61,14 +61,14 @@
                                           </Group>
                                           <EmptySpace min="-2" pref="82" max="-2" attributes="0"/>
                                           <Group type="103" groupAlignment="0" attributes="0">
-                                              <Component id="checkPro" min="-2" max="-2" attributes="0"/>
+                                              <Component id="Proforma" min="-2" max="-2" attributes="0"/>
                                               <Component id="fieldContact" min="-2" pref="225" max="-2" attributes="0"/>
                                           </Group>
                                       </Group>
                                       <Group type="102" alignment="0" attributes="0">
                                           <Component id="jLabel5" min="-2" max="-2" attributes="0"/>
                                           <EmptySpace min="-2" pref="277" max="-2" attributes="0"/>
-                                          <Component id="checkBill" min="-2" max="-2" attributes="0"/>
+                                          <Component id="DifferentBillingAddress" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <Component id="jLabel12" alignment="0" min="-2" max="-2" attributes="0"/>
                                       <Group type="102" alignment="0" attributes="0">
@@ -183,7 +183,7 @@
                   <Component id="fieldReference" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel3" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel20" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="checkPro" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="Proforma" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -199,7 +199,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <Group type="103" groupAlignment="3" attributes="0">
                           <Component id="jLabel5" alignment="3" min="-2" max="-2" attributes="0"/>
-                          <Component id="checkBill" alignment="3" min="-2" max="-2" attributes="0"/>
+                          <Component id="DifferentBillingAddress" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="3" attributes="0">
@@ -434,12 +434,12 @@
     </Component>
     <Component class="javax.swing.JSeparator" name="jSeparator4">
     </Component>
-    <Component class="javax.swing.JCheckBox" name="checkBill">
+    <Component class="javax.swing.JCheckBox" name="DifferentBillingAddress">
       <Properties>
         <Property name="text" type="java.lang.String" value="Different Billing Address:"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="checkBillActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="DifferentBillingAddressActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnSwitch">
@@ -462,7 +462,7 @@
         <Property name="text" type="java.lang.String" value="Proforma : "/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JCheckBox" name="checkPro">
+    <Component class="javax.swing.JCheckBox" name="Proforma">
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel21">
       <Properties>

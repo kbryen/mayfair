@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Mayfair Stock Control.
+ *
  */
 package main.java.order.purchase;
 
@@ -21,7 +20,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import static main.java.Main.seperator;
+import main.java.MayfairConstants;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellStyle;
 
@@ -488,7 +487,7 @@ public class Current extends javax.swing.JInternalFrame
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
 
-                    db.writeToLog(seperator);
+                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
                     fieldOrderNumber.setText("");
                     fieldName.setText("");
                     btnFindActionPerformed(null);
@@ -511,7 +510,7 @@ public class Current extends javax.swing.JInternalFrame
                     }
 
                     db.writeToLog("UNABLE TO CANCEL ORDER" + message);
-                    db.writeToLog(seperator);
+                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
                     JOptionPane.showMessageDialog(Current.this, "Can not cancel Purchase Order " + ord_num + " due to the below Products being on Sales Orders:" + message);
                 }
 
@@ -571,7 +570,7 @@ public class Current extends javax.swing.JInternalFrame
 
                 statement.executeUpdate(sql);
                 db.writeToLog(sql);
-                db.writeToLog(seperator);
+                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
 
                 JOptionPane.showMessageDialog(Current.this, "State of order has been updated.");
                 fieldOrderNumber.setText("");
@@ -689,7 +688,7 @@ public class Current extends javax.swing.JInternalFrame
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
 
-                    db.writeToLog(seperator);
+                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
                     fieldOrderNumber.setText("");
                     fieldName.setText("");
                     btnFindActionPerformed(null);

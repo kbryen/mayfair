@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Mayfair Stock Control.
+ *
  */
 package main.java.order.sales;
 
@@ -22,7 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
 import main.java.Main;
-import static main.java.Main.seperator;
+import main.java.MayfairConstants;
 
 /**
  *
@@ -608,7 +607,7 @@ public class AddProduct extends javax.swing.JInternalFrame
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
                     db.writeToLog("ORDER CANCELLED");
-                    db.writeToLog(seperator);
+                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
 
                     JOptionPane.showMessageDialog(AddProduct.this, "Order " + orderNum + " Saved");
                     this.dispose();
@@ -641,7 +640,7 @@ public class AddProduct extends javax.swing.JInternalFrame
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
                     db.writeToLog("ORDER CANCELLED");
-                    db.writeToLog(seperator);
+                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
 
                     JOptionPane.showMessageDialog(AddProduct.this, "Order " + orderNum + " Cancelled");
                     this.dispose();

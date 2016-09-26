@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Mayfair Stock Control.
+ *
  */
 package main.java.order.sales;
 
@@ -17,7 +16,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import static main.java.Main.seperator;
+import main.java.MayfairConstants;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -347,7 +346,7 @@ public class Past extends javax.swing.JInternalFrame
                 sql = "UPDATE sales_order SET delivered = false WHERE ord_num = " + Integer.parseInt(fieldOrderNumber.getText());
                 statement.executeUpdate(sql);
                 db.writeToLog(sql);
-                db.writeToLog(seperator);
+                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
 
                 fieldOrderNumber.setText("");
                 fieldName.setText("");
