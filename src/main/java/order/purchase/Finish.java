@@ -3,16 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Mayfair.order.purchase;
+package main.java.order.purchase;
 
-import Mayfair.*;
-import static Mayfair.Main.seperator;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import main.java.Database;
+import static main.java.Main.seperator;
 
 /**
  *

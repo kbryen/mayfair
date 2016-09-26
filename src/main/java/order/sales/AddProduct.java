@@ -3,11 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Mayfair.order.sales;
+package main.java.order.sales;
 
-import Mayfair.Database;
-import Mayfair.Main;
-import static Mayfair.Main.seperator;
 import java.awt.HeadlessException;
 import java.beans.PropertyVetoException;
 import java.sql.Connection;
@@ -23,6 +20,9 @@ import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import main.java.Database;
+import main.java.Main;
+import static main.java.Main.seperator;
 
 /**
  *

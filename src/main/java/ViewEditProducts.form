@@ -80,7 +80,7 @@
                       </Group>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
-                      <EmptySpace min="10" pref="297" max="32767" attributes="0"/>
+                      <EmptySpace min="10" pref="247" max="32767" attributes="0"/>
                       <Component id="btnOrdersReport" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="btnSalesReport" min="-2" max="-2" attributes="0"/>
@@ -279,6 +279,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JButton" name="btnDiscontinue">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Dicsontinue?"/>
+      </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDiscontinueActionPerformed"/>
       </Events>

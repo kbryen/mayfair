@@ -3,15 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Mayfair.order.purchase;
+package main.java.order.purchase;
 
-import Mayfair.Database;
 import java.awt.HeadlessException;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
+import main.java.Database;
 
 /**
  *

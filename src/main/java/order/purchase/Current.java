@@ -3,10 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Mayfair.order.purchase;
+package main.java.order.purchase;
 
-import Mayfair.Database;
-import static Mayfair.Main.seperator;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -22,6 +20,8 @@ import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import main.java.Database;
+import static main.java.Main.seperator;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellStyle;
 

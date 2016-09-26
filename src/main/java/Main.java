@@ -3,18 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Mayfair;
+package main.java;
 
-import java.awt.Desktop;
-import java.awt.event.KeyEvent;
 import java.beans.PropertyVetoException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.text.DefaultEditorKit;
-import java.io.File;
-import java.io.IOException;
 
 /**
  *
@@ -33,22 +26,6 @@ public class Main extends javax.swing.JFrame
         initComponents();
         setIcon();
         setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
-
-        JMenuItem menuItem = new JMenuItem(new DefaultEditorKit.CutAction());
-        menuItem.setText("Cut");
-        menuItem.setMnemonic(KeyEvent.VK_T);
-        menuEdit.add(menuItem);
-
-        menuItem = new JMenuItem(new DefaultEditorKit.CopyAction());
-        menuItem.setText("Copy");
-        menuItem.setMnemonic(KeyEvent.VK_C);
-        menuEdit.add(menuItem);
-
-        menuItem = new JMenuItem(new DefaultEditorKit.PasteAction());
-        menuItem.setText("Paste");
-        menuItem.setMnemonic(KeyEvent.VK_P);
-        menuEdit.add(menuItem);
-
     }
 
     /**
@@ -67,28 +44,18 @@ public class Main extends javax.swing.JFrame
         jLabel3 = new javax.swing.JLabel();
         btnNewPO = new javax.swing.JButton();
         btnCurrentPO = new javax.swing.JButton();
-        btnViewEditP = new javax.swing.JButton();
+        btnProducts = new javax.swing.JButton();
         jSeparator4 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
         jSeparator6 = new javax.swing.JSeparator();
-        jLabel6 = new javax.swing.JLabel();
         jSeparator8 = new javax.swing.JSeparator();
-        btnAddP = new javax.swing.JButton();
         jSeparator9 = new javax.swing.JSeparator();
-        jSeparator5 = new javax.swing.JSeparator();
-        btnViewEditC = new javax.swing.JButton();
-        btnAddC = new javax.swing.JButton();
+        btnCustomers = new javax.swing.JButton();
         jSeparator10 = new javax.swing.JSeparator();
-        jLabel7 = new javax.swing.JLabel();
         btnPastSO = new javax.swing.JButton();
         btnPastPO = new javax.swing.JButton();
+        btnReports = new javax.swing.JButton();
         desktop = new javax.swing.JDesktopPane();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        menuFile = new javax.swing.JMenu();
-        menuExit = new javax.swing.JMenuItem();
-        menuEdit = new javax.swing.JMenu();
-        menuHelp = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Mayfair Trunk Company Ltd.");
@@ -133,46 +100,24 @@ public class Main extends javax.swing.JFrame
             }
         });
 
-        btnViewEditP.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
-        btnViewEditP.setText("View All");
-        btnViewEditP.addActionListener(new java.awt.event.ActionListener() {
+        btnProducts.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        btnProducts.setText("Products");
+        btnProducts.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnViewEditPActionPerformed(evt);
+                btnProductsActionPerformed(evt);
             }
         });
 
         jLabel5.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
         jLabel5.setText("Orders");
 
-        jLabel6.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel6.setText("Products");
-
-        btnAddP.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
-        btnAddP.setText("Add New");
-        btnAddP.addActionListener(new java.awt.event.ActionListener() {
+        btnCustomers.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        btnCustomers.setText("Customers");
+        btnCustomers.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddPActionPerformed(evt);
+                btnCustomersActionPerformed(evt);
             }
         });
-
-        btnViewEditC.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
-        btnViewEditC.setText("View All");
-        btnViewEditC.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnViewEditCActionPerformed(evt);
-            }
-        });
-
-        btnAddC.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
-        btnAddC.setText("Add New");
-        btnAddC.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAddCActionPerformed(evt);
-            }
-        });
-
-        jLabel7.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
-        jLabel7.setText("Customers");
 
         btnPastSO.setFont(new java.awt.Font("Lucida Grande", 0, 10)); // NOI18N
         btnPastSO.setText("Past");
@@ -190,6 +135,14 @@ public class Main extends javax.swing.JFrame
             }
         });
 
+        btnReports.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        btnReports.setText("Reports");
+        btnReports.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReportsActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelSelectionLayout = new javax.swing.GroupLayout(panelSelection);
         panelSelection.setLayout(panelSelectionLayout);
         panelSelectionLayout.setHorizontalGroup(
@@ -202,26 +155,21 @@ public class Main extends javax.swing.JFrame
                     .addComponent(jSeparator6, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(btnPastSO, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                     .addComponent(jSeparator4)
-                    .addComponent(btnViewEditP, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnAddP, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnProducts, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jSeparator8)
                     .addComponent(jSeparator9)
-                    .addComponent(jSeparator5)
-                    .addComponent(btnViewEditC, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnAddC, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnCustomers, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jSeparator10)
                     .addGroup(panelSelectionLayout.createSequentialGroup()
                         .addGroup(panelSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel5)
                             .addComponent(jLabel2)
-                            .addGroup(panelSelectionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnNewPO, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(btnCurrentPO, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel7))
+                            .addComponent(jLabel3))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(btnPastPO, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(btnPastPO, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addComponent(btnNewPO, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnCurrentPO, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnReports, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelSelectionLayout.setVerticalGroup(
@@ -249,27 +197,19 @@ public class Main extends javax.swing.JFrame
                 .addComponent(btnPastPO, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(3, 3, 3)
                 .addComponent(jSeparator9, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel6)
+                .addGap(4, 4, 4)
+                .addComponent(btnProducts)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator8, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnAddP, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnViewEditP, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnCustomers)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel7)
+                .addComponent(btnReports)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator10, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnAddC, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnViewEditC, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(211, Short.MAX_VALUE))
+                .addContainerGap(279, Short.MAX_VALUE))
         );
 
         getContentPane().add(panelSelection, java.awt.BorderLayout.LINE_START);
@@ -281,74 +221,43 @@ public class Main extends javax.swing.JFrame
         desktop.setLayout(desktopLayout);
         desktopLayout.setHorizontalGroup(
             desktopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1046, Short.MAX_VALUE)
+            .addGap(0, 1030, Short.MAX_VALUE)
         );
         desktopLayout.setVerticalGroup(
             desktopLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 633, Short.MAX_VALUE)
+            .addGap(0, 656, Short.MAX_VALUE)
         );
 
         getContentPane().add(desktop, java.awt.BorderLayout.CENTER);
-
-        jMenuBar1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-
-        menuFile.setText("File");
-
-        menuExit.setText("Exit");
-        menuExit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuExitActionPerformed(evt);
-            }
-        });
-        menuFile.add(menuExit);
-
-        jMenuBar1.add(menuFile);
-
-        menuEdit.setText("Edit");
-        jMenuBar1.add(menuEdit);
-
-        menuHelp.setText("Help");
-
-        jMenuItem1.setText("User Guide");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        menuHelp.add(jMenuItem1);
-
-        jMenuBar1.add(menuHelp);
-
-        setJMenuBar(jMenuBar1);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewSOActionPerformed
-        Mayfair.order.sales.CustomerNumber salesOrder = new Mayfair.order.sales.CustomerNumber(desktop);
+        main.java.order.sales.CustomerNumber salesOrder = new main.java.order.sales.CustomerNumber(desktop);
         desktop.add(salesOrder);
         salesOrder.show();
     }//GEN-LAST:event_btnNewSOActionPerformed
 
     private void btnCurrentSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCurrentSOActionPerformed
-        Mayfair.order.sales.Current salesOrder = new Mayfair.order.sales.Current(desktop);
+        main.java.order.sales.Current salesOrder = new main.java.order.sales.Current(desktop);
         desktop.add(salesOrder);
         salesOrder.show();
     }//GEN-LAST:event_btnCurrentSOActionPerformed
 
     private void btnNewPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewPOActionPerformed
-        Mayfair.order.purchase.OrderNumber newPO = new Mayfair.order.purchase.OrderNumber(desktop);
+        main.java.order.purchase.OrderNumber newPO = new main.java.order.purchase.OrderNumber(desktop);
         desktop.add(newPO);
         newPO.show();
     }//GEN-LAST:event_btnNewPOActionPerformed
 
     private void btnCurrentPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCurrentPOActionPerformed
-        Mayfair.order.purchase.Current purchaseOrder = new Mayfair.order.purchase.Current(desktop);
+        main.java.order.purchase.Current purchaseOrder = new main.java.order.purchase.Current(desktop);
         desktop.add(purchaseOrder);
         purchaseOrder.show();
     }//GEN-LAST:event_btnCurrentPOActionPerformed
 
-    private void btnViewEditPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewEditPActionPerformed
+    private void btnProductsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProductsActionPerformed
         ViewEditProducts products = new ViewEditProducts(desktop);
         desktop.add(products);
         try
@@ -360,23 +269,9 @@ public class Main extends javax.swing.JFrame
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
         products.show();
-    }//GEN-LAST:event_btnViewEditPActionPerformed
+    }//GEN-LAST:event_btnProductsActionPerformed
 
-    private void menuExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuExitActionPerformed
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to close the program?", "Exit", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            System.exit(0);
-        }
-    }//GEN-LAST:event_menuExitActionPerformed
-
-    private void btnAddPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPActionPerformed
-        AddProduct addProd = new AddProduct();
-        desktop.add(addProd);
-        addProd.show();
-    }//GEN-LAST:event_btnAddPActionPerformed
-
-    private void btnViewEditCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewEditCActionPerformed
+    private void btnCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomersActionPerformed
         ViewEditCustomers customers = new ViewEditCustomers(desktop);
         desktop.add(customers);
         try
@@ -388,40 +283,23 @@ public class Main extends javax.swing.JFrame
             Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
         }
         customers.show();
-    }//GEN-LAST:event_btnViewEditCActionPerformed
-
-    private void btnAddCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddCActionPerformed
-        AddCustomer addCust = new AddCustomer("Add", 0);
-        desktop.add(addCust);
-        addCust.show();
-    }//GEN-LAST:event_btnAddCActionPerformed
+    }//GEN-LAST:event_btnCustomersActionPerformed
 
     private void btnPastSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPastSOActionPerformed
-        Mayfair.order.sales.Past salesOrder = new Mayfair.order.sales.Past(desktop);
+        main.java.order.sales.Past salesOrder = new main.java.order.sales.Past(desktop);
         desktop.add(salesOrder);
         salesOrder.show();
     }//GEN-LAST:event_btnPastSOActionPerformed
 
     private void btnPastPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPastPOActionPerformed
-        Mayfair.order.purchase.Past salesOrder = new Mayfair.order.purchase.Past(desktop);
+        main.java.order.purchase.Past salesOrder = new main.java.order.purchase.Past(desktop);
         desktop.add(salesOrder);
         salesOrder.show();
     }//GEN-LAST:event_btnPastPOActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        if (Desktop.isDesktopSupported())
-        {
-            try
-            {
-                File myFile = new File("src/userGuide.pdf");
-                Desktop.getDesktop().open(myFile);
-            }
-            catch (IOException ex)
-            {
-                // No PDF
-            }
-        }
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    private void btnReportsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportsActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_btnReportsActionPerformed
 
     /**
      * @param args the command line arguments
@@ -472,34 +350,24 @@ public class Main extends javax.swing.JFrame
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnAddC;
-    private javax.swing.JButton btnAddP;
     private javax.swing.JButton btnCurrentPO;
     private javax.swing.JButton btnCurrentSO;
+    private javax.swing.JButton btnCustomers;
     private javax.swing.JButton btnNewPO;
     private javax.swing.JButton btnNewSO;
     private javax.swing.JButton btnPastPO;
     private javax.swing.JButton btnPastSO;
-    private javax.swing.JButton btnViewEditC;
-    private javax.swing.JButton btnViewEditP;
+    private javax.swing.JButton btnProducts;
+    private javax.swing.JButton btnReports;
     private javax.swing.JDesktopPane desktop;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JSeparator jSeparator10;
     private javax.swing.JSeparator jSeparator4;
-    private javax.swing.JSeparator jSeparator5;
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSeparator jSeparator8;
     private javax.swing.JSeparator jSeparator9;
-    private javax.swing.JMenu menuEdit;
-    private javax.swing.JMenuItem menuExit;
-    private javax.swing.JMenu menuFile;
-    private javax.swing.JMenu menuHelp;
     private javax.swing.JPanel panelSelection;
     // End of variables declaration//GEN-END:variables
 

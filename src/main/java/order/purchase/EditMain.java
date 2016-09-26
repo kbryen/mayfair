@@ -1,7 +1,5 @@
-package Mayfair.order.purchase;
+package main.java.order.purchase;
 
-import Mayfair.*;
-import static Mayfair.Main.seperator;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +8,8 @@ import java.util.HashMap;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import main.java.Database;
+import static main.java.Main.seperator;
 
 /**
  *

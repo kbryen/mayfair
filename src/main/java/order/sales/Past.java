@@ -3,10 +3,8 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Mayfair.order.sales;
+package main.java.order.sales;
 
-import Mayfair.Database;
-import static Mayfair.Main.seperator;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -18,6 +16,8 @@ import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import main.java.Database;
+import static main.java.Main.seperator;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;

@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Mayfair;
+package main.java;
 
-import static Mayfair.Main.seperator;
+import static main.java.Main.seperator;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Mayfair;
+package main.java;
 
-import static Mayfair.Main.seperator;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
+import static main.java.Main.seperator;
 
 /**
  *

@@ -1,7 +1,5 @@
-package Mayfair.order.sales;
+package main.java.order.sales;
 
-import Mayfair.Database;
-import static Mayfair.Main.seperator;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,6 +15,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import main.java.Database;
+import static main.java.Main.seperator;
 
 /**
  *
