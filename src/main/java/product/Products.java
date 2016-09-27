@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
@@ -66,8 +67,6 @@ public class Products extends javax.swing.JInternalFrame
         btnView = new javax.swing.JButton();
         btnDelete = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
-        scrollPane1 = new javax.swing.JScrollPane();
-        table2 = new javax.swing.JTable();
         btnEdit = new javax.swing.JButton();
         Add = new javax.swing.JButton();
 
@@ -91,17 +90,17 @@ public class Products extends javax.swing.JInternalFrame
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Prod Num", "Code", "Purchase Price", "Sales Price", "Avaliable Stock", "PO Stock", "Potential (Avaliable + PO)", "Season", "Discontinued"
+                "Prod Num", "Code", "Barcode", "Purchase Price", "Sales Price", "Avaliable Stock", "PO Stock", "Potential (Avaliable + PO)", "Warehouse", "Season", "Discontinued"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false
+                false, false, true, false, false, false, false, false, true, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -122,7 +121,7 @@ public class Products extends javax.swing.JInternalFrame
         scrollPane.setViewportView(table);
         table.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         if (table.getColumnModel().getColumnCount() > 0) {
-            table.getColumnModel().getColumn(8).setResizable(false);
+            table.getColumnModel().getColumn(10).setResizable(false);
         }
 
         jLabel3.setText("Season : ");
@@ -158,39 +157,6 @@ public class Products extends javax.swing.JInternalFrame
             }
         });
 
-        table2.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null}
-            },
-            new String [] {
-                "Prod Num", "Warehouse"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Object.class, java.lang.Integer.class
-            };
-            boolean[] canEdit = new boolean [] {
-                false, false
-            };
-
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
-
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        });
-        table2.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table2.setColumnSelectionAllowed(true);
-        table2.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                table2MouseClicked(evt);
-            }
-        });
-        scrollPane1.setViewportView(table2);
-        table2.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-
         btnEdit.setText("Edit");
         btnEdit.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -212,49 +178,40 @@ public class Products extends javax.swing.JInternalFrame
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSeparator1)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator1)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(18, 18, 18)
-                                .addComponent(fieldProdCode, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jLabel3)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(comboSeason, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 162, Short.MAX_VALUE)
-                                .addComponent(btnClear)
-                                .addGap(18, 18, 18)
-                                .addComponent(btnFind)
-                                .addGap(44, 44, 44))
-                            .addComponent(jSeparator2)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(scrollPane)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(scrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 177, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(fieldProdCode, javax.swing.GroupLayout.PREFERRED_SIZE, 148, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(comboSeason, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 162, Short.MAX_VALUE)
+                        .addComponent(btnClear)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnFind)
+                        .addGap(44, 44, 44))
+                    .addComponent(jSeparator2)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(btnDelete)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnDiscontinue)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnEdit))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(btnView)))
-                                .addContainerGap())
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(Add)
-                                .addContainerGap())))))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createSequentialGroup()
+                                    .addComponent(btnDelete)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnDiscontinue)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                    .addComponent(btnEdit))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(btnView)))
+                            .addComponent(Add, javax.swing.GroupLayout.Alignment.TRAILING)))
+                    .addComponent(scrollPane))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -263,7 +220,7 @@ public class Products extends javax.swing.JInternalFrame
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(fieldProdCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -272,12 +229,10 @@ public class Products extends javax.swing.JInternalFrame
                     .addComponent(comboSeason, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnClear))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 292, Short.MAX_VALUE)
-                    .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 296, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(Add)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -296,20 +251,25 @@ public class Products extends javax.swing.JInternalFrame
         Connection con = db.getConnection();
         try
         {
-            ArrayList<Integer> prod_nums = new ArrayList();
-            ArrayList<Integer> in_stocks = new ArrayList();
-
+            List<String> prodNums = new ArrayList();
+            
             Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet rs;
             if (!comboSeason.getSelectedItem().equals("Discontinued"))
             {
-                rs = statement.executeQuery("SELECT prod_num, code, purchase_price, sales_price, in_stock, in_order, total, SSAW, discon FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' AND SSAW LIKE '%" + comboSeason.getSelectedItem() + "%' ORDER BY discon ASC, code");
+                rs = statement.executeQuery("SELECT prod_num AS prodNum FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' AND SSAW LIKE '%" + comboSeason.getSelectedItem() + "%' ORDER BY discon ASC, code, total");
             }
             else
             {
-                rs = statement.executeQuery("SELECT prod_num, code, purchase_price, sales_price, in_stock, in_order, total, SSAW, discon FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' AND discon = true ORDER BY discon ASC, code");
+                rs = statement.executeQuery("SELECT prod_num AS prodNum FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' AND discon = true ORDER BY discon ASC, code, total");
             }
-
+            
+            while(rs.next())
+            {
+                prodNums.add(rs.getString("prodNum"));
+            }
+            
+            // Clear table
             scrollPane.setVisible(true);
             getContentPane().validate();
             getContentPane().repaint();
@@ -317,49 +277,29 @@ public class Products extends javax.swing.JInternalFrame
             {
                 ((DefaultTableModel) table.getModel()).removeRow(0);
             }
-            int columns = rs.getMetaData().getColumnCount();
-            while (rs.next())
+            int rowNum = 0;
+            
+            for(String prodNum : prodNums)
             {
-                int prod_num = rs.getInt("prod_num");
-                int in_stock = rs.getInt("in_stock");
-                prod_nums.add(prod_num);
-                in_stocks.add(in_stock);
-
-                Object[] row = new Object[columns];
-                for (int i = 1; i <= columns; i++)
+                rs = statement.executeQuery("SELECT products.prod_num AS prodNum, products.code AS code, products.barcode AS barcode, products.purchase_price AS purchasePrice, products.sales_price AS salesPrice, products.in_stock AS availableStock, products.in_order AS purchaseOrderStock, products.total AS potentialStock, IFNULL(SUM(sales_order_details.fromStock) + products.in_stock, 0) AS warehouseStock, products.SSAW AS season, products.discon AS discontinued FROM sales_order_details LEFT JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num RIGHT JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.dispatched = false AND sales_order.delivered = false AND products.prod_num = " + prodNum);
+            
+                int columns = rs.getMetaData().getColumnCount();
+                while (rs.next())
                 {
-                    row[i - 1] = rs.getObject(i);
+                    Object[] row = new Object[columns];
+                    for (int i = 1; i <= columns; i++)
+                    {
+                        row[i - 1] = rs.getObject(i);
+                    }
+                    ((DefaultTableModel) table.getModel()).insertRow(rowNum++, row);
                 }
-                ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
             }
-
-            DefaultTableModel model = (DefaultTableModel) table2.getModel();
-            model.setRowCount(0);
-
-            for (int i = 0; i < prod_nums.size(); i++)
-            {
-                int prod_num = prod_nums.get(i);
-
-                rs = statement.executeQuery("SELECT SUM(sales_order_details.fromStock) AS total FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num WHERE sales_order_details.prod_num = " + prod_num + " AND sales_order.dispatched = false AND sales_order.delivered = false");
-                rs.next();
-
-                int in_stock = in_stocks.get(i);
-                int total = rs.getInt("total");
-
-                int stock = in_stock + total;
-                Object[] row =
-                {
-                    prod_num, stock
-                };
-                //table2.setValueAt(stock, i, 0);
-                model.insertRow(i, row);
-            }
-
             btnDiscontinue.setVisible(false);
             btnView.setEnabled(false);
             btnDelete.setEnabled(false);
             btnEdit.setEnabled(false);
-        }
+            
+        }   
         catch (SQLException e)
         {
             JOptionPane.showMessageDialog(Products.this, e.getMessage());
@@ -379,7 +319,7 @@ public class Products extends javax.swing.JInternalFrame
         fieldProdCode.setText((String) table.getValueAt(table.getSelectedRow(), 1));
 
         btnDiscontinue.setVisible(true);
-        if ((boolean) table.getValueAt(table.getSelectedRow(), 8))
+        if ((boolean) table.getValueAt(table.getSelectedRow(), 10))
         {
             btnDiscontinue.setText("Undiscontinue");
         }
@@ -520,11 +460,11 @@ public class Products extends javax.swing.JInternalFrame
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
         fieldProdCode.setText("");
+        btnDiscontinue.setVisible(false);
+        btnView.setEnabled(false);
+        btnDelete.setEnabled(false);
+        btnEdit.setEnabled(false);
     }//GEN-LAST:event_btnClearActionPerformed
-
-    private void table2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table2MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_table2MouseClicked
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
         Edit prod = new Edit(desktop, (int) table.getValueAt(table.getSelectedRow(), 0));
@@ -555,8 +495,6 @@ public class Products extends javax.swing.JInternalFrame
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JScrollPane scrollPane;
-    private javax.swing.JScrollPane scrollPane1;
     private javax.swing.JTable table;
-    private javax.swing.JTable table2;
     // End of variables declaration//GEN-END:variables
 }

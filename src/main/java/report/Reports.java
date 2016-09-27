@@ -106,6 +106,7 @@ public class Reports extends javax.swing.JInternalFrame
         setMaximizable(true);
         setResizable(true);
         setTitle("Reports");
+        setPreferredSize(new java.awt.Dimension(630, 600));
 
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
         jLabel1.setText("Reports");
@@ -148,10 +149,10 @@ public class Reports extends javax.swing.JInternalFrame
             }
         });
 
-        jLabel6.setFont(new java.awt.Font("Lucida Grande", 2, 13)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Lucida Grande", 2, 10)); // NOI18N
         jLabel6.setText("Start Date");
 
-        jLabel7.setFont(new java.awt.Font("Lucida Grande", 2, 13)); // NOI18N
+        jLabel7.setFont(new java.awt.Font("Lucida Grande", 2, 10)); // NOI18N
         jLabel7.setText("End Date");
 
         btnFind.setText("Find");
@@ -161,7 +162,7 @@ public class Reports extends javax.swing.JInternalFrame
             }
         });
 
-        jLabel8.setFont(new java.awt.Font("Lucida Grande", 2, 13)); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Lucida Grande", 2, 10)); // NOI18N
         jLabel8.setText("Product Search");
 
         comboProducts.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -260,34 +261,31 @@ public class Reports extends javax.swing.JInternalFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnOutOfStockReport)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel6)
-                            .addComponent(jLabel7))
-                        .addGap(7, 7, 7)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnPOMadeDate)
-                            .addComponent(dateSPO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(dateEPO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnSOMadeDate)
-                            .addComponent(dateSSO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(dateESO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(52, 52, 52))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel8)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(labelProduct, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnFind)
-                            .addComponent(btnSOMadeProd)
-                            .addComponent(comboProducts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addComponent(jLabel7))
+                .addGap(7, 7, 7)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnPOMadeDate)
+                    .addComponent(dateSPO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dateEPO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnSOMadeDate)
+                    .addComponent(dateSSO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(dateESO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel8)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelProduct, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnFind)
+                    .addComponent(btnSOMadeProd)
+                    .addComponent(comboProducts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -298,12 +296,10 @@ public class Reports extends javax.swing.JInternalFrame
                 .addComponent(btnCustomers)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
                 .addComponent(btnCreate)
                 .addContainerGap())
         );
-
-        getAccessibleContext().setAccessibleName("Reports");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -773,13 +769,17 @@ public class Reports extends javax.swing.JInternalFrame
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(false);
         btnSOMadeProd.setSelected(false);
+        
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
+        
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
+        
         labelProduct.setEnabled(false);
         btnFind.setEnabled(false);
         comboProducts.setEnabled(false);
+        
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnAvailableStockReportActionPerformed
 
@@ -789,13 +789,17 @@ public class Reports extends javax.swing.JInternalFrame
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(false);
         btnSOMadeProd.setSelected(false);
+        
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
+        
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
+        
         labelProduct.setEnabled(false);
         btnFind.setEnabled(false);
         comboProducts.setEnabled(false);
+        
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnOutOfStockReportActionPerformed
 
@@ -805,13 +809,17 @@ public class Reports extends javax.swing.JInternalFrame
         btnPOMadeDate.setSelected(true);
         btnSOMadeDate.setSelected(false);
         btnSOMadeProd.setSelected(false);
+        
         dateSPO.setEnabled(true);
         dateEPO.setEnabled(true);
+        
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
+        
         labelProduct.setEnabled(false);
         btnFind.setEnabled(false);
         comboProducts.setEnabled(false);
+        
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnPOMadeDateActionPerformed
 
@@ -821,13 +829,17 @@ public class Reports extends javax.swing.JInternalFrame
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(true);
         btnSOMadeProd.setSelected(false);
+        
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
+        
         dateSSO.setEnabled(true);
         dateESO.setEnabled(true);
+        
         labelProduct.setEnabled(false);
         btnFind.setEnabled(false);
         comboProducts.setEnabled(false);
+        
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnSOMadeDateActionPerformed
 
@@ -837,13 +849,17 @@ public class Reports extends javax.swing.JInternalFrame
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(false);
         btnSOMadeProd.setSelected(true);
+        
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
+        
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
+        
         labelProduct.setEnabled(true);
         btnFind.setEnabled(true);
         comboProducts.setEnabled(true);
+        
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnSOMadeProdActionPerformed
 

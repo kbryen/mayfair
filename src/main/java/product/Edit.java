@@ -184,14 +184,11 @@ public class Edit extends javax.swing.JInternalFrame
         jLabel6 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         btnSave = new javax.swing.JButton();
-        jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
-        jLabel13 = new javax.swing.JLabel();
         btnRevert = new javax.swing.JButton();
         jLabel14 = new javax.swing.JLabel();
         labelProdNum = new javax.swing.JLabel();
-        jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
         labelBarCode = new javax.swing.JTextField();
         labelProdCode = new javax.swing.JTextField();
@@ -209,13 +206,16 @@ public class Edit extends javax.swing.JInternalFrame
         jSeparator3 = new javax.swing.JSeparator();
         jSeparator4 = new javax.swing.JSeparator();
         jSeparator6 = new javax.swing.JSeparator();
-        labelInStock = new javax.swing.JLabel();
-        labelWarehouseStock = new javax.swing.JLabel();
-        labelOnOrder = new javax.swing.JLabel();
+        btnOverrideStock = new javax.swing.JButton();
         btnInStock = new javax.swing.JButton();
         btnWarehouseStock = new javax.swing.JButton();
         btnOnOrder = new javax.swing.JButton();
-        btnOverrideStock = new javax.swing.JButton();
+        labelInStock = new javax.swing.JLabel();
+        labelOnOrder = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
+        jLabel15 = new javax.swing.JLabel();
+        labelWarehouseStock = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
 
         jTextField1.setText("jTextField1");
 
@@ -232,7 +232,7 @@ public class Edit extends javax.swing.JInternalFrame
         setResizable(true);
         setTitle("Edit Product");
         setMinimumSize(new java.awt.Dimension(0, 0));
-        setPreferredSize(new java.awt.Dimension(400, 550));
+        setPreferredSize(new java.awt.Dimension(400, 700));
 
         labelHeader.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
         labelHeader.setText("Product Code");
@@ -256,13 +256,9 @@ public class Edit extends javax.swing.JInternalFrame
             }
         });
 
-        jLabel9.setText("Available Stock:");
-
         jLabel10.setText("Purchase Price: ");
 
         jLabel12.setText("Season: ");
-
-        jLabel13.setText("On Order:");
 
         btnRevert.setText("Revert Changes");
         btnRevert.addActionListener(new java.awt.event.ActionListener() {
@@ -274,8 +270,6 @@ public class Edit extends javax.swing.JInternalFrame
         jLabel14.setText("Product Number:");
 
         labelProdNum.setText("0");
-
-        jLabel15.setText("Warehouse Stock:");
 
         jLabel16.setText("Barcode:");
 
@@ -290,12 +284,14 @@ public class Edit extends javax.swing.JInternalFrame
             }
         });
 
-        labelInStock.setText("0");
+        btnOverrideStock.setText("Override Stock Count");
+        btnOverrideStock.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnOverrideStockActionPerformed(evt);
+            }
+        });
 
-        labelWarehouseStock.setText("0");
-
-        labelOnOrder.setText("0");
-
+        btnInStock.setFont(new java.awt.Font("Lucida Grande", 0, 8)); // NOI18N
         btnInStock.setText("?");
         btnInStock.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -303,6 +299,7 @@ public class Edit extends javax.swing.JInternalFrame
             }
         });
 
+        btnWarehouseStock.setFont(new java.awt.Font("Lucida Grande", 0, 8)); // NOI18N
         btnWarehouseStock.setText("?");
         btnWarehouseStock.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -310,6 +307,7 @@ public class Edit extends javax.swing.JInternalFrame
             }
         });
 
+        btnOnOrder.setFont(new java.awt.Font("Lucida Grande", 0, 8)); // NOI18N
         btnOnOrder.setText("?");
         btnOnOrder.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -317,12 +315,17 @@ public class Edit extends javax.swing.JInternalFrame
             }
         });
 
-        btnOverrideStock.setText("Override Stock Count");
-        btnOverrideStock.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnOverrideStockActionPerformed(evt);
-            }
-        });
+        labelInStock.setText("0");
+
+        labelOnOrder.setText("0");
+
+        jLabel13.setText("On Order:");
+
+        jLabel15.setText("Warehouse Stock:");
+
+        labelWarehouseStock.setText("0");
+
+        jLabel9.setText("Available Stock:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -392,31 +395,28 @@ public class Edit extends javax.swing.JInternalFrame
                             .addComponent(jLabel14)
                             .addComponent(labelHeader)
                             .addComponent(btnOverrideStock, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 230, Short.MAX_VALUE)))
-                .addContainerGap())
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGap(0, 127, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnInStock, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnOnOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel9)
+                        .addComponent(jLabel13)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(labelInStock))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(btnWarehouseStock, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnOnOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(labelOnOrder))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnInStock, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnWarehouseStock, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel13)
+                                .addComponent(jLabel9)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(labelOnOrder))
+                                .addComponent(labelInStock))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel15)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(labelWarehouseStock)))))
-                .addGap(15, 15, 15))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -470,27 +470,30 @@ public class Edit extends javax.swing.JInternalFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(labelInStock)
-                    .addComponent(btnInStock))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(labelInStock)
+                        .addComponent(jLabel9))
+                    .addComponent(btnInStock, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel15)
-                    .addComponent(labelWarehouseStock)
-                    .addComponent(btnWarehouseStock))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(labelWarehouseStock)
+                        .addComponent(jLabel15))
+                    .addComponent(btnWarehouseStock, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel13)
-                    .addComponent(labelOnOrder)
-                    .addComponent(btnOnOrder))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(labelOnOrder)
+                        .addComponent(btnOnOrder, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(labelComments, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
                 .addComponent(btnRevert)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -499,8 +502,6 @@ public class Edit extends javax.swing.JInternalFrame
                     .addComponent(btnOverrideStock))
                 .addContainerGap())
         );
-
-        getAccessibleContext().setAccessibleName("Edit Product");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -563,18 +564,6 @@ public class Edit extends javax.swing.JInternalFrame
         // TODO add your handling code here:
     }//GEN-LAST:event_btnCancel1ActionPerformed
 
-    private void btnInStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInStockActionPerformed
-        JOptionPane.showMessageDialog(Edit.this, "Instantly available stock which is currently in the warehouse and not on an active sales order.");
-    }//GEN-LAST:event_btnInStockActionPerformed
-
-    private void btnWarehouseStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWarehouseStockActionPerformed
-        JOptionPane.showMessageDialog(Edit.this, "Instantly available stock + stock which is on an active sales but not dispatched from the warehouse.");
-    }//GEN-LAST:event_btnWarehouseStockActionPerformed
-
-    private void btnOnOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOnOrderActionPerformed
-        JOptionPane.showMessageDialog(Edit.this, "Stock on undelivered active purchase orders and not on an active sales order.");
-    }//GEN-LAST:event_btnOnOrderActionPerformed
-
     private void btnOverrideStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOverrideStockActionPerformed
             try 
             {
@@ -615,6 +604,18 @@ public class Edit extends javax.swing.JInternalFrame
                 JOptionPane.showMessageDialog(Edit.this, "Warehouse stock must be a positive whole number");
             }
     }//GEN-LAST:event_btnOverrideStockActionPerformed
+
+    private void btnInStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInStockActionPerformed
+        JOptionPane.showMessageDialog(Edit.this, "Instantly available stock which is currently in the warehouse and not on an active sales order.");
+    }//GEN-LAST:event_btnInStockActionPerformed
+
+    private void btnWarehouseStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWarehouseStockActionPerformed
+        JOptionPane.showMessageDialog(Edit.this, "Instantly available stock + stock which is on an active sales but not dispatched from the warehouse.");
+    }//GEN-LAST:event_btnWarehouseStockActionPerformed
+
+    private void btnOnOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOnOrderActionPerformed
+        JOptionPane.showMessageDialog(Edit.this, "Stock on undelivered active purchase orders and not on an active sales order.");
+    }//GEN-LAST:event_btnOnOrderActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

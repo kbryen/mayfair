@@ -145,7 +145,7 @@ public class Add extends javax.swing.JInternalFrame
         setResizable(true);
         setTitle("Add Product");
         setMinimumSize(new java.awt.Dimension(0, 0));
-        setPreferredSize(new java.awt.Dimension(400, 550));
+        setPreferredSize(new java.awt.Dimension(400, 600));
 
         labelHeader.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
         labelHeader.setText("New Product");
