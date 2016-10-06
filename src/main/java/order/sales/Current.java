@@ -22,6 +22,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
 import main.java.MayfairConstants;
+import static main.java.MayfairConstants.DISPATCH_NOTE_TEMPLATE;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.CellStyle;
@@ -742,8 +743,7 @@ public class Current extends javax.swing.JInternalFrame
                 rs.next();
                 temp = rs.getString("ord_date").split(" ");
                 ordDate = temp[0];
-                temp = rs.getString("del_date").split(" ");
-                delDate = temp[0];
+                delDate = rs.getString("del_date");
                 // Delivery Instructions
                 if (pro)
                 {
@@ -770,9 +770,7 @@ public class Current extends javax.swing.JInternalFrame
 
             try (FileOutputStream fileOut = new FileOutputStream("S:/VELTA/Automatically Created/VELTA ORDER - " + custRef + " " + ordDate + ".xls"))
             {
-                JOptionPane.showMessageDialog(Current.this, "778");
-                HSSFWorkbook wb = this.getWorkBook("S:/MayfairApplication/dist/OrderImport.xls");
-                JOptionPane.showMessageDialog(Current.this, "780");
+                HSSFWorkbook wb = this.getWorkBook(DISPATCH_NOTE_TEMPLATE);
                 HSSFSheet worksheet = wb.getSheet("Import File");
 //                CellStyle editableStyle = wb.createCellStyle();
 //                editableStyle.setLocked(false);
@@ -930,7 +928,7 @@ public class Current extends javax.swing.JInternalFrame
                     {
                         HSSFRow main = worksheet.getRow(i++);
                         HSSFCell acc = main.getCell(0);
-                        acc.setCellValue("MAYFAIR");
+                        acc.setCellValue("MAYTRUMDT");
 
                         HSSFCell code = main.getCell(2);
                         code.setCellValue(custRef);
@@ -938,8 +936,8 @@ public class Current extends javax.swing.JInternalFrame
                         HSSFCell date = main.getCell(5);
                         date.setCellValue(delDate);
 
-                        HSSFCell time = main.getCell(6);
-                        time.setCellValue(delIns);
+//                        HSSFCell time = main.getCell(6);
+//                        time.setCellValue(delIns);
 
                         HSSFCell name = main.getCell(7);
                         name.setCellValue(custName);

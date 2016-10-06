@@ -196,27 +196,14 @@ public class CustomerNumber extends javax.swing.JInternalFrame
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
         ArrayList<String> customers = new ArrayList<>();
-        Connection con = db.getConnection();
-        try
+        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            if (!fieldCustomerNumber.getText().equals(""))
+            ResultSet rs = statement.executeQuery("SELECT cust_num, name FROM customers WHERE cust_num LIKE '%" + fieldCustomerNumber.getText() + "%' AND name LIKE '%" + fieldCustomerName.getText() + "%' ORDER BY cust_num ASC");
+            while (rs.next())
             {
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = statement.executeQuery("SELECT cust_num, name FROM customers WHERE cust_num LIKE '%" + fieldCustomerNumber.getText() + "%' ORDER BY cust_num ASC");
-                while (rs.next())
-                {
-                    customers.add(rs.getString("cust_num") + " " + rs.getString("name"));
-                }
+                customers.add(rs.getString("cust_num") + " - " + rs.getString("name"));
             }
-            else
-            {
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = statement.executeQuery("SELECT cust_num, name FROM customers WHERE name LIKE '%" + fieldCustomerName.getText() + "%' ORDER BY cust_num ASC");
-                while (rs.next())
-                {
-                    customers.add(rs.getString("cust_num") + " " + rs.getString("name"));
-                }
-            }
+            
             comboFindCustomers.setVisible(true);
             comboFindCustomers.setModel(new javax.swing.DefaultComboBoxModel(customers.toArray()));
             btnNext.setEnabled(true);
@@ -224,15 +211,6 @@ public class CustomerNumber extends javax.swing.JInternalFrame
         catch (SQLException e)
         {
             JOptionPane.showMessageDialog(CustomerNumber.this, e.getMessage());
-        }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
@@ -283,12 +261,24 @@ public class CustomerNumber extends javax.swing.JInternalFrame
     }//GEN-LAST:event_fieldCustomerNumberActionPerformed
 
     private void comboFindCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboFindCustomersActionPerformed
-        String[] selected = ((String) comboFindCustomers.getSelectedItem()).split(" ");
+        String[] selected = ((String) comboFindCustomers.getSelectedItem()).split(" - ", 2);
         fieldCustomerNumber.setText(selected[0]);
-        fieldCustomerName.setText("");
-        for (int i = 1; i < selected.length; i++)
+        fieldCustomerName.setText(selected[1]);
+        
+        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            fieldCustomerName.setText(fieldCustomerName.getText() + " " + selected[i]);
+            ResultSet rs = statement.executeQuery("SELECT proforma FROM customers WHERE cust_num = " + fieldCustomerNumber.getText());
+            rs.next();
+            boolean proforma = rs.getBoolean("proforma");
+            
+            if(proforma)
+            {
+                JOptionPane.showMessageDialog(CustomerNumber.this, "WARNING: " + fieldCustomerName.getText() + " is a pro forma.\nDo not send stock before the pro forma invoice is sent.");
+            }
+        }
+        catch (SQLException e)
+        {
+            JOptionPane.showMessageDialog(CustomerNumber.this, e.getMessage());
         }
     }//GEN-LAST:event_comboFindCustomersActionPerformed
 

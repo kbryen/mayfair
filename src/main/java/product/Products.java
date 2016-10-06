@@ -93,14 +93,14 @@ public class Products extends javax.swing.JInternalFrame
                 {null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Prod Num", "Code", "Barcode", "Purchase Price", "Sales Price", "Avaliable Stock", "PO Stock", "Potential (Avaliable + PO)", "Warehouse", "Season", "Discontinued"
+                "Product Number", "Code", "Barcode", "Purchase Price", "Sales Price", "Avaliable Stock", "PO Stock", "Potential Stock", "Warehouse Stock", "Season", "Discontinued"
             }
         ) {
             Class[] types = new Class [] {
                 java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, true, false, false, false, false, false, true, false, false
+                false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {

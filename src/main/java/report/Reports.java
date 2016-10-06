@@ -23,6 +23,9 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import main.java.Database;
+import static main.java.MayfairConstants.PROD_SALES_ORDERS_DIR;
+import static main.java.MayfairConstants.SALES_PURCHASE_ORDERS_DIR;
+import static main.java.MayfairConstants.STOCK_REPORTS_DIR;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -312,7 +315,7 @@ public class Reports extends javax.swing.JInternalFrame
             DateFormat df = new SimpleDateFormat("MM-dd-yy");
             Date d = new Date();
             String date = df.format(d);
-            try (FileOutputStream fileOut = new FileOutputStream("S:/Stock Reports/Stock Report " + date + ".xls"))
+            try (FileOutputStream fileOut = new FileOutputStream(STOCK_REPORTS_DIR + "Stock Report " + date + ".xls"))
             {
                 HSSFWorkbook wb = new HSSFWorkbook();
                 HSSFSheet worksheet = wb.createSheet(date);
@@ -456,7 +459,7 @@ public class Reports extends javax.swing.JInternalFrame
             DateFormat df = new SimpleDateFormat("MM-dd-yy");
             Date d = new Date();
             String date = df.format(d);
-            try (FileOutputStream fileOut = new FileOutputStream("S:/Stock Reports/Out of Stock Report " + date + ".xls"))
+            try (FileOutputStream fileOut = new FileOutputStream(STOCK_REPORTS_DIR + "Out of Stock Report " + date + ".xls"))
             {
                 HSSFWorkbook wb = new HSSFWorkbook();
                 HSSFSheet worksheet = wb.createSheet(date);
@@ -548,7 +551,7 @@ public class Reports extends javax.swing.JInternalFrame
             String reportName = JOptionPane.showInputDialog("Please give the report a name \nFor example: Nov 30 - Spring Sales").trim();
             ResultSet rs = statement.executeQuery("SELECT products.code, purchase_order_details.quantity FROM purchase_order_details JOIN purchase_order ON purchase_order_details.ord_num = purchase_order.ord_num JOIN products ON purchase_order_details.prod_num = products.prod_num WHERE del_date >= '" + startDate + "' AND del_date <= '" + endDate + "'");
             
-            try (FileWriter writer = new FileWriter("S:/Sales & Orders Reports/" + reportName + ".csv"))
+            try (FileWriter writer = new FileWriter(SALES_PURCHASE_ORDERS_DIR + reportName + ".csv"))
             {
                 HashMap<String, Integer> map = new HashMap();
                 // 2016-08-26--2016-09-26
@@ -604,7 +607,7 @@ public class Reports extends javax.swing.JInternalFrame
 
             ResultSet rs = statement.executeQuery("SELECT products.code, sales_order_details.fromOrder, sales_order_details.fromStock FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num JOIN products ON sales_order_details.prod_num = products.prod_num WHERE del_date >= '" + startDate + "' AND del_date <= '" + endDate + "'");
 
-            try (FileWriter writer = new FileWriter("S:/Sales & Orders Reports/" + reportName + ".csv"))
+            try (FileWriter writer = new FileWriter(SALES_PURCHASE_ORDERS_DIR + reportName + ".csv"))
             {
                 HashMap<String, Integer> map = new HashMap();
 
@@ -663,7 +666,7 @@ public class Reports extends javax.swing.JInternalFrame
                 rs.next();
                 int prod_num = rs.getInt("prod_num");
                 
-                try (FileOutputStream fileOut = new FileOutputStream("S:/Order Reports/Order Report - Prod num " + prod_num + ".xls")) 
+                try (FileOutputStream fileOut = new FileOutputStream(PROD_SALES_ORDERS_DIR + prodCode + " - Sales Orders.xls")) 
                 {
                     HSSFWorkbook wb = new HSSFWorkbook();
                     HSSFSheet worksheet = wb.createSheet(String.valueOf(prod_num));

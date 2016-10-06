@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
 import main.java.MayfairConstants;
+import static main.java.MayfairConstants.PURCHASE_ORDERS_DIR;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellStyle;
 
@@ -740,7 +741,7 @@ public class Current extends javax.swing.JInternalFrame
                 price = rs.getDouble("price");
 
                 FileOutputStream fileOut;
-                fileOut = new FileOutputStream("S://Purchase Orders/PURCHASE ORDER - " + ord_num + ".xls");
+                fileOut = new FileOutputStream(PURCHASE_ORDERS_DIR + "/PURCHASE ORDER - " + ord_num + ".xls");
 
                 HSSFWorkbook wb = new HSSFWorkbook();
                 HSSFSheet worksheet = wb.createSheet(ord_num);
