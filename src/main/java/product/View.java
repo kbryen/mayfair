@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import main.java.Database;
 import static main.java.MayfairConstants.*;
 
@@ -437,15 +438,15 @@ public class View extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnViewSalesActionPerformed
 
     private void btnInStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInStockActionPerformed
-        JOptionPane.showMessageDialog(View.this, "Instantly available stock which is currently in the warehouse and not on an active sales order.");
+        JOptionPane.showMessageDialog(View.this, "Instantly available stock which is currently in the warehouse and not on an active sales order.", "Available Stock", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnInStockActionPerformed
 
     private void btnWarehouseStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWarehouseStockActionPerformed
-        JOptionPane.showMessageDialog(View.this, "Instantly available stock + stock which is on an active sales but not dispatched from the warehouse.");
+        JOptionPane.showMessageDialog(View.this, "Instantly available stock + stock which is on an active sales order but not dispatched from the warehouse.", "Warehouse Stock", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnWarehouseStockActionPerformed
 
     private void btnOnOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOnOrderActionPerformed
-        JOptionPane.showMessageDialog(View.this, "Stock on undelivered active purchase orders and not on an active sales order.");
+        JOptionPane.showMessageDialog(View.this, "Stock on undelivered active purchase orders and not on an active sales order.", "On Order", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnOnOrderActionPerformed
 
 

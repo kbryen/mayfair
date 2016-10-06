@@ -11,6 +11,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import main.java.Database;
 
 /**
@@ -273,7 +274,7 @@ public class CustomerNumber extends javax.swing.JInternalFrame
             
             if(proforma)
             {
-                JOptionPane.showMessageDialog(CustomerNumber.this, "WARNING: " + fieldCustomerName.getText() + " is a pro forma.\nDo not send stock before the pro forma invoice is sent.");
+                JOptionPane.showMessageDialog(CustomerNumber.this, "<html><b>WARNING:</b> " + fieldCustomerName.getText() + " is a pro forma.</html>\nDo not send stock before the pro forma invoice is sent.","Pro Forma Alert",WARNING_MESSAGE);
             }
         }
         catch (SQLException e)
