@@ -4,7 +4,6 @@
  */
 package main.java.customer;
 
-import main.java.customer.AddCustomer;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;

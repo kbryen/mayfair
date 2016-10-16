@@ -4,13 +4,13 @@
  */
 package main.java.product;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import javax.swing.table.DefaultTableModel;
 import main.java.Database;
 import static main.java.MayfairConstants.*;
 
@@ -47,9 +47,8 @@ public class View extends javax.swing.JInternalFrame
 
     private void requestDB()
     {
-        try (Connection con = db.getConnection())
+        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet rs = statement.executeQuery("SELECT code, barcode, leather, style, colour, sales_price, purchase_price, SSAW, in_stock, in_order, comments FROM products WHERE prod_num = " + prodNum);
             rs.next();
             
@@ -92,8 +91,49 @@ public class View extends javax.swing.JInternalFrame
         labelSalesPrice.setText(String.valueOf(salesPrice));
         labelPurchasePrice.setText(String.valueOf(purchasePrice));
         labelInStock.setText(String.valueOf(inStock));
-        labelOnOrder.setText(String.valueOf(onOrder));
         labelWarehouseStock.setText(String.valueOf(warehouseStock));
+        
+        // Show a breakdown of stock on purchase orders
+        labelOnOrder.setText(String.valueOf(onOrder));
+        if(onOrder == 0)
+        {
+            scrollPane.setVisible(false);
+            tableOnOrder.setVisible(false);
+        }
+        else
+        {
+            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+            {
+                ResultSet rs = statement.executeQuery("SELECT purchase_order.ord_num, purchase_order_details.avaliable, DATE(purchase_order.del_date) AS del_date FROM purchase_order JOIN purchase_order_details ON purchase_order.ord_num = purchase_order_details.ord_num WHERE purchase_order.delivered=false AND purchase_order_details.prod_num = " + prodNum);
+            
+                scrollPane.setVisible(true);
+                tableOnOrder.setVisible(true);
+                getContentPane().validate();
+                getContentPane().repaint();
+                while (tableOnOrder.getRowCount() > 0)
+                {
+                    ((DefaultTableModel) tableOnOrder.getModel()).removeRow(0);
+                }
+                int columns = rs.getMetaData().getColumnCount();
+                while (rs.next())
+                {
+                    Object[] row = new Object[columns];
+                    for (int i = 1; i <= columns; i++)
+                    {
+                        row[i - 1] = rs.getObject(i);
+                    }
+                    ((DefaultTableModel) tableOnOrder.getModel()).insertRow(rs.getRow() - 1, row);
+                }
+                
+                tableOnOrder.setSize(tableOnOrder.getWidth(),tableOnOrder.getRowCount() * tableOnOrder.getRowHeight());
+                scrollPane.setSize(tableOnOrder.getSize());
+                getContentPane().setSize(scrollPane.getSize());
+            }
+            catch (SQLException e)
+            {
+                JOptionPane.showMessageDialog(View.this, e.getMessage());
+            }
+        }
     }
 
     /**
@@ -144,6 +184,8 @@ public class View extends javax.swing.JInternalFrame
         btnInStock = new javax.swing.JButton();
         btnWarehouseStock = new javax.swing.JButton();
         btnOnOrder = new javax.swing.JButton();
+        scrollPane = new javax.swing.JScrollPane();
+        tableOnOrder = new javax.swing.JTable();
 
         setClosable(true);
         setIconifiable(true);
@@ -151,7 +193,7 @@ public class View extends javax.swing.JInternalFrame
         setResizable(true);
         setTitle("View Product");
         setMinimumSize(new java.awt.Dimension(0, 0));
-        setPreferredSize(new java.awt.Dimension(400, 600));
+        setPreferredSize(new java.awt.Dimension(500, 650));
 
         labelHeader.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
         labelHeader.setText("Product Code");
@@ -250,6 +292,34 @@ public class View extends javax.swing.JInternalFrame
             }
         });
 
+        tableOnOrder.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null},
+                {null, null, null},
+                {null, null, null},
+                {null, null, null}
+            },
+            new String [] {
+                "Order Number", "Quantity", "Delivery Date"
+            }
+        ) {
+            Class[] types = new Class [] {
+                java.lang.String.class, java.lang.Integer.class, java.lang.Object.class
+            };
+            boolean[] canEdit = new boolean [] {
+                true, false, false
+            };
+
+            public Class getColumnClass(int columnIndex) {
+                return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        scrollPane.setViewportView(tableOnOrder);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -257,16 +327,21 @@ public class View extends javax.swing.JInternalFrame
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel8)
-                        .addContainerGap(298, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(labelComments)
+                        .addContainerGap())
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jSeparator4)
                             .addComponent(jSeparator5)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(labelHeader)
-                                .addGap(0, 130, Short.MAX_VALUE))
+                                .addGap(0, 135, Short.MAX_VALUE))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel14)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -293,12 +368,9 @@ public class View extends javax.swing.JInternalFrame
                             .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addComponent(btnViewSales)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnClose))
-                                    .addComponent(labelComments, javax.swing.GroupLayout.Alignment.TRAILING))))
+                                .addComponent(btnViewSales)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnClose)))
                         .addContainerGap())
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -340,7 +412,7 @@ public class View extends javax.swing.JInternalFrame
                         .addGap(10, 10, 10))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jSeparator6)
-                        .addGap(2, 2, 2))))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -411,7 +483,9 @@ public class View extends javax.swing.JInternalFrame
                         .addComponent(labelOnOrder)
                         .addComponent(btnOnOrder, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -490,5 +564,7 @@ public class View extends javax.swing.JInternalFrame
     private javax.swing.JLabel labelSeason;
     private javax.swing.JLabel labelStyle;
     private javax.swing.JLabel labelWarehouseStock;
+    private javax.swing.JScrollPane scrollPane;
+    private javax.swing.JTable tableOnOrder;
     // End of variables declaration//GEN-END:variables
 }

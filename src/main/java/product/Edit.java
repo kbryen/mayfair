@@ -233,7 +233,7 @@ public class Edit extends javax.swing.JInternalFrame
         setResizable(true);
         setTitle("Edit Product");
         setMinimumSize(new java.awt.Dimension(0, 0));
-        setPreferredSize(new java.awt.Dimension(400, 700));
+        setPreferredSize(new java.awt.Dimension(500, 700));
 
         labelHeader.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
         labelHeader.setText("Product Code");
@@ -396,7 +396,7 @@ public class Edit extends javax.swing.JInternalFrame
                             .addComponent(jLabel14)
                             .addComponent(labelHeader)
                             .addComponent(btnOverrideStock, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 127, Short.MAX_VALUE))
+                        .addGap(0, 307, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(btnOnOrder, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)

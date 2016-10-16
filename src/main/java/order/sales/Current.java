@@ -4,30 +4,29 @@
  */
 package main.java.order.sales;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.YES_NO_OPTION;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
 import main.java.MayfairConstants;
+import static main.java.MayfairConstants.DISPATCH_NOTES_DIR;
 import static main.java.MayfairConstants.DISPATCH_NOTE_TEMPLATE;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 /**
  *
@@ -342,10 +341,8 @@ public class Current extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnViewSummaryActionPerformed
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        Connection con = db.getConnection();
-        try
+        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
             ResultSet rs;
             if (!fieldOrderNumber.getText().equals(""))
             {
@@ -391,15 +388,6 @@ public class Current extends javax.swing.JInternalFrame
         {
             JOptionPane.showMessageDialog(Current.this, e.getMessage());
         }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
-        }
     }//GEN-LAST:event_btnFindActionPerformed
 
     private void fieldOrderNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldOrderNumberActionPerformed
@@ -431,10 +419,9 @@ public class Current extends javax.swing.JInternalFrame
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel this order?", "Cancel order", JOptionPane.YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            Connection con = db.getConnection();
             int ord_num = (int) table.getValueAt(table.getSelectedRow(), 0);
 
-            try
+            try (Connection con = db.getConnection())
             {
                 Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 Statement statement2 = con.createStatement();
@@ -522,15 +509,6 @@ public class Current extends javax.swing.JInternalFrame
             {
                 JOptionPane.showMessageDialog(Current.this, e.getMessage());
             }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
-            }
         }
     }//GEN-LAST:event_btnCancelActionPerformed
 
@@ -555,12 +533,8 @@ public class Current extends javax.swing.JInternalFrame
 
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            Connection con = db.getConnection();
-            try
+            try (Statement statement = db.getConnection().createStatement())
             {
-                Statement statement = con.createStatement();
-                Statement statement2 = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-
                 if (btnMarkDispatched.getText().equals("Mark Dispatched"))
                 {
 //                    // CHECK FOR UNDELIVERED PURCHASE ORDER
@@ -609,15 +583,6 @@ public class Current extends javax.swing.JInternalFrame
             {
                 JOptionPane.showMessageDialog(Current.this, e.getMessage());
             }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
-            }
         }
     }//GEN-LAST:event_btnMarkDispatchedActionPerformed
 
@@ -629,8 +594,7 @@ public class Current extends javax.swing.JInternalFrame
 
             if (mark)
             {
-                Connection con = db.getConnection();
-                try
+                try (Connection con = db.getConnection())
                 {
                     Statement statement = con.createStatement();
                     Statement statement2 = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
@@ -667,46 +631,15 @@ public class Current extends javax.swing.JInternalFrame
                 {
                     JOptionPane.showMessageDialog(Current.this, e.getMessage());
                 }
-                finally
-                {
-                    try
-                    {
-                        con.close();
-                    }
-                    catch (Exception e)
-                    { /* ignored */ }
-                }
             }
         }
     }//GEN-LAST:event_btnMarkDeliveredActionPerformed
 
-    private HSSFWorkbook getWorkBook(String file)
-    {
-        if (file != null)
-        {
-            try (InputStream inp = new FileInputStream(file))
-            {
-                HSSFWorkbook workbook;
-                Workbook wb = WorkbookFactory.create(inp);
-                workbook = (HSSFWorkbook) wb;
-                return workbook;
-            }
-            catch (IOException | InvalidFormatException ex)
-            {
-                return new HSSFWorkbook();
-            }
-        }
-        else
-        {
-            return new HSSFWorkbook();
-        }
-    }
-
     private void btnDispatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDispatchActionPerformed
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to Create a Dispatch Note?", "Dispatch Note", JOptionPane.YES_NO_OPTION);
+        int ordNum = (int) table.getValueAt(table.getSelectedRow(), 0);
+        int selectedOption = JOptionPane.showConfirmDialog(null, "<html> Are you sure you want to create a dispatch note for order <b>" + ordNum + "</b>?", "Dispatch Note", YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            int ordNum = (int) table.getValueAt(table.getSelectedRow(), 0);
             String custName = (String) table.getValueAt(table.getSelectedRow(), 1);
             String custRef = "";
             String custTel = "";
@@ -720,11 +653,8 @@ public class Current extends javax.swing.JInternalFrame
             Boolean pro;
             String instructions = "";
 
-            // SQL
-            Connection con = db.getConnection();
-            try
+            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 ResultSet rs = statement.executeQuery("SELECT reference, del_address, country, tel, delivery, proforma FROM customers WHERE name = '" + custName + "'");
                 rs.next();
                 // Customer
@@ -756,172 +686,20 @@ public class Current extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(Current.this, e.getMessage());
-            }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
+                JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Current.this, e);
             }
 
-            try (FileOutputStream fileOut = new FileOutputStream("S:/VELTA/Automatically Created/VELTA ORDER - " + custRef + " " + ordDate + ".xls"))
+            String fileName = DISPATCH_NOTES_DIR + "VELTA ORDER - " + custRef + " " + ordDate + ".xls";
+            try (FileOutputStream fileOut = new FileOutputStream(fileName))
             {
-                HSSFWorkbook wb = this.getWorkBook(DISPATCH_NOTE_TEMPLATE);
+                HSSFWorkbook wb = db.getHSSFWorkbook(DISPATCH_NOTE_TEMPLATE);
                 HSSFSheet worksheet = wb.getSheet("Import File");
-//                CellStyle editableStyle = wb.createCellStyle();
-//                editableStyle.setLocked(false);
-//
-//                // Fonts
-//                HSSFFont row1font = wb.createFont();
-//                row1font.setFontHeightInPoints((short) 10);
-//                row1font.setFontName("Arial");
-//                row1font.setBold(true);
-//                row1font.setUnderline(HSSFFont.U_SINGLE);
-//
-//                HSSFFont rowfontred = wb.createFont();
-//                rowfontred.setFontHeightInPoints((short) 11);
-//                rowfontred.setFontName("Calibri");
-//                rowfontred.setBold(true);
-//                rowfontred.setColor(HSSFColor.RED.index);
-//
-//                HSSFFont rowfontblack = wb.createFont();
-//                rowfontblack.setFontHeightInPoints((short) 11);
-//                rowfontblack.setFontName("Calibri");
-//                rowfontblack.setBold(true);
-//
-//                HSSFFont mayfairfont = wb.createFont();
-//                mayfairfont.setFontHeightInPoints((short) 8);
-//                mayfairfont.setFontName("Arial");
-//
-//                // Styles
-//                HSSFCellStyle row1style = wb.createCellStyle();
-//                row1style.setFont(row1font);
-//
-//                HSSFCellStyle rowstyle1 = wb.createCellStyle();
-//                rowstyle1.setFont(rowfontred);
-//                rowstyle1.setFillForegroundColor(HSSFColor.GREY_40_PERCENT.index);
-//                rowstyle1.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-//
-//                HSSFCellStyle rowstyle2 = wb.createCellStyle();
-//                rowstyle2.setFont(rowfontblack);
-//                rowstyle2.setFillForegroundColor(HSSFColor.GREY_40_PERCENT.index);
-//                rowstyle2.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-//
-//                HSSFCellStyle mayfairstyle = wb.createCellStyle();
-//                mayfairstyle.setFont(mayfairfont);
-//                mayfairstyle.setFillForegroundColor(HSSFColor.SEA_GREEN.index);
-//                mayfairstyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-//
-//                HSSFCellStyle style = wb.createCellStyle();
-//                style.setBorderBottom(HSSFCellStyle.BORDER_THIN);
-//                style.setBottomBorderColor(HSSFColor.BLACK.index);
-//                style.setBorderLeft(HSSFCellStyle.BORDER_THIN);
-//                style.setLeftBorderColor(HSSFColor.BLACK.index);
-//                style.setBorderRight(HSSFCellStyle.BORDER_THIN);
-//                style.setRightBorderColor(HSSFColor.BLACK.index);
-//                style.setBorderTop(HSSFCellStyle.BORDER_THIN);
-//                style.setTopBorderColor(HSSFColor.BLACK.index);
-//
-//                // Row 4
-//                HSSFRow row = worksheet.createRow((short) 3);
-//                HSSFCell cell1 = row.createCell(0);
-//                cell1.setCellValue("AccountCode");
-//                cell1.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell2 = row.createCell(1);
-//                cell2.setCellValue("Tag No.");
-//                cell2.setCellStyle(rowstyle2);
-//
-//                HSSFCell cell3 = row.createCell(2);
-//                cell3.setCellValue("OrderCode");
-//                cell3.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell4 = row.createCell(3);
-//                cell4.setCellValue("Customer Ref");
-//                cell4.setCellStyle(rowstyle2);
-//
-//                HSSFCell cell5 = row.createCell(4);
-//                cell5.setCellValue("Customer Account Code");
-//                cell5.setCellStyle(rowstyle2);
-//
-//                HSSFCell cell6 = row.createCell(5);
-//                cell6.setCellValue("Delivery Date");
-//                cell6.setCellStyle(rowstyle2);
-//
-//                HSSFCell cell7 = row.createCell(6);
-//                cell7.setCellValue("Delivery Time");
-//                cell7.setCellStyle(rowstyle2);
-//
-//                HSSFCell cell8 = row.createCell(7);
-//                cell8.setCellValue("DeliveryName");
-//                cell8.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell9 = row.createCell(8);
-//                cell9.setCellValue("DeliveryAddress1");
-//                cell9.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell10 = row.createCell(9);
-//                cell10.setCellValue("DeliveryAddress2");
-//                cell10.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell11 = row.createCell(10);
-//                cell11.setCellValue("DeliveryAddress3");
-//                cell11.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell12 = row.createCell(11);
-//                cell12.setCellValue("DeliveryAddress4");
-//                cell12.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell13 = row.createCell(12);
-//                cell13.setCellValue("DeliveryPostCode");
-//                cell13.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell14 = row.createCell(13);
-//                cell14.setCellValue("DeliveryCountry");
-//                cell14.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell15 = row.createCell(14);
-//                cell15.setCellValue("DeliveryTel");
-//                cell15.setCellStyle(rowstyle2);
-//
-//                HSSFCell cell16 = row.createCell(15);
-//                cell16.setCellValue("ProductCode");
-//                cell16.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell17 = row.createCell(16);
-//                cell17.setCellValue("Quantity");
-//                cell17.setCellStyle(rowstyle1);
-//
-//                HSSFCell cell18 = row.createCell(17);
-//                cell18.setCellValue("VAT RATE");
-//                cell18.setCellStyle(rowstyle2);
-//
-//                HSSFCell cell19 = row.createCell(18);
-//                cell19.setCellValue("Delivery Instructions");
-//                cell19.setCellStyle(rowstyle2);
-//
-//                HSSFCell cell20 = row.createCell(19);
-//                cell20.setCellValue("Picking Instructions");
-//                cell20.setCellStyle(rowstyle2);
-//
-//                HSSFCell cell21 = row.createCell(20);
-//                cell21.setCellValue("Hold Ref");
-//                cell21.setCellStyle(rowstyle2);
-//
-//                HSSFCell cell22 = row.createCell(21);
-//                cell22.setCellValue("Email");
-//                cell22.setCellStyle(rowstyle2);
 
                 int i = 3;
                 int total = 0;
-                try
+                try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
-                    con = db.getConnection();
-                    Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                     ResultSet rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity FROM sales_order_details JOIN products ON sales_order_details.prod_num = products.prod_num WHERE sales_order_details.ord_num = " + ordNum);
                     // Main Rows
                     while (rs.next())
@@ -977,16 +755,8 @@ public class Current extends javax.swing.JInternalFrame
                 }
                 catch (SQLException e)
                 {
-                    JOptionPane.showMessageDialog(Current.this, e.getMessage());
-                }
-                finally
-                {
-                    try
-                    {
-                        con.close();
-                    }
-                    catch (Exception e)
-                    { /* ignored */ }
+                    JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(Current.this, e);
                 }
 
                 // Quant total
@@ -995,28 +765,16 @@ public class Current extends javax.swing.JInternalFrame
                 HSSFCell quantCell = quantRow.getCell(16);
                 quantCell.setCellValue(String.valueOf(total));
 
-//                // Auto Size Columns
-//                for (int k = 0; k < 22; k++)
-//                {
-//                    worksheet.autoSizeColumn(k);
-//                    worksheet.setDefaultColumnStyle(i, editableStyle);
-//                }
-                // Row 1
-//                HSSFRow row1 = worksheet.createRow((short) 0);
-//                HSSFCell cell = row1.createCell(0);
-//                cell.setCellValue("ORDER - " + custName + " " + ordDate + "");
-//                cell.setCellStyle(row1style);
                 wb.write(fileOut);
                 fileOut.flush();
                 fileOut.close();
 
-                JOptionPane.showMessageDialog(Current.this, "Dispatch Note Created.\n'VELTA ORDER - " + custRef + " " + ordDate + ".xls'");
+                JOptionPane.showMessageDialog(Current.this, "<html> <b>Dispatch note created successfully.</b> \n<html> <i> " + fileName + " </i>", "Dispatch Note Created", INFORMATION_MESSAGE);
             }
-            catch (FileNotFoundException e)
+            catch (IOException e) 
             {
-            }
-            catch (IOException e)
-            {
+                JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Current.this, e);
             }
         }
     }//GEN-LAST:event_btnDispatchActionPerformed
@@ -1027,24 +785,20 @@ public class Current extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnExcelSummaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelSummaryActionPerformed
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to Create an Excel Version of the Order?", "Excel Summary", JOptionPane.YES_NO_OPTION);
+        int ordNum = (int) table.getValueAt(table.getSelectedRow(), 0);
+        int selectedOption = JOptionPane.showConfirmDialog(null, "<html> Are you sure you want to create an excel summary for order <b>" + ordNum + "</b>?", "Excel Summary", YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            int ord_num = (int) table.getValueAt(table.getSelectedRow(), 0);
             int cust_num;
             String name;
             String del_date;
             double price;
 
-            // SQL
-            Connection con = db.getConnection();
-            Statement statement;
-            try
+            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
                 ResultSet rs;
 
-                rs = statement.executeQuery("SELECT cust_num, del_date, price FROM sales_order WHERE ord_num = " + ord_num);
+                rs = statement.executeQuery("SELECT cust_num, del_date, price FROM sales_order WHERE ord_num = " + ordNum);
                 rs.next();
                 cust_num = rs.getInt("cust_num");
                 String[] date = rs.getString("del_date").split(" ");
@@ -1056,101 +810,92 @@ public class Current extends javax.swing.JInternalFrame
                 rs.next();
                 name = rs.getString("name");
 
-                FileOutputStream fileOut;
-                fileOut = new FileOutputStream("S://SALES ORDERS/SALES ORDER - " + ord_num + ".xls");
-
-                HSSFWorkbook wb = new HSSFWorkbook();
-                HSSFSheet worksheet = wb.createSheet(String.valueOf(ord_num));
-                CellStyle editableStyle = wb.createCellStyle();
-                editableStyle.setLocked(false);
-
-                HSSFRow row = worksheet.createRow((short) 0);
-                HSSFCell cell = row.createCell(0);
-                cell.setCellValue("Order Number");
-                cell = row.createCell(1);
-                cell.setCellValue(ord_num);
-
-                row = worksheet.createRow((short) 1);
-                cell = row.createCell(0);
-                cell.setCellValue("Delivery Date");
-                cell = row.createCell(1);
-                cell.setCellValue(del_date);
-
-                row = worksheet.createRow((short) 3);
-                cell = row.createCell(0);
-                cell.setCellValue("Customer Number");
-                cell = row.createCell(1);
-                cell.setCellValue(cust_num);
-
-                row = worksheet.createRow((short) 4);
-                cell = row.createCell(0);
-                cell.setCellValue("Customer Name");
-                cell = row.createCell(1);
-                cell.setCellValue(name);
-
-                row = worksheet.createRow((short) 6);
-                cell = row.createCell(0);
-                cell.setCellValue("Product Code");
-                cell = row.createCell(1);
-                cell.setCellValue("Quantity");
-
-                int i = 7;
-                rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity FROM sales_order_details JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + ord_num);
-                while (rs.next())
+                String fileName = "S://SALES ORDERS/SALES ORDER - " + ordNum + ".xls";
+                try (FileOutputStream fileOut = new FileOutputStream(fileName)) 
                 {
-                    String code = rs.getString("code");
-                    int quantity = rs.getInt("quantity");
-
-                    row = worksheet.createRow((short) i);
-                    cell = row.createCell(0);
-                    cell.setCellValue(code);
+                    HSSFWorkbook wb = new HSSFWorkbook();
+                    HSSFSheet worksheet = wb.createSheet(String.valueOf(ordNum));
+                    CellStyle editableStyle = wb.createCellStyle();
+                    editableStyle.setLocked(false);
+                    
+                    HSSFRow row = worksheet.createRow((short) 0);
+                    HSSFCell cell = row.createCell(0);
+                    cell.setCellValue("Order Number");
                     cell = row.createCell(1);
-                    cell.setCellValue(quantity);
-
-                    i++;
+                    cell.setCellValue(ordNum);
+                    
+                    row = worksheet.createRow((short) 1);
+                    cell = row.createCell(0);
+                    cell.setCellValue("Delivery Date");
+                    cell = row.createCell(1);
+                    cell.setCellValue(del_date);
+                    
+                    row = worksheet.createRow((short) 3);
+                    cell = row.createCell(0);
+                    cell.setCellValue("Customer Number");
+                    cell = row.createCell(1);
+                    cell.setCellValue(cust_num);
+                    
+                    row = worksheet.createRow((short) 4);
+                    cell = row.createCell(0);
+                    cell.setCellValue("Customer Name");
+                    cell = row.createCell(1);
+                    cell.setCellValue(name);
+                    
+                    row = worksheet.createRow((short) 6);
+                    cell = row.createCell(0);
+                    cell.setCellValue("Product Code");
+                    cell = row.createCell(1);
+                    cell.setCellValue("Quantity");
+                    
+                    int i = 7;
+                    rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity FROM sales_order_details JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + ordNum);
+                    while (rs.next())
+                    {
+                        String code = rs.getString("code");
+                        int quantity = rs.getInt("quantity");
+                        
+                        row = worksheet.createRow((short) i);
+                        cell = row.createCell(0);
+                        cell.setCellValue(code);
+                        cell = row.createCell(1);
+                        cell.setCellValue(quantity);
+                        
+                        i++;
+                    }
+                    
+                    row = worksheet.createRow((short) i + 1);
+                    cell = row.createCell(0);
+                    cell.setCellValue("Order Price");
+                    cell = row.createCell(1);
+                    cell.setCellValue(price);
+                    
+                    rs = statement.executeQuery("SELECT SUM(quantity) as total FROM sales_order_details WHERE ord_num = " + ordNum);
+                    rs.next();
+                    
+                    row = worksheet.createRow((short) i + 2);
+                    cell = row.createCell(0);
+                    cell.setCellValue("Total Units");
+                    cell = row.createCell(1);
+                    cell.setCellValue(rs.getInt("total"));
+                    
+                    // Auto Size Columns
+                    for (int k = 0; k < 2; k++)
+                    {
+                        worksheet.autoSizeColumn(k);
+                        worksheet.setDefaultColumnStyle(i + 4, editableStyle);
+                    }
+                    
+                    wb.write(fileOut);
+                    fileOut.flush();
+                    
+                    JOptionPane.showMessageDialog(Current.this, "<html> <b>Excel summary created successfully.</b> \n<html> <i> " + fileName + " </i>", "Excel Summary Created", INFORMATION_MESSAGE);
                 }
-
-                row = worksheet.createRow((short) i + 1);
-                cell = row.createCell(0);
-                cell.setCellValue("Order Price");
-                cell = row.createCell(1);
-                cell.setCellValue(price);
-
-                rs = statement.executeQuery("SELECT SUM(quantity) as total FROM sales_order_details WHERE ord_num = " + ord_num);
-                rs.next();
-
-                row = worksheet.createRow((short) i + 2);
-                cell = row.createCell(0);
-                cell.setCellValue("Total Units");
-                cell = row.createCell(1);
-                cell.setCellValue(rs.getInt("total"));
-
-                // Auto Size Columns
-                for (int k = 0; k < 2; k++)
-                {
-                    worksheet.autoSizeColumn(k);
-                    worksheet.setDefaultColumnStyle(i + 4, editableStyle);
-                }
-
-                wb.write(fileOut);
-                fileOut.flush();
-                fileOut.close();
-                JOptionPane.showMessageDialog(Current.this, "Excel Order Summary Created.\n'SALES ORDER - " + ord_num + ".xls'");
-
             }
-
-            catch (SQLException | IOException ex)
+            catch (SQLException | IOException e)
             {
-                Logger.getLogger(Current.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
+                JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Current.this, e);
             }
         }
     }//GEN-LAST:event_btnExcelSummaryActionPerformed

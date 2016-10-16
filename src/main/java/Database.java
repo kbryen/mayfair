@@ -4,12 +4,19 @@
  */
 package main.java;
 
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Date;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  *
@@ -46,6 +53,50 @@ public class Database {
         catch(IOException ioe)
         {
             System.err.println("IOException: " + ioe.getMessage());
+        }
+    }
+    
+    public XSSFWorkbook getXSSFWorkbook(String file)
+    {
+        if (file != null)
+        {
+            try (InputStream inp = new FileInputStream(file))
+            {
+                XSSFWorkbook workbook;
+                Workbook wb = WorkbookFactory.create(inp);
+                workbook = (XSSFWorkbook) wb;
+                return workbook;
+            }
+            catch (IOException | InvalidFormatException ex)
+            {
+                return new XSSFWorkbook();
+            }
+        }
+        else
+        {
+            return new XSSFWorkbook();
+        }
+    }
+    
+    public HSSFWorkbook getHSSFWorkbook(String file)
+    {
+        if (file != null)
+        {
+            try (InputStream inp = new FileInputStream(file))
+            {
+                HSSFWorkbook workbook;
+                Workbook wb = WorkbookFactory.create(inp);
+                workbook = (HSSFWorkbook) wb;
+                return workbook;
+            }
+            catch (IOException | InvalidFormatException ex)
+            {
+                return new HSSFWorkbook();
+            }
+        }
+        else
+        {
+            return new HSSFWorkbook();
         }
     }
 }

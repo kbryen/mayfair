@@ -7,12 +7,10 @@ package main.java.report;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,19 +19,27 @@ import java.util.Map;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
-import javax.swing.JTextField;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.QUESTION_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import main.java.Database;
+import static main.java.MayfairConstants.ALL_PURCHASE_TEMPLATE;
+import static main.java.MayfairConstants.ALL_SALES_TEMPLATE;
+import static main.java.MayfairConstants.OUT_OF_STOCK_REPORT_TEMPLATE;
 import static main.java.MayfairConstants.PROD_SALES_ORDERS_DIR;
+import static main.java.MayfairConstants.PROD_SALES_TEMPLATE;
 import static main.java.MayfairConstants.SALES_PURCHASE_ORDERS_DIR;
 import static main.java.MayfairConstants.STOCK_REPORTS_DIR;
+import static main.java.MayfairConstants.STOCK_REPORT_TEMPLATE;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.CellStyle;
+import static org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD;
 
 /**
  *
@@ -312,74 +318,53 @@ public class Reports extends javax.swing.JInternalFrame
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create an available stock report?", "Available Stock Report", JOptionPane.YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            DateFormat df = new SimpleDateFormat("MM-dd-yy");
-            Date d = new Date();
-            String date = df.format(d);
-            try (FileOutputStream fileOut = new FileOutputStream(STOCK_REPORTS_DIR + "Stock Report " + date + ".xls"))
+            String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+            String fileName = STOCK_REPORTS_DIR + "Stock Report " + date + ".xls";
+            try (FileOutputStream fileOut = new FileOutputStream(fileName))
             {
-                HSSFWorkbook wb = new HSSFWorkbook();
-                HSSFSheet worksheet = wb.createSheet(date);
-                CellStyle editableStyle = wb.createCellStyle();
-                editableStyle.setLocked(false);
-
-                // Fonts
-                HSSFFont row1font = wb.createFont();
-                row1font.setFontHeightInPoints((short) 10);
-                row1font.setFontName("Arial");
-                row1font.setBold(true);
-                row1font.setUnderline(HSSFFont.U_SINGLE);
-
-                HSSFFont row4fontblack = wb.createFont();
-                row4fontblack.setFontHeightInPoints((short) 11);
-                row4fontblack.setFontName("Calibri");
-                row4fontblack.setBold(true);
-
-                // Styles
-                HSSFCellStyle style0 = wb.createCellStyle();
-                style0.setFont(row1font);
-
-                HSSFCellStyle style1 = wb.createCellStyle();
-                style1.setFont(row4fontblack);
-                style1.setFillForegroundColor(HSSFColor.GREY_40_PERCENT.index);
-                style1.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-
-                HSSFRow row = worksheet.createRow(0);
-                HSSFCell cell = row.createCell(0);
-                cell.setCellValue("Stock Report");
-                cell.setCellStyle(style0);
-
-                int rowCount = 3;
-                int cellCount = 0;
-
+                HSSFWorkbook workBook = db.getHSSFWorkbook(STOCK_REPORT_TEMPLATE);
+                HSSFSheet sheet = workBook.getSheet("Stock Report");
+                
+                // Create bold style
+                HSSFCellStyle bold = workBook.createCellStyle();
+                HSSFFont boldFont = workBook.createFont();
+                boldFont.setBoldweight(BOLDWEIGHT_BOLD);
+                bold.setFont(boldFont);
+                
+                int finalCellCount = 0;
                 try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
-                    ResultSet rs;
+                    HSSFRow row;
+                    int rowCount = 0;
+                    HSSFCell cell;
+                    int cellCount = 3;
+                    
+                    // Date row
+                    row = sheet.getRow(rowCount++);
+                    cell = row.getCell(1);
+                    cell.setCellValue(date);
 
-                    row = worksheet.createRow(rowCount++);
-                    cell = row.createCell(cellCount++);
-                    cell.setCellValue("Product Code");
-                    cell.setCellStyle(style1);
-
-                    cell = row.createCell(cellCount++);
-                    cell.setCellValue("In Stock");
-                    cell.setCellStyle(style1);
-
-                    rs = statement.executeQuery("SELECT ord_num FROM purchase_order WHERE delivered = false");
-                    ArrayList<String> ord_nums = new ArrayList();
+                    // Headings row
+                    row = sheet.getRow(rowCount++);
+                                        
+                    // Each undelivered purchase order becomes a header
+                    ResultSet rs = statement.executeQuery("SELECT ord_num FROM purchase_order WHERE delivered = false");
+                    ArrayList<String> orderNumbers = new ArrayList();
                     while (rs.next())
                     {
-                        String ord_num = rs.getString("ord_num");
-                        ord_nums.add(ord_num);
-
+                        String orderNumber = rs.getString("ord_num");
+                        orderNumbers.add(orderNumber);
+                        
                         cell = row.createCell(cellCount++);
-                        cell.setCellValue(ord_num);
-                        cell.setCellStyle(style1);
+                        cell.setCellValue(orderNumber);
+                        cell.setCellStyle(bold);
                     }
                     
-                    cell = row.createCell(cellCount++);
+                    cell = row.createCell(cellCount);
                     cell.setCellValue("Total");
-                    cell.setCellStyle(style1);
-
+                    cell.setCellStyle(bold);
+                    finalCellCount = cellCount;
+                    
                     rs = statement.executeQuery("SELECT prod_num, code, in_stock FROM products");
                     HashMap<Integer, Pair<String, Integer>> products = new HashMap();
                     while (rs.next())
@@ -393,17 +378,27 @@ public class Reports extends javax.swing.JInternalFrame
                         String code = product.getValue().getKey();
                         int in_stock = product.getValue().getValue();
 
+                        // Reset cell count 
                         cellCount = 0;
-                        row = worksheet.createRow(rowCount++);
+                        row = sheet.createRow(rowCount++);
+                        
+                        // Cell 1 - prod num
+                        cell = row.createCell(cellCount++);
+                        cell.setCellValue(prod_num);
+                        
+                        // Cell 2 - prod code
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(code);
+                        
+                        // Cell 3 - in stock
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(in_stock);
 
+                        // Loop through undelivered purchase orders
                         int total = in_stock;
-                        for (String ord_num : ord_nums)
+                        for (String orderNumber : orderNumbers)
                         {
-                            rs = statement.executeQuery("SELECT avaliable FROM purchase_order_details WHERE prod_num = " + prod_num + " AND ord_num = '" + ord_num + "'");
+                            rs = statement.executeQuery("SELECT avaliable FROM purchase_order_details WHERE prod_num = " + prod_num + " AND ord_num = '" + orderNumber + "'");
 
                             int avaliable = 0;
                             if (rs.next())
@@ -411,11 +406,14 @@ public class Reports extends javax.swing.JInternalFrame
                                 avaliable = rs.getInt("avaliable");
                             }
 
+                            // Cell * - purchase order avaliable
                             cell = row.createCell(cellCount++);
                             cell.setCellValue(avaliable);
 
                             total = total + avaliable;
                         }
+                        
+                        // Cell last - total
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(total);
                     }
@@ -426,27 +424,21 @@ public class Reports extends javax.swing.JInternalFrame
                 }
 
                 // Auto Size Columns
-                for (int k = 0; k < 2; k++)
+                for (int i = 0; i < finalCellCount; i++)
                 {
-                    worksheet.autoSizeColumn(k);
-                    worksheet.setDefaultColumnStyle(rowCount, editableStyle);
+                    sheet.autoSizeColumn(i);
                 }
 
-                wb.write(fileOut);
+                workBook.write(fileOut);
                 fileOut.flush();
                 fileOut.close();
 
-                JOptionPane.showMessageDialog(Reports.this, "Stock Report Created.");
+                JOptionPane.showMessageDialog(Reports.this, "<html> <b>Stock report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
             }
-            catch (FileNotFoundException e)
+            catch (Exception e)
             {
-                JOptionPane.showMessageDialog(Reports.this, "Error while creating report, please try again.");
-                JOptionPane.showMessageDialog(Reports.this, e);
-            }
-            catch (IOException e)
-            {
-                JOptionPane.showMessageDialog(Reports.this, "Error while creating report, please try again.");
-                JOptionPane.showMessageDialog(Reports.this, e);
+                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating stock report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
             }
         }
     }
@@ -456,312 +448,311 @@ public class Reports extends javax.swing.JInternalFrame
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create an out of stock report?", "Out of Stock Report", JOptionPane.YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            DateFormat df = new SimpleDateFormat("MM-dd-yy");
-            Date d = new Date();
-            String date = df.format(d);
-            try (FileOutputStream fileOut = new FileOutputStream(STOCK_REPORTS_DIR + "Out of Stock Report " + date + ".xls"))
+            String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
+            String fileName = STOCK_REPORTS_DIR + "Out of Stock Report " + date + ".xls";
+            try (FileOutputStream fileOut = new FileOutputStream(fileName))
             {
-                HSSFWorkbook wb = new HSSFWorkbook();
-                HSSFSheet worksheet = wb.createSheet(date);
-                CellStyle editableStyle = wb.createCellStyle();
-                editableStyle.setLocked(false);
-
-                // Fonts
-                HSSFFont row1font = wb.createFont();
-                row1font.setFontHeightInPoints((short) 10);
-                row1font.setFontName("Arial");
-                row1font.setBold(true);
-                row1font.setUnderline(HSSFFont.U_SINGLE);
-
-                HSSFFont row4fontblack = wb.createFont();
-                row4fontblack.setFontHeightInPoints((short) 11);
-                row4fontblack.setFontName("Calibri");
-                row4fontblack.setBold(true);
-
-                // Styles
-                HSSFCellStyle style0 = wb.createCellStyle();
-                style0.setFont(row1font);
-
-                HSSFCellStyle style1 = wb.createCellStyle();
-                style1.setFont(row4fontblack);
-                style1.setFillForegroundColor(HSSFColor.GREY_40_PERCENT.index);
-                style1.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-
-                // Row 4
-                HSSFRow row4 = worksheet.createRow((short) 3);
-                HSSFCell cell1 = row4.createCell(0);
-                cell1.setCellValue("Product Code");
-                cell1.setCellStyle(style1);
-
-                int i = 4;
+                HSSFWorkbook workBook = db.getHSSFWorkbook(OUT_OF_STOCK_REPORT_TEMPLATE);
+                HSSFSheet sheet = workBook.getSheet("Out of Stock Report");
+                
                 try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
-                    ResultSet rs = statement.executeQuery("SELECT code FROM products WHERE in_stock = 0");
+                    HSSFRow row;
+                    int rowCount = 2;
+                    HSSFCell cell;
+                    
+                    // Date row
+                    row = sheet.getRow(0);
+                    cell = row.getCell(1);
+                    cell.setCellValue(date);
 
-                    // Main Rows
+                    ResultSet rs = statement.executeQuery("SELECT prod_num, code, in_stock FROM products where in_stock = 0");
                     while (rs.next())
                     {
-                        HSSFRow main = worksheet.createRow((short) i);
-                        HSSFCell code = main.createCell(0);
-                        code.setCellValue(rs.getString("code"));
-                        i++;
+                        row = sheet.createRow(rowCount++);
+                        cell = row.createCell(0);
+                        cell.setCellValue(rs.getString("prod_num"));
+                        cell = row.createCell(1);
+                        cell.setCellValue(rs.getString("code"));
                     }
                 }
                 catch (SQLException e)
                 {
-                    JOptionPane.showMessageDialog(Reports.this, e.getMessage());
+                    JOptionPane.showMessageDialog(Reports.this, e);
                 }
-                
+
                 // Auto Size Columns
-                for (int k = 0; k < 2; k++)
+                for (int i = 0; i < 2; i++)
                 {
-                    worksheet.autoSizeColumn(k);
-                    worksheet.setDefaultColumnStyle(i, editableStyle);
+                    sheet.autoSizeColumn(i);
                 }
 
-                // Row 1
-                HSSFRow row1 = worksheet.createRow((short) 0);
-                HSSFCell cell = row1.createCell(0);
-                cell.setCellValue("Out of Stock Report");
-                cell.setCellStyle(style0);
-
-                wb.write(fileOut);
+                workBook.write(fileOut);
                 fileOut.flush();
                 fileOut.close();
 
-                JOptionPane.showMessageDialog(Reports.this, "Out of Stock Report Created.");
+                JOptionPane.showMessageDialog(Reports.this, "<html> <b>Out of Stock report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
             }
-            catch (FileNotFoundException e)
+            catch (Exception e)
             {
-                JOptionPane.showMessageDialog(Reports.this, "Error while creating report, please try again.");
-                JOptionPane.showMessageDialog(Reports.this, e);
-            }
-            catch (IOException e)
-            {
-                JOptionPane.showMessageDialog(Reports.this, "Error while creating report, please try again.");
-                JOptionPane.showMessageDialog(Reports.this, e);
+                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating out of stock report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
             }
         }
     }
     
-    private void createPurchaseOrderReportByDates(String startDate, String endDate)
+    private void createPurchaseOrderReportByDates()
     {
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a purchase orders report?", "Purchase Orders Report", JOptionPane.YES_NO_OPTION);
+        if (selectedOption == JOptionPane.YES_OPTION)
         {
-            String reportName = JOptionPane.showInputDialog("Please give the report a name \nFor example: Nov 30 - Spring Sales").trim();
-            ResultSet rs = statement.executeQuery("SELECT products.code, purchase_order_details.quantity FROM purchase_order_details JOIN purchase_order ON purchase_order_details.ord_num = purchase_order.ord_num JOIN products ON purchase_order_details.prod_num = products.prod_num WHERE del_date >= '" + startDate + "' AND del_date <= '" + endDate + "'");
-            
-            try (FileWriter writer = new FileWriter(SALES_PURCHASE_ORDERS_DIR + reportName + ".csv"))
+            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                HashMap<String, Integer> map = new HashMap();
-                // 2016-08-26--2016-09-26
-                writer.append("Product,Quantity");
-                writer.append('\n');
+                SimpleDateFormat df1 = new SimpleDateFormat("dd-MM-yy");
+                SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+                Date startDate = dateSPO.getDate();
+                Date endDate = dateEPO.getDate();
 
-                while (rs.next())
+                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, purchase_order_details.quantity FROM purchase_order_details JOIN purchase_order ON purchase_order_details.ord_num = purchase_order.ord_num JOIN products ON purchase_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");           
+                if(rs.isBeforeFirst())
                 {
-                    String code = rs.getString("code");
-                    int quant = rs.getInt("quantity");
-                    if (map.containsKey(code))
+                    String fileName = SALES_PURCHASE_ORDERS_DIR + "Purchase Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
+                    try (FileOutputStream fileOut = new FileOutputStream(fileName))
                     {
-                        int num = map.get(code);
-                        int newquant = num + quant;
+                        HSSFWorkbook workBook = db.getHSSFWorkbook(ALL_PURCHASE_TEMPLATE);
+                        HSSFSheet sheet = workBook.getSheet("Purchase Orders Made");
 
-                        map.remove(code);
-                        map.put(code, newquant);
-                    }
-                    else
-                    {
-                        map.put(code, quant);
+                        HSSFRow row;
+                        int rowCount = 0;
+                        HSSFCell cell;
+
+                        // Start date
+                        row = sheet.getRow(rowCount++);
+                        cell = row.getCell(5);
+                        cell.setCellValue(df1.format(startDate));
+
+                        // End date
+                        row = sheet.getRow(rowCount++);
+                        cell = row.getCell(5);
+                        cell.setCellValue(df1.format(endDate));
+
+                        // Fill table
+                        while(rs.next())
+                        {
+                            // num
+                            cell = row.createCell(0);
+                            cell.setCellValue(rs.getString("prod_num"));
+                            // code
+                            cell = row.createCell(1);
+                            cell.setCellValue(rs.getString("code"));
+                            // quant
+                            cell = row.createCell(2);
+                            cell.setCellValue(rs.getString("quantity"));
+
+                            row = sheet.createRow(rowCount++);
+                        }
+
+                        // Auto Size Columns
+                        for (int i = 0; i < 3; i++)
+                        {
+                            sheet.autoSizeColumn(i);
+                        }
+
+                        workBook.write(fileOut);
+                        fileOut.flush();
+                        fileOut.close();
+
+                        JOptionPane.showMessageDialog(Reports.this, "<html> <b>Purchase orders report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
                     }
                 }
-
-                for (String code : map.keySet())
+                else
                 {
-                    int quant = map.get(code);
-                    writer.append(code + "," + String.valueOf(quant) + "\n");
+                    JOptionPane.showMessageDialog(Reports.this, "<html> No purchase orders made between <b> " + df1.format(startDate) + " </b> and <b> " + df1.format(endDate) + " </b>", "Report not created", INFORMATION_MESSAGE);
                 }
-
-                writer.flush();
             }
-
-            JOptionPane.showMessageDialog(Reports.this, reportName + " Report created.");
-        }
-        catch (SQLException | FileNotFoundException e)
-        {
-            JOptionPane.showMessageDialog(Reports.this, "Error while creating report, please try again.");
-            JOptionPane.showMessageDialog(Reports.this, e);
-        } 
-        catch (IOException e) 
-        {
-            JOptionPane.showMessageDialog(Reports.this, "Error while creating report, please try again.");
-            JOptionPane.showMessageDialog(Reports.this, e);
+            catch (Exception e)
+            {
+                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating purchase orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+            }
         }
     }
     
-    private void createSalesOrderReportByDates(String startDate, String endDate)
+    private void createSalesOrderReportByDates()
     {
-        try(Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a sales orders report?", "Sales Orders Report", JOptionPane.YES_NO_OPTION);
+        if (selectedOption == JOptionPane.YES_OPTION)
         {
-            String reportName = JOptionPane.showInputDialog("Please give the report a name \nFor example: Nov 30 - Spring Sales").trim();
-
-            ResultSet rs = statement.executeQuery("SELECT products.code, sales_order_details.fromOrder, sales_order_details.fromStock FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num JOIN products ON sales_order_details.prod_num = products.prod_num WHERE del_date >= '" + startDate + "' AND del_date <= '" + endDate + "'");
-
-            try (FileWriter writer = new FileWriter(SALES_PURCHASE_ORDERS_DIR + reportName + ".csv"))
+            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                HashMap<String, Integer> map = new HashMap();
+                SimpleDateFormat df1 = new SimpleDateFormat("dd-MM-yy");
+                SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+                Date startDate = dateSSO.getDate();
+                Date endDate = dateESO.getDate();
 
-                writer.append("Product,Quantity");
-                writer.append('\n');
-
-                while (rs.next())
+                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, sales_order_details.quantity FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num JOIN products ON sales_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");           
+                if(rs.isBeforeFirst())
                 {
-                    String code = rs.getString("code");
-                    int quant = rs.getInt("fromOrder") + rs.getInt("fromStock");
-                    if (map.containsKey(code))
+                    String fileName = SALES_PURCHASE_ORDERS_DIR + "Sales Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
+                    try (FileOutputStream fileOut = new FileOutputStream(fileName))
                     {
-                        int num = map.get(code);
-                        int newquant = num + quant;
+                        HSSFWorkbook workBook = db.getHSSFWorkbook(ALL_SALES_TEMPLATE);
+                        HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
 
-                        map.remove(code);
-                        map.put(code, newquant);
-                    }
-                    else
-                    {
-                        map.put(code, quant);
+                        HSSFRow row;
+                        int rowCount = 0;
+                        HSSFCell cell;
+
+                        // Start date
+                        row = sheet.getRow(rowCount++);
+                        cell = row.getCell(5);
+                        cell.setCellValue(df1.format(startDate));
+
+                        // End date
+                        row = sheet.getRow(rowCount++);
+                        cell = row.getCell(5);
+                        cell.setCellValue(df1.format(endDate));
+
+                        // Fill table
+                        while(rs.next())
+                        {
+                            // num
+                            cell = row.createCell(0);
+                            cell.setCellValue(rs.getString("prod_num"));
+                            // code
+                            cell = row.createCell(1);
+                            cell.setCellValue(rs.getString("code"));
+                            // quant
+                            cell = row.createCell(2);
+                            cell.setCellValue(rs.getString("quantity"));
+
+                            row = sheet.createRow(rowCount++);
+                        }
+
+                        // Auto Size Columns
+                        for (int i = 0; i < 3; i++)
+                        {
+                            sheet.autoSizeColumn(i);
+                        }
+
+                        workBook.write(fileOut);
+                        fileOut.flush();
+                        fileOut.close();
+
+                        JOptionPane.showMessageDialog(Reports.this, "<html> <b>Sales orders report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
                     }
                 }
-
-                for (String code : map.keySet())
+                else
                 {
-                    int quant = map.get(code);
-                    writer.append(code + "," + String.valueOf(quant) + "\n");
+                    JOptionPane.showMessageDialog(Reports.this, "<html> No sales orders made between <b> " + df1.format(startDate) + " </b> and <b> " + df1.format(endDate) + " </b>", "Report not created", INFORMATION_MESSAGE);
                 }
-
-                writer.flush();
             }
-
-            JOptionPane.showMessageDialog(Reports.this, reportName + " Report created.");
-        }
-        catch (SQLException | FileNotFoundException e)
-        {
-            JOptionPane.showMessageDialog(Reports.this, "Error while creating report, please try again.");
-            JOptionPane.showMessageDialog(Reports.this, e);
-        } 
-        catch (IOException e) 
-        {
-            JOptionPane.showMessageDialog(Reports.this, "Error while creating report, please try again.");
-            JOptionPane.showMessageDialog(Reports.this, e);
+            catch (Exception e)
+            {
+                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating sales orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+            }
         }
     }
     
-    private void createSalesOrderReportByProduct(String prodCode) 
+    private void createSalesOrderReportByProduct(String prodCode)
     {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a sales order report for " + prodCode + "?", "Sales Order Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION) 
+        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a sales orders report?", "Sales Orders Report", JOptionPane.YES_NO_OPTION);
+        if (selectedOption == JOptionPane.YES_OPTION)
         {
-            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE)) 
+            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
                 ResultSet rs = statement.executeQuery("SELECT prod_num FROM products where code = '" + prodCode + "'");
-                rs.next();
-                int prod_num = rs.getInt("prod_num");
-                
-                try (FileOutputStream fileOut = new FileOutputStream(PROD_SALES_ORDERS_DIR + prodCode + " - Sales Orders.xls")) 
+                if(rs.next())
                 {
-                    HSSFWorkbook wb = new HSSFWorkbook();
-                    HSSFSheet worksheet = wb.createSheet(String.valueOf(prod_num));
-                    CellStyle editableStyle = wb.createCellStyle();
-                    editableStyle.setLocked(false);
-
-                    HSSFRow row = worksheet.createRow((short) 0);
-                    HSSFCell cell = row.createCell(0);
-                    cell.setCellValue("Product Code");
-
-                    cell = row.createCell(1);
-                    cell.setCellValue(prodCode);
-
-                    row = worksheet.createRow((short) 2);
-                    cell = row.createCell(0);
-                    cell.setCellValue("Orders");
-
-                    row = worksheet.createRow((short) 3);
-                    cell = row.createCell(0);
-                    cell.setCellValue("Order Number");
-                    cell = row.createCell(1);
-                    cell.setCellValue("Customer Name");
-                    cell = row.createCell(2);
-                    cell.setCellValue("Order Date");
-                    cell = row.createCell(3);
-                    cell.setCellValue("Delivery Date");
-                    cell = row.createCell(4);
-                    cell.setCellValue("Dispatched");
-                    cell = row.createCell(5);
-                    cell.setCellValue("Delivered");
-                    cell = row.createCell(6);
-                    cell.setCellValue("Quantity");
-
-                    int i = 4;
-                    rs = statement.executeQuery("SELECT sales_order_details.ord_num, sales_order_details.quantity, sales_order.cust_num, customers.name, sales_order.ord_date, sales_order.del_date, sales_order.dispatched, sales_order.delivered FROM sales_order JOIN sales_order_details ON sales_order.ord_num=sales_order_details.ord_num JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order_details.prod_num = " + prod_num);
-                    while (rs.next()) 
+                    String prodNum = rs.getString("prod_num");
+                    
+                    rs = statement.executeQuery("SELECT sales_order_details.ord_num, sales_order_details.quantity, sales_order.cust_num, customers.name, sales_order.ord_date, sales_order.del_date, sales_order.dispatched, sales_order.delivered FROM sales_order JOIN sales_order_details ON sales_order.ord_num=sales_order_details.ord_num JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order_details.prod_num = " + prodNum);
+                    if(rs.isBeforeFirst())  
                     {
-                        row = worksheet.createRow((short) i);
-                        cell = row.createCell(0);
-                        cell.setCellValue(rs.getString("ord_num"));
-                        cell = row.createCell(1);
-                        cell.setCellValue(rs.getString("name"));
-                        cell = row.createCell(2);
-                        cell.setCellValue(rs.getString("ord_date"));
-                        cell = row.createCell(3);
-                        cell.setCellValue(rs.getString("del_date"));
-                        
-                        cell = row.createCell(4);
-                        if (rs.getInt("dispatched") == 1) 
+                        String fileName = PROD_SALES_ORDERS_DIR + "Sales Orders " + prodCode.replaceAll("/", "") + ".xls";
+                        try (FileOutputStream fileOut = new FileOutputStream(fileName))
                         {
-                            cell.setCellValue("yes");
-                        } 
-                        else 
-                        {
-                            cell.setCellValue("no");
-                        }
-                        
-                        cell = row.createCell(5);
-                        if (rs.getInt("delivered") == 1) 
-                        {
-                            cell.setCellValue("yes");
-                        } 
-                        else 
-                        {
-                            cell.setCellValue("no");
-                        }
-                        
-                        cell = row.createCell(6);
-                        cell.setCellValue(rs.getString("quantity"));
-                        i++;
-                    }
 
-                    // Auto Size Columns
-                    for (int k = 0; k < 5; k++) 
+                            HSSFWorkbook workBook = db.getHSSFWorkbook(PROD_SALES_TEMPLATE);
+                            HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
+
+                            HSSFRow row;
+                            int rowCount = 3;
+                            HSSFCell cell;
+
+                            // Prod code
+                            row = sheet.getRow(0);
+                            cell = row.getCell(1);
+                            cell.setCellValue(prodCode);
+
+                            // Fill table
+                            while(rs.next())
+                            {
+                                row = sheet.createRow(rowCount++);
+
+                                cell = row.createCell(0);
+                                cell.setCellValue(rs.getString("ord_num"));
+
+                                cell = row.createCell(1);
+                                cell.setCellValue(rs.getString("name"));
+                                cell = row.createCell(2);
+                                cell.setCellValue(rs.getString("ord_date"));
+
+                                cell = row.createCell(3);
+                                cell.setCellValue(rs.getString("del_date"));
+
+                                cell = row.createCell(4);
+                                if (rs.getInt("dispatched") == 1) 
+                                {
+                                    cell.setCellValue("yes");
+                                } 
+                                else 
+                                {
+                                    cell.setCellValue("no");
+                                }
+
+                                cell = row.createCell(5);
+                                if (rs.getInt("delivered") == 1) 
+                                {
+                                    cell.setCellValue("yes");
+                                } 
+                                else 
+                                {
+                                    cell.setCellValue("no");
+                                }
+
+                                cell = row.createCell(6);
+                                cell.setCellValue(rs.getString("quantity"));
+                            }
+
+                            // Auto Size Columns
+                            for (int i = 0; i < 7; i++)
+                            {
+                                sheet.autoSizeColumn(i);
+                            }
+
+                            workBook.write(fileOut);
+                            fileOut.flush();
+                            fileOut.close();
+
+                            JOptionPane.showMessageDialog(Reports.this, "<html> <b>Sales orders report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
+                        }
+                    }
+                    else
                     {
-                        worksheet.autoSizeColumn(k);
-                        worksheet.setDefaultColumnStyle(i, editableStyle);
+                        JOptionPane.showMessageDialog(Reports.this, "<html> No sales orders made for <b> " + prodCode + " </b>", "Report not created", INFORMATION_MESSAGE);
                     }
-
-                    wb.write(fileOut);
-                    fileOut.flush();
-                    fileOut.close();
                 }
-                
-                JOptionPane.showMessageDialog(Reports.this, "Order Report Created.");
-            } 
-            catch (SQLException | FileNotFoundException e) 
+                else
+                {
+                    JOptionPane.showMessageDialog(Reports.this, "<html>Product does not exist - <b>" + prodCode + "</b> \nPlease select from drop down box", "Unknown Product",WARNING_MESSAGE);
+                }
+            }
+            catch (Exception e)
             {
-                JOptionPane.showMessageDialog(Reports.this, "Error while creating report, please try again.");
-                JOptionPane.showMessageDialog(Reports.this, e);
-            } 
-            catch (IOException e) 
-            {
-                JOptionPane.showMessageDialog(Reports.this, "Error while creating report, please try again.");
-                JOptionPane.showMessageDialog(Reports.this, e);
+                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating sales orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
             }
         }
     }
@@ -877,30 +868,24 @@ public class Reports extends javax.swing.JInternalFrame
         }
         if(btnPOMadeDate.isSelected())
         {
-            String startDate = ((JTextField) dateSPO.getDateEditor().getUiComponent()).getText();
-            String endDate = ((JTextField) dateEPO.getDateEditor().getUiComponent()).getText();
-            
-            if(startDate.isEmpty() || endDate.isEmpty())
+            if(dateSPO.getDate() == null || dateEPO.getDate() == null)
             {
-                JOptionPane.showMessageDialog(Reports.this, "Please select start and end date");
+                JOptionPane.showMessageDialog(Reports.this, "Please select start and end date", "Missing information", QUESTION_MESSAGE);
             }
             else
             {
-                createPurchaseOrderReportByDates(startDate, endDate);
+                createPurchaseOrderReportByDates();
             }
         }
         if(btnSOMadeDate.isSelected())
         {
-            String startDate = ((JTextField) dateSSO.getDateEditor().getUiComponent()).getText();
-            String endDate = ((JTextField) dateESO.getDateEditor().getUiComponent()).getText();
-            
-            if(startDate.isEmpty() || endDate.isEmpty())
+            if(dateSSO.getDate() == null || dateESO.getDate() == null)
             {
-                JOptionPane.showMessageDialog(Reports.this, "Please select start and end date");
+                JOptionPane.showMessageDialog(Reports.this, "Please select start and end date", "Missing information", QUESTION_MESSAGE);
             }
             else
             {
-                createSalesOrderReportByDates(startDate, endDate);
+                createSalesOrderReportByDates();
             }
         }
         if(btnSOMadeProd.isSelected())
@@ -909,7 +894,7 @@ public class Reports extends javax.swing.JInternalFrame
             
             if(prodCode.isEmpty())
             {
-               JOptionPane.showMessageDialog(Reports.this, "Please select a product");
+               JOptionPane.showMessageDialog(Reports.this, "Please select a product", "Missing information", QUESTION_MESSAGE);
             }
             else
             {

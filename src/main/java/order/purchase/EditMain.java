@@ -276,18 +276,17 @@ public class EditMain extends javax.swing.JInternalFrame
      */
     private void FillLabels()
     {
-        Connection con = db.getConnection();
-        try
+        try (Connection con = db.getConnection())
         {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = statement.executeQuery("SELECT SUM(price) AS total_price FROM purchase_order_details WHERE ord_num = '" + orderNum + "'");
+            Statement queryStatement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            ResultSet rs = queryStatement.executeQuery("SELECT SUM(price) AS total_price FROM purchase_order_details WHERE ord_num = '" + orderNum + "'");
             rs.next();
             double price = Double.parseDouble(rs.getString("total_price"));
 
-            Statement statement2 = con.createStatement();
-            statement2.executeUpdate("UPDATE purchase_order SET price = " + price + " WHERE ord_num = '" + orderNum + "'");
+            Statement updateStatement = con.createStatement();
+            updateStatement.executeUpdate("UPDATE purchase_order SET price = " + price + " WHERE ord_num = '" + orderNum + "'");
 
-            rs = statement.executeQuery("SELECT suppliers.supp_num, suppliers.name, purchase_order.ord_num, purchase_order.del_date, purchase_order.price, purchase_order.comments FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE purchase_order.ord_num = '" + orderNum + "'");
+            rs = queryStatement.executeQuery("SELECT suppliers.supp_num, suppliers.name, purchase_order.ord_num, purchase_order.del_date, purchase_order.price, purchase_order.comments FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE purchase_order.ord_num = '" + orderNum + "'");
             rs.next();
 
             labelNumber.setText("Supplier Number : ");
@@ -297,12 +296,13 @@ public class EditMain extends javax.swing.JInternalFrame
             db.writeToLog("EDIT PURCHASE ORDER " + orderNum);
 
             labelOrdNum.setText(rs.getString("ord_num"));
+            calDelDate.setDate(rs.getDate("del_date"));
             String[] date = rs.getString("del_date").split(" ");
             labelDelDate.setText(date[0]);
             labelOrdTotal.setText(String.format("%.02f", rs.getFloat("price")));
             fieldComments.setText(rs.getString("comments"));
 
-            rs = statement.executeQuery("SELECT products.code, purchase_order_details.quantity, products.purchase_price, purchase_order_details.price FROM purchase_order_details INNER JOIN products ON purchase_order_details.prod_num=products.prod_num WHERE purchase_order_details.ord_num = '" + orderNum + "'");
+            rs = queryStatement.executeQuery("SELECT products.code, purchase_order_details.quantity, products.purchase_price, purchase_order_details.price FROM purchase_order_details INNER JOIN products ON purchase_order_details.prod_num=products.prod_num WHERE purchase_order_details.ord_num = '" + orderNum + "'");
             while (table.getRowCount() > 0)
             {
                 ((DefaultTableModel) table.getModel()).removeRow(0);
@@ -322,19 +322,9 @@ public class EditMain extends javax.swing.JInternalFrame
         {
             JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
         }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
-        }
     }
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-
         EditAddProduct purchaseOrder = new EditAddProduct(orderNum, desktop);
         desktop.add(purchaseOrder);
         purchaseOrder.show();
@@ -348,24 +338,23 @@ public class EditMain extends javax.swing.JInternalFrame
 
         if(newQuantity > 0)
         {
-        Connection con = db.getConnection();
         String prodCode = (String) table.getValueAt(table.getSelectedRow(), 0);
-        try
+        try (Connection con = db.getConnection())
         {
-            Statement statement = con.createStatement();
-            Statement statement2 = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+            Statement updateStatement = con.createStatement();
+            Statement queryStatement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
             db.writeToLog("UPDATE QUANTITY " + prodCode + " ON  PO " + orderNum);
 
             // FIND PROD_NUM
-            ResultSet rs = statement2.executeQuery("SELECT prod_num, purchase_price, in_order FROM products WHERE code = '" + prodCode + "'");
+            ResultSet rs = queryStatement.executeQuery("SELECT prod_num, purchase_price, in_order FROM products WHERE code = '" + prodCode + "'");
             rs.next();
             int prod_num = rs.getInt("prod_num");
             double price = rs.getDouble("purchase_price");
             int in_order = rs.getInt("in_order");
 
             // CHECK PURCHASE_ORDER_DETAILS 
-            rs = statement2.executeQuery("SELECT quantity, avaliable FROM purchase_order_details WHERE ord_num = '" + orderNum + "' AND prod_num = " + prod_num);
+            rs = queryStatement.executeQuery("SELECT quantity, avaliable FROM purchase_order_details WHERE ord_num = '" + orderNum + "' AND prod_num = " + prod_num);
             rs.next();
             int quantity = rs.getInt("quantity");
             int avaliable = rs.getInt("avaliable");
@@ -374,13 +363,13 @@ public class EditMain extends javax.swing.JInternalFrame
             if (newQuantity >= onOrder)
             {
                 sql = ("UPDATE purchase_order_details SET quantity = " + newQuantity + ", avaliable = " + (newQuantity - onOrder) + ", price = " + (price * newQuantity) + " WHERE ord_num = '" + orderNum + "'  AND prod_num = " + prod_num);
-                statement.executeUpdate(sql);
+                updateStatement.executeUpdate(sql);
                 db.writeToLog(sql);
 
                 // UPDATE PRODUCTS
                 int difference = newQuantity - quantity;
                 sql = ("UPDATE products SET in_order = " + (in_order + difference) + " WHERE prod_num = " + prod_num);
-                statement.executeUpdate(sql);
+                updateStatement.executeUpdate(sql);
                 db.writeToLog(sql);
 
                 db.writeToLog(MayfairConstants.LOG_SEPERATOR);
@@ -398,15 +387,6 @@ public class EditMain extends javax.swing.JInternalFrame
         {
             JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
         }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
-        }
         }
         else
         {
@@ -418,23 +398,22 @@ public class EditMain extends javax.swing.JInternalFrame
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this product?", "Delete Product", JOptionPane.YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            Connection con = db.getConnection();
             String prodCode = (String) table.getValueAt(table.getSelectedRow(), 0);
-            try
+            try (Connection con = db.getConnection())
             {
-                Statement statement = con.createStatement();
-                Statement statement2 = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
+                Statement updateStatment = con.createStatement();
+                Statement queryStatement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
                 db.writeToLog("DELETE PRODUCT " + prodCode + " FROM PO " + orderNum);
 
                 // FIND PROD_NUM
-                ResultSet rs = statement2.executeQuery("SELECT prod_num FROM products WHERE code = '" + prodCode + "'");
+                ResultSet rs = queryStatement.executeQuery("SELECT prod_num FROM products WHERE code = '" + prodCode + "'");
                 rs.next();
                 int prod_num = rs.getInt("prod_num");
 
                 // CHECK PURCHASE_SALES_ORDER 
                 HashMap<Integer, Integer> prodsOnSales = new HashMap();
-                rs = statement2.executeQuery("SELECT so_num, quantity FROM purchase_sales_order WHERE po_num = '" + orderNum + "' AND prod_num = " + prod_num);
+                rs = queryStatement.executeQuery("SELECT so_num, quantity FROM purchase_sales_order WHERE po_num = '" + orderNum + "' AND prod_num = " + prod_num);
                 while (rs.next())
                 {
                     int so_num = rs.getInt("so_num");
@@ -446,21 +425,21 @@ public class EditMain extends javax.swing.JInternalFrame
                 if (prodsOnSales.isEmpty())
                 {
                     // UPDATE PURCHASE_ORDER_DETAILS
-                    rs = statement2.executeQuery("SELECT quantity FROM purchase_order_details WHERE ord_num = '" + orderNum + "' AND prod_num = " + prod_num);
+                    rs = queryStatement.executeQuery("SELECT quantity FROM purchase_order_details WHERE ord_num = '" + orderNum + "' AND prod_num = " + prod_num);
                     rs.next();
                     int quantity = rs.getInt("quantity");
 
                     sql = ("DELETE FROM purchase_order_details WHERE ord_num = '" + orderNum + "'  AND prod_num = " + prod_num);
-                    statement.executeUpdate(sql);
+                    updateStatment.executeUpdate(sql);
                     db.writeToLog(sql);
 
                     // UPDATE PRODUCTS
-                    rs = statement2.executeQuery("SELECT in_order FROM products WHERE prod_num = " + prod_num);
+                    rs = queryStatement.executeQuery("SELECT in_order FROM products WHERE prod_num = " + prod_num);
                     rs.next();
                     int in_order = rs.getInt("in_order");
 
                     sql = ("UPDATE products SET in_order = " + (in_order - quantity) + " WHERE prod_num = " + prod_num);
-                    statement.executeUpdate(sql);
+                    updateStatment.executeUpdate(sql);
                     db.writeToLog(sql);
 
                     db.writeToLog(MayfairConstants.LOG_SEPERATOR);
@@ -487,15 +466,6 @@ public class EditMain extends javax.swing.JInternalFrame
             {
                 JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
             }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
-            }
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
@@ -503,9 +473,7 @@ public class EditMain extends javax.swing.JInternalFrame
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you have finished editting?", "Finish", JOptionPane.YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-
-            Connection con = db.getConnection();
-            try
+            try (Connection con = db.getConnection())
             {
                 Statement statement = con.createStatement();
                 sql = "UPDATE purchase_order SET comments = '" + fieldComments.getText() + "' WHERE ord_num = '" + orderNum + "'";
@@ -521,14 +489,8 @@ public class EditMain extends javax.swing.JInternalFrame
             }
             finally
             {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
+                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
             }
-            db.writeToLog(MayfairConstants.LOG_SEPERATOR);
         }
     }//GEN-LAST:event_btnFinishActionPerformed
 
