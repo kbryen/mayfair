@@ -28,6 +28,7 @@ public class MayfairConstants
     public static final String ALL_SALES_TEMPLATE = TEMPLATES_DIR + "AllSalesOrders.xls";
     public static final String OUT_OF_STOCK_REPORT_TEMPLATE = TEMPLATES_DIR + "OutOfStockReport.xls";
     public static final String STOCK_REPORT_TEMPLATE = TEMPLATES_DIR + "StockReport.xls";
+    public static final String WAREHOUSE_STOCK_REPORT_TEMPLATE = TEMPLATES_DIR + "WarehouseStockReport.xls";
     public static final String PROD_SALES_TEMPLATE = TEMPLATES_DIR + "ProdSalesOrders.xls";
     public static final String REPORTS_DIR = "S://STOCK SYSTEM/";
     public static final String PROD_SALES_ORDERS_DIR = REPORTS_DIR + "Product Sales Orders/";
