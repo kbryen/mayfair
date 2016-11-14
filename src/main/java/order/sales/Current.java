@@ -642,6 +642,7 @@ public class Current extends javax.swing.JInternalFrame
         {
             String custName = (String) table.getValueAt(table.getSelectedRow(), 1);
             String custRef = "";
+            String custEmail = "";
             String custTel = "";
             String custCountry = "";
             String temp[];
@@ -655,10 +656,11 @@ public class Current extends javax.swing.JInternalFrame
 
             try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                ResultSet rs = statement.executeQuery("SELECT reference, del_address, country, tel, delivery, proforma FROM customers WHERE name = '" + custName + "'");
+                ResultSet rs = statement.executeQuery("SELECT reference, del_address, country, email, tel, delivery, proforma FROM customers WHERE name = '" + custName + "'");
                 rs.next();
                 // Customer
                 custRef = rs.getString("reference");
+                custEmail = rs.getString("email");
                 custTel = rs.getString("tel");
                 custCountry = rs.getString("country");
                 delIns = rs.getString("delivery");
@@ -689,82 +691,92 @@ public class Current extends javax.swing.JInternalFrame
                 JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
                 JOptionPane.showMessageDialog(Current.this, e);
             }
-
+            
             String fileName = DISPATCH_NOTES_DIR + "VELTA ORDER - " + custRef + " " + ordDate + ".xls";
             try (FileOutputStream fileOut = new FileOutputStream(fileName))
             {
                 HSSFWorkbook wb = db.getHSSFWorkbook(DISPATCH_NOTE_TEMPLATE);
-                HSSFSheet worksheet = wb.getSheet("Import File");
+                HSSFSheet worksheet = wb.getSheet("Order Details");
 
-                int i = 3;
-                int total = 0;
+                int i = 1;
                 try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
                     ResultSet rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity FROM sales_order_details JOIN products ON sales_order_details.prod_num = products.prod_num WHERE sales_order_details.ord_num = " + ordNum);
                     // Main Rows
                     while (rs.next())
                     {
-                        HSSFRow main = worksheet.getRow(i++);
-                        HSSFCell acc = main.getCell(0);
-                        acc.setCellValue("MAYTRUMDT");
+                        HSSFRow main = worksheet.createRow(i++);
+                         
+                        HSSFCell customer = main.createCell(0);
+                        customer.setCellValue("MTC");
+                        
+                        HSSFCell prefix = main.createCell(1);
+                        prefix.setCellValue("J");
 
-                        HSSFCell code = main.getCell(2);
-                        code.setCellValue(custRef);
-
-                        HSSFCell date = main.getCell(5);
-                        date.setCellValue(delDate);
-
-//                        HSSFCell time = main.getCell(6);
-//                        time.setCellValue(delIns);
-
-                        HSSFCell name = main.getCell(7);
-                        name.setCellValue(custName);
-
-                        HSSFCell add1 = main.getCell(8);
+                        HSSFCell orderRef = main.createCell(2);
+                        orderRef.setCellValue(ordNum);
+                        
+                        HSSFCell customerRef = main.createCell(3);
+                        customerRef.setCellValue(custRef);
+                        
+                        HSSFCell addName = main.createCell(4);
+                        addName.setCellValue(custName);
+                        
+                        HSSFCell add1 = main.createCell(5);
                         add1.setCellValue(address[0]);
 
-                        HSSFCell add2 = main.getCell(9);
+                        HSSFCell add2 = main.createCell(6);
                         add2.setCellValue(address[1]);
 
-                        HSSFCell add3 = main.getCell(10);
+                        HSSFCell add3 = main.createCell(7);
                         add3.setCellValue(address[2]);
 
-                        HSSFCell add4 = main.getCell(11);
+                        HSSFCell add4 = main.createCell(8);
                         add4.setCellValue(address[3]);
-
-                        HSSFCell postcode = main.getCell(12);
+                        
+                        HSSFCell postcode = main.createCell(9);
                         postcode.setCellValue(postCode);
-
-                        HSSFCell country = main.getCell(13);
-                        country.setCellValue(custCountry);
-
-                        HSSFCell tel = main.getCell(14);
-                        tel.setCellValue(custTel);
-
-                        HSSFCell prod = main.getCell(15);
-                        prod.setCellValue(rs.getString("code"));
-
-                        int q = rs.getInt("quantity");
-                        HSSFCell quant = main.getCell(16);
-                        quant.setCellValue(String.valueOf(q));
-
-                        HSSFCell ins = main.getCell(18);
+                        
+                        HSSFCell country = main.createCell(10);
+                        country.setCellValue(custCountry.isEmpty() ? "GB" : custCountry);
+                        
+                        HSSFCell ins = main.createCell(11);
                         ins.setCellValue(instructions);
-                        total = total + q;
+                        
+                        HSSFCell lineNum = main.createCell(12);
+                        lineNum.setCellValue(i - 1);
+                        
+                        HSSFCell prod = main.createCell(13);
+                        prod.setCellValue(rs.getString("code"));
+                        
+                        HSSFCell quant = main.createCell(14);
+                        quant.setCellValue(String.valueOf(rs.getInt("quantity")));
+                        
+                        HSSFCell email = main.createCell(15);
+                        email.setCellValue(custEmail);
+                        
+                        HSSFCell tell = main.createCell(16);
+                        tell.setCellValue(custTel);
                     }
                 }
-                catch (SQLException e)
+                catch (Exception e)
                 {
                     JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                    JOptionPane.showMessageDialog(Current.this, e);
+                    JOptionPane.showMessageDialog(Current.this, e.getStackTrace());
                 }
 
-                // Quant total
-                i++;
-                HSSFRow quantRow = worksheet.getRow(i);
-                HSSFCell quantCell = quantRow.getCell(16);
-                quantCell.setCellValue(String.valueOf(total));
+//                // Quant total
+//                i++;
+//                HSSFRow quantRow = worksheet.getRow(i);
+//                HSSFCell quantCell = quantRow.getCell(16);
+//                quantCell.setCellValue(String.valueOf(total));
 
+                // Auto Size Columns
+                for (int k = 0; k < 17; k++)
+                {
+                    worksheet.autoSizeColumn(k);
+                }
+                
                 wb.write(fileOut);
                 fileOut.flush();
                 fileOut.close();

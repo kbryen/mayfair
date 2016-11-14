@@ -4,11 +4,17 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/product/View.java</file>
+            <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/order/sales/EditMain.java</file>
+            <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/order/sales/EditAddProduct.java</file>
             <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/product/Add.java</file>
+            <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/order/sales/ViewSalesSummary.java</file>
             <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/Database.java</file>
             <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/Main.java</file>
             <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/MayfairConstants.java</file>
+            <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/order/sales/Finish.java</file>
+            <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/order/sales/CustomerNumber.java</file>
             <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/report/Reports.java</file>
+            <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/order/sales/PickPurchaseOrders.java</file>
             <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/customer/Customers.java</file>
             <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/order/sales/Current.java</file>
             <file>file:/Users/kian_bryen/Documents/Github/mayfair/trunk/src/main/java/product/Edit.java</file>

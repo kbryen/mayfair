@@ -318,9 +318,19 @@ public class EditMain extends javax.swing.JInternalFrame
             db.writeToLog("EDIT SALES ORDER " + orderNum);
 
             labelOrdNum.setText(rs.getString("ord_num"));
-            calDelDate.setDate(rs.getDate("del_date"));
-            String[] date = rs.getString("del_date").split(" ");
-            labelDelDate.setText(date[0]);
+            Date delDate = rs.getDate("del_date");
+            String date;
+            if(delDate == null)
+            {
+                delDate = new Date();
+                date = "";
+            }
+            else
+            {
+                date = delDate.toString();
+            }
+            labelDelDate.setText(date);
+            calDelDate.setDate(delDate);
             labelOrdTotal.setText(String.format("%.02f", rs.getFloat("price")));
             fieldComments.setText(rs.getString("comments"));
 
