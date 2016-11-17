@@ -35,5 +35,5 @@ public class MayfairConstants
     public static final String PURCHASE_ORDERS_DIR = REPORTS_DIR + "Purchase Orders/";
     public static final String SALES_PURCHASE_ORDERS_DIR = REPORTS_DIR + "Sales & Purchase Order Reports/";
     public static final String STOCK_REPORTS_DIR = REPORTS_DIR + "Stock Reports/";
-    public static final String DISPATCH_NOTES_DIR = "S://VELTA/Automatically Created/";
+    public static final String DISPATCH_NOTES_DIR = REPORTS_DIR + "Dispatch Notes/";
 }

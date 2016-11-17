@@ -65,8 +65,7 @@ public class Current extends javax.swing.JInternalFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents()
-    {
+    private void initComponents() {
 
         jLabel1 = new javax.swing.JLabel();
         btnViewSummary = new javax.swing.JButton();
@@ -98,19 +97,15 @@ public class Current extends javax.swing.JInternalFrame
 
         btnViewSummary.setBackground(new java.awt.Color(153, 204, 255));
         btnViewSummary.setText("View Summary");
-        btnViewSummary.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnViewSummary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnViewSummaryActionPerformed(evt);
             }
         });
 
         btnFind.setText("Find");
-        btnFind.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnFind.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnFindActionPerformed(evt);
             }
         });
@@ -118,43 +113,34 @@ public class Current extends javax.swing.JInternalFrame
         scrollPane.setBorder(null);
 
         table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][]
-            {
+            new Object [][] {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null}
             },
-            new String []
-            {
+            new String [] {
                 "Number", "", "Ordered", "Expected Delivery", "Total (£)", "Dispatched", "Date"
             }
-        )
-        {
-            Class[] types = new Class []
-            {
+        ) {
+            Class[] types = new Class [] {
                 java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Float.class, java.lang.Boolean.class, java.lang.String.class
             };
-            boolean[] canEdit = new boolean []
-            {
+            boolean[] canEdit = new boolean [] {
                 false, false, false, false, false, false, false
             };
 
-            public Class getColumnClass(int columnIndex)
-            {
+            public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
 
-            public boolean isCellEditable(int rowIndex, int columnIndex)
-            {
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
         });
         table.setColumnSelectionAllowed(true);
-        table.addMouseListener(new java.awt.event.MouseAdapter()
-        {
-            public void mouseClicked(java.awt.event.MouseEvent evt)
-            {
+        table.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tableMouseClicked(evt);
             }
         });
@@ -163,10 +149,8 @@ public class Current extends javax.swing.JInternalFrame
 
         jLabel3.setText("Order Number");
 
-        fieldOrderNumber.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        fieldOrderNumber.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 fieldOrderNumberActionPerformed(evt);
             }
         });
@@ -174,63 +158,49 @@ public class Current extends javax.swing.JInternalFrame
         jLabel4.setText("OR");
 
         btnCancel.setText("Cancel Order");
-        btnCancel.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnCancel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnCancelActionPerformed(evt);
             }
         });
 
         btnEdit.setText("Edit Order");
-        btnEdit.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnEdit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnEditActionPerformed(evt);
             }
         });
 
-        btnMarkDispatched.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnMarkDispatched.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnMarkDispatchedActionPerformed(evt);
             }
         });
 
         btnMarkDelivered.setText("Mark Delivered");
-        btnMarkDelivered.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnMarkDelivered.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnMarkDeliveredActionPerformed(evt);
             }
         });
 
         btnDispatch.setText("Create Dispatch Note");
-        btnDispatch.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnDispatch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnDispatchActionPerformed(evt);
             }
         });
 
         btnClear.setText("Clear");
-        btnClear.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnClear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnClearActionPerformed(evt);
             }
         });
 
         btnExcelSummary.setText("Create Summary File");
-        btnExcelSummary.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
+        btnExcelSummary.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnExcelSummaryActionPerformed(evt);
             }
         });
@@ -244,7 +214,7 @@ public class Current extends javax.swing.JInternalFrame
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 494, Short.MAX_VALUE)
+                            .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE)
                             .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
@@ -263,20 +233,20 @@ public class Current extends javax.swing.JInternalFrame
                                             .addComponent(fieldOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                 .addGap(0, 210, Short.MAX_VALUE))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 193, Short.MAX_VALUE)
+                                .addGap(0, 0, Short.MAX_VALUE)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                         .addComponent(btnMarkDispatched)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addComponent(btnMarkDelivered))
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addComponent(btnCancel)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnEdit))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                         .addComponent(btnExcelSummary, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnDispatch)))))
+                                        .addComponent(btnDispatch))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(btnCancel)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnEdit)))))
                         .addContainerGap())
                     .addGroup(layout.createSequentialGroup()
                         .addGap(36, 36, 36)
@@ -692,7 +662,7 @@ public class Current extends javax.swing.JInternalFrame
                 JOptionPane.showMessageDialog(Current.this, e);
             }
             
-            String fileName = DISPATCH_NOTES_DIR + "VELTA ORDER - " + custRef + " " + ordDate + ".xls";
+            String fileName = DISPATCH_NOTES_DIR + "RIF ORDER " + ordNum + " - " + custRef + " " + ordDate + ".xls";
             try (FileOutputStream fileOut = new FileOutputStream(fileName))
             {
                 HSSFWorkbook wb = db.getHSSFWorkbook(DISPATCH_NOTE_TEMPLATE);
@@ -734,28 +704,30 @@ public class Current extends javax.swing.JInternalFrame
                         HSSFCell add4 = main.createCell(8);
                         add4.setCellValue(address[3]);
                         
-                        HSSFCell postcode = main.createCell(9);
+                        // add5
+                        
+                        HSSFCell postcode = main.createCell(10);
                         postcode.setCellValue(postCode);
                         
-                        HSSFCell country = main.createCell(10);
+                        HSSFCell country = main.createCell(11);
                         country.setCellValue(custCountry.isEmpty() ? "GB" : custCountry);
                         
-                        HSSFCell ins = main.createCell(11);
+                        HSSFCell ins = main.createCell(12);
                         ins.setCellValue(instructions);
                         
-                        HSSFCell lineNum = main.createCell(12);
+                        HSSFCell lineNum = main.createCell(13);
                         lineNum.setCellValue(i - 1);
                         
-                        HSSFCell prod = main.createCell(13);
+                        HSSFCell prod = main.createCell(14);
                         prod.setCellValue(rs.getString("code"));
                         
-                        HSSFCell quant = main.createCell(14);
+                        HSSFCell quant = main.createCell(15);
                         quant.setCellValue(String.valueOf(rs.getInt("quantity")));
                         
-                        HSSFCell email = main.createCell(15);
+                        HSSFCell email = main.createCell(16);
                         email.setCellValue(custEmail);
                         
-                        HSSFCell tell = main.createCell(16);
+                        HSSFCell tell = main.createCell(17);
                         tell.setCellValue(custTel);
                     }
                 }
