@@ -6,6 +6,7 @@
 package main.java.report;
 
 import java.io.FileOutputStream;
+import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -25,6 +26,8 @@ import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import main.java.Database;
 import static main.java.MayfairConstants.ALL_PURCHASE_TEMPLATE;
 import static main.java.MayfairConstants.ALL_SALES_TEMPLATE;
+import static main.java.MayfairConstants.CUSTOMERS_TEMPLATE;
+import static main.java.MayfairConstants.CUSTOMER_REPORTS_DIR;
 import static main.java.MayfairConstants.OUT_OF_STOCK_REPORT_TEMPLATE;
 import static main.java.MayfairConstants.PROD_SALES_ORDERS_DIR;
 import static main.java.MayfairConstants.PROD_SALES_TEMPLATE;
@@ -34,6 +37,7 @@ import static main.java.MayfairConstants.STOCK_REPORT_TEMPLATE;
 import static main.java.MayfairConstants.WAREHOUSE_STOCK_REPORT_TEMPLATE;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -50,6 +54,8 @@ public class Reports extends javax.swing.JInternalFrame
     private final JDesktopPane desktop;
     private final Database db = new Database();
     private String sql;
+    private static final String COMMA = ",";
+    private static final String DIVIDER = " - ";
 
     /**
      * Creates new form ViewEditProducts
@@ -60,15 +66,20 @@ public class Reports extends javax.swing.JInternalFrame
     {
         desktop = pane;
         initComponents();
-        btnCustomers.setEnabled(false);
         btnCreate.setEnabled(false);
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
+        dateSR.setEnabled(false);
+        dateER.setEnabled(false);
+        checkAll.setEnabled(false);
         labelProduct.setEnabled(false);
-        btnFind.setEnabled(false);
+        btnFindProd.setEnabled(false);
         comboProducts.setEnabled(false);
+        labelReference.setEnabled(false);
+        btnFindCust.setEnabled(false);
+        comboCustomers.setEnabled(false);
     }
 
     /**
@@ -99,23 +110,33 @@ public class Reports extends javax.swing.JInternalFrame
         jLabel7 = new javax.swing.JLabel();
         jSeparator4 = new javax.swing.JSeparator();
         labelProduct = new javax.swing.JTextField();
-        btnFind = new javax.swing.JButton();
+        btnFindProd = new javax.swing.JButton();
         jLabel8 = new javax.swing.JLabel();
         comboProducts = new javax.swing.JComboBox();
         jLabel5 = new javax.swing.JLabel();
         jSeparator5 = new javax.swing.JSeparator();
         jSeparator6 = new javax.swing.JSeparator();
-        btnCustomers = new javax.swing.JRadioButton();
+        btnAllCustomers = new javax.swing.JRadioButton();
         jSeparator7 = new javax.swing.JSeparator();
         btnCreate = new javax.swing.JButton();
         btnWarehouseStockReport = new javax.swing.JRadioButton();
+        dateSR = new com.toedter.calendar.JDateChooser();
+        dateER = new com.toedter.calendar.JDateChooser();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        checkAll = new javax.swing.JCheckBox();
+        btnCustomers = new javax.swing.JRadioButton();
+        btnFindCust = new javax.swing.JButton();
+        comboCustomers = new javax.swing.JComboBox();
+        labelReference = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
 
         setClosable(true);
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
         setTitle("Reports");
-        setPreferredSize(new java.awt.Dimension(630, 600));
+        setPreferredSize(new java.awt.Dimension(630, 720));
 
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
         jLabel1.setText("Reports");
@@ -164,10 +185,10 @@ public class Reports extends javax.swing.JInternalFrame
         jLabel7.setFont(new java.awt.Font("Lucida Grande", 2, 10)); // NOI18N
         jLabel7.setText("End Date");
 
-        btnFind.setText("Find");
-        btnFind.addActionListener(new java.awt.event.ActionListener() {
+        btnFindProd.setText("Find");
+        btnFindProd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnFindActionPerformed(evt);
+                btnFindProdActionPerformed(evt);
             }
         });
 
@@ -184,7 +205,12 @@ public class Reports extends javax.swing.JInternalFrame
         jLabel5.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
         jLabel5.setText("Customers");
 
-        btnCustomers.setText("Coming soon...");
+        btnAllCustomers.setText("All customers");
+        btnAllCustomers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAllCustomersActionPerformed(evt);
+            }
+        });
 
         btnCreate.setText("Create");
         btnCreate.addActionListener(new java.awt.event.ActionListener() {
@@ -200,6 +226,44 @@ public class Reports extends javax.swing.JInternalFrame
             }
         });
 
+        jLabel9.setFont(new java.awt.Font("Lucida Grande", 2, 10)); // NOI18N
+        jLabel9.setText("Start Date");
+
+        jLabel10.setFont(new java.awt.Font("Lucida Grande", 2, 10)); // NOI18N
+        jLabel10.setText("End Date");
+
+        checkAll.setFont(new java.awt.Font("Lucida Grande", 2, 12)); // NOI18N
+        checkAll.setText("All Dates");
+        checkAll.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkAllActionPerformed(evt);
+            }
+        });
+
+        btnCustomers.setText("Specific customers");
+        btnCustomers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCustomersActionPerformed(evt);
+            }
+        });
+
+        btnFindCust.setText("Find");
+        btnFindCust.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnFindCustActionPerformed(evt);
+            }
+        });
+
+        comboCustomers.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboCustomers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboCustomersActionPerformed(evt);
+            }
+        });
+
+        jLabel11.setFont(new java.awt.Font("Lucida Grande", 2, 10)); // NOI18N
+        jLabel11.setText("Customer Reference Search");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -209,61 +273,84 @@ public class Reports extends javax.swing.JInternalFrame
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jSeparator1)
-                            .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(btnCreate))
+                            .addComponent(btnCustomers)
+                            .addComponent(btnAllCustomers))
+                        .addGap(40, 40, 40)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(dateSR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel9))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel10)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(dateER, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(checkAll)))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel11)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(labelReference, javax.swing.GroupLayout.PREFERRED_SIZE, 168, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnFindCust)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(comboCustomers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(53, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator6)
+                            .addComponent(jSeparator5)
+                            .addComponent(jSeparator4)
+                            .addComponent(jSeparator2)
+                            .addComponent(jSeparator1)
+                            .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(btnWarehouseStockReport)
+                                    .addComponent(btnOutOfStockReport)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(btnPOMadeDate)
+                                            .addComponent(btnSOMadeDate))
+                                        .addGap(18, 18, 18)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(dateSSO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(dateESO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(dateSPO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                    .addComponent(jLabel6))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                    .addComponent(jLabel7)
+                                                    .addComponent(dateEPO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(btnSOMadeProd)
+                                        .addGap(43, 43, 43)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel8)
+                                            .addGroup(layout.createSequentialGroup()
+                                                .addComponent(labelProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(btnFindProd)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(comboProducts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addComponent(jLabel5)
                                     .addComponent(jLabel4)
                                     .addComponent(btnAvailableStockReport)
                                     .addComponent(jLabel1))
-                                .addGap(0, 460, Short.MAX_VALUE)))
-                        .addContainerGap())
-                    .addComponent(jSeparator7)
-                    .addComponent(jSeparator4)
-                    .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jSeparator5)
-                    .addComponent(jSeparator6, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnCustomers)
-                        .addGap(466, 466, 466))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnWarehouseStockReport)
-                            .addComponent(btnOutOfStockReport)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(btnPOMadeDate)
-                                    .addComponent(btnSOMadeDate))
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(dateSSO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(dateESO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(dateSPO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(jLabel6))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(jLabel7)
-                                            .addComponent(dateEPO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(btnSOMadeProd)
-                                .addGap(43, 43, 43)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel8)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(labelProduct, javax.swing.GroupLayout.PREFERRED_SIZE, 167, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnFind)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(comboProducts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addComponent(jLabel5))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jSeparator7, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addContainerGap())))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnCreate)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -305,7 +392,7 @@ public class Reports extends javax.swing.JInternalFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(labelProduct, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnFind)
+                    .addComponent(btnFindProd)
                     .addComponent(btnSOMadeProd)
                     .addComponent(comboProducts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
@@ -314,11 +401,33 @@ public class Reports extends javax.swing.JInternalFrame
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jLabel11)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnCustomers)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnCustomers)
+                    .addComponent(labelReference, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(btnFindCust)
+                    .addComponent(comboCustomers, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(btnAllCustomers))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(23, 23, 23)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel9)
+                            .addComponent(jLabel10))
+                        .addGap(4, 4, 4)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(checkAll)
+                                .addGap(3, 3, 3))
+                            .addComponent(dateSR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(dateER, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(18, 18, 18)
                 .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 102, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
                 .addComponent(btnCreate)
                 .addContainerGap())
         );
@@ -337,6 +446,10 @@ public class Reports extends javax.swing.JInternalFrame
             {
                 HSSFWorkbook workBook = db.getHSSFWorkbook(STOCK_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Stock Report");
+                
+                HSSFDataFormat format = workBook.createDataFormat();
+                HSSFCellStyle numberStyle = workBook.createCellStyle();
+                numberStyle.setDataFormat(format.getFormat("0"));
                 
                 // Create bold style
                 HSSFCellStyle bold = workBook.createCellStyle();
@@ -398,6 +511,7 @@ public class Reports extends javax.swing.JInternalFrame
                         // Cell 1 - prod num
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(prod_num);
+                        cell.setCellStyle(numberStyle);
                         
                         // Cell 2 - prod code
                         cell = row.createCell(cellCount++);
@@ -406,6 +520,7 @@ public class Reports extends javax.swing.JInternalFrame
                         // Cell 3 - available
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(in_stock);
+                        cell.setCellStyle(numberStyle);
 
                         // Loop through undelivered purchase orders
                         int total = in_stock;
@@ -422,6 +537,7 @@ public class Reports extends javax.swing.JInternalFrame
                             // Cell * - purchase order avaliable
                             cell = row.createCell(cellCount++);
                             cell.setCellValue(avaliable);
+                            cell.setCellStyle(numberStyle);
 
                             total = total + avaliable;
                         }
@@ -429,6 +545,7 @@ public class Reports extends javax.swing.JInternalFrame
                         // Cell last - total
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(total);
+                        cell.setCellStyle(numberStyle);
                     }
                 }
                 catch (SQLException e)
@@ -467,6 +584,10 @@ public class Reports extends javax.swing.JInternalFrame
             {
                 HSSFWorkbook workBook = db.getHSSFWorkbook(WAREHOUSE_STOCK_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Warehouse Stock Report");
+                
+                HSSFDataFormat format = workBook.createDataFormat();
+                HSSFCellStyle numberStyle = workBook.createCellStyle();
+                numberStyle.setDataFormat(format.getFormat("0"));
                 
                 // Create bold style
                 HSSFCellStyle bold = workBook.createCellStyle();
@@ -508,6 +629,7 @@ public class Reports extends javax.swing.JInternalFrame
                             // Cell 1 - prod num
                             cell = row.createCell(0);
                             cell.setCellValue(prod_num);
+                            cell.setCellStyle(numberStyle);
 
                             // Cell 2 - prod code
                             cell = row.createCell(1);
@@ -516,6 +638,7 @@ public class Reports extends javax.swing.JInternalFrame
                             // Cell 3 - warehouse
                             cell = row.createCell(2);
                             cell.setCellValue(warehouse);
+                            cell.setCellStyle(numberStyle);
                         }
                     }
                 }
@@ -556,6 +679,10 @@ public class Reports extends javax.swing.JInternalFrame
                 HSSFWorkbook workBook = db.getHSSFWorkbook(OUT_OF_STOCK_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Out of Stock Report");
                 
+                HSSFDataFormat format = workBook.createDataFormat();
+                HSSFCellStyle numberStyle = workBook.createCellStyle();
+                numberStyle.setDataFormat(format.getFormat("0"));
+                
                 try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
                     HSSFRow row;
@@ -567,12 +694,13 @@ public class Reports extends javax.swing.JInternalFrame
                     cell = row.getCell(1);
                     cell.setCellValue(date);
 
-                    ResultSet rs = statement.executeQuery("SELECT prod_num, code, in_stock FROM products where in_stock = 0");
+                    ResultSet rs = statement.executeQuery("SELECT prod_num, code FROM products where in_stock = 0");
                     while (rs.next())
                     {
                         row = sheet.createRow(rowCount++);
                         cell = row.createCell(0);
                         cell.setCellValue(rs.getString("prod_num"));
+                        cell.setCellStyle(numberStyle);
                         cell = row.createCell(1);
                         cell.setCellValue(rs.getString("code"));
                     }
@@ -621,6 +749,11 @@ public class Reports extends javax.swing.JInternalFrame
                     try (FileOutputStream fileOut = new FileOutputStream(fileName))
                     {
                         HSSFWorkbook workBook = db.getHSSFWorkbook(ALL_PURCHASE_TEMPLATE);
+                        
+                        HSSFDataFormat format = workBook.createDataFormat();
+                        HSSFCellStyle numberStyle = workBook.createCellStyle();
+                        numberStyle.setDataFormat(format.getFormat("0"));
+                        
                         HSSFSheet sheet = workBook.getSheet("Purchase Orders Made");
 
                         HSSFRow row;
@@ -642,13 +775,15 @@ public class Reports extends javax.swing.JInternalFrame
                         {
                             // num
                             cell = row.createCell(0);
-                            cell.setCellValue(rs.getString("prod_num"));
+                            cell.setCellValue(rs.getInt("prod_num"));
+                            cell.setCellStyle(numberStyle);
                             // code
                             cell = row.createCell(1);
                             cell.setCellValue(rs.getString("code"));
                             // quant
                             cell = row.createCell(2);
-                            cell.setCellValue(rs.getString("quantity"));
+                            cell.setCellValue(rs.getInt("quantity"));
+                            cell.setCellStyle(numberStyle);
 
                             row = sheet.createRow(rowCount++);
                         }
@@ -700,6 +835,10 @@ public class Reports extends javax.swing.JInternalFrame
                         HSSFWorkbook workBook = db.getHSSFWorkbook(ALL_SALES_TEMPLATE);
                         HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
 
+                        HSSFDataFormat format = workBook.createDataFormat();
+                        HSSFCellStyle numberStyle = workBook.createCellStyle();
+                        numberStyle.setDataFormat(format.getFormat("0"));
+                
                         HSSFRow row;
                         int rowCount = 0;
                         HSSFCell cell;
@@ -720,13 +859,15 @@ public class Reports extends javax.swing.JInternalFrame
                             // num
                             cell = row.createCell(0);
                             cell.setCellValue(rs.getString("prod_num"));
+                            cell.setCellStyle(numberStyle);
                             // code
                             cell = row.createCell(1);
                             cell.setCellValue(rs.getString("code"));
                             // quant
                             cell = row.createCell(2);
                             cell.setCellValue(rs.getString("quantity"));
-
+                            cell.setCellStyle(numberStyle);
+                            
                             row = sheet.createRow(rowCount++);
                         }
 
@@ -778,6 +919,10 @@ public class Reports extends javax.swing.JInternalFrame
                             HSSFWorkbook workBook = db.getHSSFWorkbook(PROD_SALES_TEMPLATE);
                             HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
 
+                            HSSFDataFormat format = workBook.createDataFormat();
+                            HSSFCellStyle numberStyle = workBook.createCellStyle();
+                            numberStyle.setDataFormat(format.getFormat("0"));
+                
                             HSSFRow row;
                             int rowCount = 3;
                             HSSFCell cell;
@@ -794,6 +939,7 @@ public class Reports extends javax.swing.JInternalFrame
 
                                 cell = row.createCell(0);
                                 cell.setCellValue(rs.getString("ord_num"));
+                                cell.setCellStyle(numberStyle);
 
                                 cell = row.createCell(1);
                                 cell.setCellValue(rs.getString("name"));
@@ -825,6 +971,7 @@ public class Reports extends javax.swing.JInternalFrame
 
                                 cell = row.createCell(6);
                                 cell.setCellValue(rs.getString("quantity"));
+                                cell.setCellStyle(numberStyle);
                             }
 
                             // Auto Size Columns
@@ -858,111 +1005,173 @@ public class Reports extends javax.swing.JInternalFrame
         }
     }
     
-    private void btnAvailableStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvailableStockReportActionPerformed
-        btnAvailableStockReport.setSelected(true);
-        btnWarehouseStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(false);
-        
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-        
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-        
-        labelProduct.setEnabled(false);
-        btnFind.setEnabled(false);
-        comboProducts.setEnabled(false);
-        
-        btnCreate.setEnabled(true);
-    }//GEN-LAST:event_btnAvailableStockReportActionPerformed
+    private void createCustomerReport()
+    {
+        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a customer report?", "Customer Report", JOptionPane.YES_NO_OPTION);
+        if (selectedOption == JOptionPane.YES_OPTION)
+        {
+            if(!btnCustomers.isSelected())
+            {
+                JOptionPane.showMessageDialog(Reports.this, "<html><b>WARNING:</b>This report can take up to <b>3 minutes</b> to create.</html>\nPlease do not use the system and ensure no one else is while the report is created.","Warning",WARNING_MESSAGE);
+            }
+            
+            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+            {
+                SimpleDateFormat df1 = new SimpleDateFormat("dd-MM-yy");
+                SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
+                Date startDate = dateSR.getDate();
+                Date endDate = dateER.getDate();
 
-    private void btnOutOfStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOutOfStockReportActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(true);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(false);
-        
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-        
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-        
-        labelProduct.setEnabled(false);
-        btnFind.setEnabled(false);
-        comboProducts.setEnabled(false);
-        
-        btnCreate.setEnabled(true);
-    }//GEN-LAST:event_btnOutOfStockReportActionPerformed
+                StringBuilder fileName = new StringBuilder();
+                fileName.append(CUSTOMER_REPORTS_DIR).append("Customer Report");
+                
+                String whereClauseReference = "";
+                if(btnCustomers.isSelected())
+                {
+                    fileName.append(" - ").append(labelReference.getText());
+                    whereClauseReference = " WHERE reference = '" + labelReference.getText() + "'";
+                }
+                
+                String whereClauseDates = "";
+                if(!checkAll.isSelected())
+                {
+                    fileName.append(" - ").append(df1.format(startDate)) .append(" ") .append(df1.format(endDate));
+                    whereClauseDates = " AND ord_date >= '" + df2.format(startDate) + "' AND ord_date <= '" + df2.format(endDate) + "'";
+                }
+                
+                fileName.append(".xls");
+                
+                try (FileOutputStream fileOut = new FileOutputStream(fileName.toString()))
+                {
+                    HSSFWorkbook workBook = db.getHSSFWorkbook(CUSTOMERS_TEMPLATE);
+                    HSSFSheet sheet = workBook.getSheet("Customers");
+                    
+                    HSSFRow row;
+                    HSSFCell cell;
+                    
+                    // Products
+                    int rowCount = 1;
+                    Map<Integer, Integer> prodCellIndexes = new HashMap();
+                    Map<Integer, String> disconProds = new HashMap();
+                    ResultSet rs = statement.executeQuery("SELECT prod_num, code, sales_price, purchase_price, discon FROM products ORDER BY prod_num");           
+                    while(rs.next())
+                    {
+                        int prodNum = rs.getInt("prod_num");
+                        String code = rs.getString("code");
+                        String salesPrice = "£" + rs.getBigDecimal("sales_price").setScale(2, RoundingMode.CEILING).toPlainString();
+                        String purchasePrice = "£" + rs.getBigDecimal("purchase_price").setScale(2, RoundingMode.CEILING).toPlainString();
+                        boolean discon = rs.getBoolean("discon");
+                        
+                        if(discon)
+                        {
+                            disconProds.put(prodNum, code + COMMA + salesPrice + COMMA + purchasePrice);
+                        }
+                        else
+                        {
+                            prodCellIndexes.put(prodNum, rowCount);
+                            
+                            row = sheet.createRow(rowCount++);
+                            cell = row.createCell(0);
+                            cell.setCellValue(prodNum);
+                            cell = row.createCell(1);
+                            cell.setCellValue(code);
+                            cell = row.createCell(2);
+                            cell.setCellValue(salesPrice);
+                            cell = row.createCell(3);
+                            cell.setCellValue(purchasePrice);
+                        }
+                    }
+                    
+                    // Discontinuted                  
+                    rowCount++;
+                    row = sheet.createRow(rowCount++);
+                    cell = row.createCell(0);
+                    cell.setCellValue("DISCONTINUED");
+                    rowCount++;
+                    for(Map.Entry<Integer, String> discon : disconProds.entrySet())
+                    {
+                        int prodNum = discon.getKey();
+                        prodCellIndexes.put(prodNum, rowCount);
+                        
+                        String prod = discon.getValue();
+                        row = sheet.createRow(rowCount++);
+                        int cellCount = 0;
+                        
+                        cell = row.createCell(cellCount++); 
+                        cell.setCellValue(prodNum);
+                        for(String info : prod.split(COMMA))
+                        {
+                            cell = row.createCell(cellCount++); 
+                            cell.setCellValue(info);
+                        }
+                    }
+                    
+                    // Auto Size Columns
+                    for (int i = 0; i < 5; i++)
+                    {
+                        sheet.autoSizeColumn(i);
+                    }
+                    
+                    // Customers
+                    row = sheet.getRow(0);
+                    HSSFCellStyle rotate = workBook.createCellStyle();
+                    rotate.setRotation((short)90);
+                    int columnCount = 5;
+                    Map<Integer, Integer> custCellIndexes = new HashMap();
+                    rs = statement.executeQuery("SELECT cust_num, name FROM customers" + whereClauseReference + " ORDER BY cust_num");           
+                    while(rs.next())
+                    {
+                        int custNum = rs.getInt("cust_num");
+                        String name = rs.getString("name");
+                        custCellIndexes.put(custNum, columnCount);
+                        cell = row.createCell(columnCount++);
+                        cell.setCellValue(custNum + DIVIDER + name);
+                        cell.setCellStyle(rotate);
+                        sheet.autoSizeColumn(columnCount - 1);
+                    }
+                    
+                    // Orders made
+                    for(Map.Entry<Integer, Integer> product : prodCellIndexes.entrySet())
+                    {
+                        int prodNum = product.getKey();
+                        int rowNum = product.getValue();
+                        int total = 0;
+                        for(Map.Entry<Integer, Integer> customer : custCellIndexes.entrySet())
+                        {
+                            int custNum = customer.getKey();
+                            int columnNum = customer.getValue();
+                            rs = statement.executeQuery("SELECT SUM(quantity) AS total FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.cust_num = " + custNum + whereClauseDates); 
+                            if(rs.isBeforeFirst())
+                            {
+                                rs.next();
+                                int quantity = rs.getInt("total");
+                                if(quantity != 0)
+                                {
+                                    cell = sheet.getRow(rowNum).createCell(columnNum);
+                                    cell.setCellValue(quantity);
+                                    total += quantity;
+                                }
+                            }
+                        }
+                        cell = sheet.getRow(rowNum).createCell(4);
+                        cell.setCellValue(total);
+                    }
+                    
+                    workBook.write(fileOut);
+                    fileOut.flush();
+                    fileOut.close();
 
-    private void btnPOMadeDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPOMadeDateActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(true);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(false);
-        
-        dateSPO.setEnabled(true);
-        dateEPO.setEnabled(true);
-        
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-        
-        labelProduct.setEnabled(false);
-        btnFind.setEnabled(false);
-        comboProducts.setEnabled(false);
-        
-        btnCreate.setEnabled(true);
-    }//GEN-LAST:event_btnPOMadeDateActionPerformed
-
-    private void btnSOMadeDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSOMadeDateActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(true);
-        btnSOMadeProd.setSelected(false);
-        
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-        
-        dateSSO.setEnabled(true);
-        dateESO.setEnabled(true);
-        
-        labelProduct.setEnabled(false);
-        btnFind.setEnabled(false);
-        comboProducts.setEnabled(false);
-        
-        btnCreate.setEnabled(true);
-    }//GEN-LAST:event_btnSOMadeDateActionPerformed
-
-    private void btnSOMadeProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSOMadeProdActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(true);
-        
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-        
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-        
-        labelProduct.setEnabled(true);
-        btnFind.setEnabled(true);
-        comboProducts.setEnabled(true);
-        
-        btnCreate.setEnabled(true);
-    }//GEN-LAST:event_btnSOMadeProdActionPerformed
-
+                    JOptionPane.showMessageDialog(Reports.this, "<html> <b>Customer report created successfully.</b> \n<html> <i> " + fileName.toString() + " </i>", "Report Created", INFORMATION_MESSAGE);
+                }
+            }
+            catch (Exception e)
+            {
+                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating customer report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+            }
+        }
+    }
+    
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
         if(btnAvailableStockReport.isSelected())
         {
@@ -1011,9 +1220,222 @@ public class Reports extends javax.swing.JInternalFrame
                 createSalesOrderReportByProduct(prodCode);
             }
         }
+        if(btnAllCustomers.isSelected())
+        {
+            if(!checkAll.isSelected() && (dateSR.getDate() == null || dateER.getDate() == null))
+            {
+                JOptionPane.showMessageDialog(Reports.this, "Please select start and end date or 'All Dates'", "Missing information", QUESTION_MESSAGE);
+            }
+            else
+            {
+                createCustomerReport();
+            }
+        }
+        if(btnCustomers.isSelected())
+        {
+            String reference = labelReference.getText();
+            if(!checkAll.isSelected() && (dateSR.getDate() == null || dateER.getDate() == null))
+            {
+                JOptionPane.showMessageDialog(Reports.this, "Please select start and end date or 'All Dates'", "Missing information", QUESTION_MESSAGE);
+            }
+            else if (reference.isEmpty())
+            {
+                JOptionPane.showMessageDialog(Reports.this, "Please select a customer reference", "Missing information", QUESTION_MESSAGE);
+            }
+            else
+            {
+                createCustomerReport();
+            }
+        }
     }//GEN-LAST:event_btnCreateActionPerformed
 
-    private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
+    private void btnAvailableStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvailableStockReportActionPerformed
+        btnAvailableStockReport.setSelected(true);
+        btnWarehouseStockReport.setSelected(false);
+        btnOutOfStockReport.setSelected(false);
+        btnPOMadeDate.setSelected(false);
+        btnSOMadeDate.setSelected(false);
+        btnSOMadeProd.setSelected(false);
+        btnAllCustomers.setSelected(false);
+        btnCustomers.setSelected(false);
+        
+        dateSPO.setEnabled(false);
+        dateEPO.setEnabled(false);
+        
+        dateSSO.setEnabled(false);
+        dateESO.setEnabled(false);
+        
+        labelProduct.setEnabled(false);
+        btnFindProd.setEnabled(false);
+        comboProducts.setEnabled(false);
+        
+        dateSR.setEnabled(false);
+        dateER.setEnabled(false);
+        checkAll.setEnabled(false);
+        
+        labelReference.setEnabled(false);
+        btnFindCust.setEnabled(false);
+        comboCustomers.setEnabled(false);
+        
+        btnCreate.setEnabled(true);
+    }//GEN-LAST:event_btnAvailableStockReportActionPerformed
+
+    private void btnWarehouseStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWarehouseStockReportActionPerformed
+        btnAvailableStockReport.setSelected(false);
+        btnWarehouseStockReport.setSelected(true);
+        btnOutOfStockReport.setSelected(false);
+        btnPOMadeDate.setSelected(false);
+        btnSOMadeDate.setSelected(false);
+        btnSOMadeProd.setSelected(false);
+        btnAllCustomers.setSelected(false);
+        btnCustomers.setSelected(false);
+        
+        dateSPO.setEnabled(false);
+        dateEPO.setEnabled(false);
+        
+        dateSSO.setEnabled(false);
+        dateESO.setEnabled(false);
+        
+        labelProduct.setEnabled(false);
+        btnFindProd.setEnabled(false);
+        comboProducts.setEnabled(false);
+        
+        dateSR.setEnabled(false);
+        dateER.setEnabled(false);
+        checkAll.setEnabled(false);
+        
+        labelReference.setEnabled(false);
+        btnFindCust.setEnabled(false);
+        comboCustomers.setEnabled(false);
+        
+        btnCreate.setEnabled(true);
+    }//GEN-LAST:event_btnWarehouseStockReportActionPerformed
+
+    private void btnOutOfStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOutOfStockReportActionPerformed
+        btnAvailableStockReport.setSelected(false);
+        btnWarehouseStockReport.setSelected(false);
+        btnOutOfStockReport.setSelected(true);
+        btnPOMadeDate.setSelected(false);
+        btnSOMadeDate.setSelected(false);
+        btnSOMadeProd.setSelected(false);
+        btnAllCustomers.setSelected(false);
+        btnCustomers.setSelected(false);
+        
+        dateSPO.setEnabled(false);
+        dateEPO.setEnabled(false);
+        
+        dateSSO.setEnabled(false);
+        dateESO.setEnabled(false);
+        
+        labelProduct.setEnabled(false);
+        btnFindProd.setEnabled(false);
+        comboProducts.setEnabled(false);
+        
+        dateSR.setEnabled(false);
+        dateER.setEnabled(false);
+        checkAll.setEnabled(false);
+        
+        labelReference.setEnabled(false);
+        btnFindCust.setEnabled(false);
+        comboCustomers.setEnabled(false);
+        
+        btnCreate.setEnabled(true);
+    }//GEN-LAST:event_btnOutOfStockReportActionPerformed
+
+    private void btnPOMadeDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPOMadeDateActionPerformed
+        btnAvailableStockReport.setSelected(false);
+        btnWarehouseStockReport.setSelected(false);
+        btnOutOfStockReport.setSelected(false);
+        btnPOMadeDate.setSelected(true);
+        btnSOMadeDate.setSelected(false);
+        btnSOMadeProd.setSelected(false);
+        btnAllCustomers.setSelected(false);
+        btnCustomers.setSelected(false);
+        
+        dateSPO.setEnabled(true);
+        dateEPO.setEnabled(true);
+        
+        dateSSO.setEnabled(false);
+        dateESO.setEnabled(false);
+        
+        labelProduct.setEnabled(false);
+        btnFindProd.setEnabled(false);
+        comboProducts.setEnabled(false);
+        
+        dateSR.setEnabled(false);
+        dateER.setEnabled(false);
+        checkAll.setEnabled(false);
+        
+        labelReference.setEnabled(false);
+        btnFindCust.setEnabled(false);
+        comboCustomers.setEnabled(false);
+        
+        btnCreate.setEnabled(true);
+    }//GEN-LAST:event_btnPOMadeDateActionPerformed
+
+    private void btnSOMadeDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSOMadeDateActionPerformed
+        btnAvailableStockReport.setSelected(false);
+        btnWarehouseStockReport.setSelected(false);
+        btnOutOfStockReport.setSelected(false);
+        btnPOMadeDate.setSelected(false);
+        btnSOMadeDate.setSelected(true);
+        btnSOMadeProd.setSelected(false);
+        btnAllCustomers.setSelected(false);
+        btnCustomers.setSelected(false);
+        
+        dateSPO.setEnabled(false);
+        dateEPO.setEnabled(false);
+        
+        dateSSO.setEnabled(true);
+        dateESO.setEnabled(true);
+        
+        labelProduct.setEnabled(false);
+        btnFindProd.setEnabled(false);
+        comboProducts.setEnabled(false);
+        
+        dateSR.setEnabled(false);
+        dateER.setEnabled(false);
+        checkAll.setEnabled(false);
+        
+        labelReference.setEnabled(false);
+        btnFindCust.setEnabled(false);
+        comboCustomers.setEnabled(false);
+        
+        btnCreate.setEnabled(true);
+    }//GEN-LAST:event_btnSOMadeDateActionPerformed
+
+    private void btnSOMadeProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSOMadeProdActionPerformed
+        btnAvailableStockReport.setSelected(false);
+        btnWarehouseStockReport.setSelected(false);
+        btnOutOfStockReport.setSelected(false);
+        btnPOMadeDate.setSelected(false);
+        btnSOMadeDate.setSelected(false);
+        btnSOMadeProd.setSelected(true);
+        btnAllCustomers.setSelected(false);
+        btnCustomers.setSelected(false);
+        
+        dateSPO.setEnabled(false);
+        dateEPO.setEnabled(false);
+        
+        dateSSO.setEnabled(false);
+        dateESO.setEnabled(false);
+        
+        labelProduct.setEnabled(true);
+        btnFindProd.setEnabled(true);
+        comboProducts.setEnabled(true);
+        
+        dateSR.setEnabled(false);
+        dateER.setEnabled(false);
+        checkAll.setEnabled(false);
+        
+        labelReference.setEnabled(false);
+        btnFindCust.setEnabled(false);
+        comboCustomers.setEnabled(false);
+        
+        btnCreate.setEnabled(true);
+    }//GEN-LAST:event_btnSOMadeProdActionPerformed
+
+    private void btnFindProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindProdActionPerformed
          try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             ArrayList<String> products = new ArrayList<>();
@@ -1030,20 +1452,22 @@ public class Reports extends javax.swing.JInternalFrame
             JOptionPane.showMessageDialog(Reports.this, "Error while searching products, please try again.");
             JOptionPane.showMessageDialog(Reports.this, e);
         } 
-    }//GEN-LAST:event_btnFindActionPerformed
+    }//GEN-LAST:event_btnFindProdActionPerformed
 
     private void comboProductsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboProductsActionPerformed
         String product = (String) comboProducts.getSelectedItem();
         labelProduct.setText(product);
     }//GEN-LAST:event_comboProductsActionPerformed
 
-    private void btnWarehouseStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWarehouseStockReportActionPerformed
+    private void btnAllCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAllCustomersActionPerformed
         btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(true);
+        btnWarehouseStockReport.setSelected(false);
         btnOutOfStockReport.setSelected(false);
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(false);
         btnSOMadeProd.setSelected(false);
+        btnAllCustomers.setSelected(true);
+        btnCustomers.setSelected(false);
         
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
@@ -1052,35 +1476,125 @@ public class Reports extends javax.swing.JInternalFrame
         dateESO.setEnabled(false);
         
         labelProduct.setEnabled(false);
-        btnFind.setEnabled(false);
+        btnFindProd.setEnabled(false);
         comboProducts.setEnabled(false);
         
+        if(!checkAll.isSelected())
+        {
+            dateSR.setEnabled(true);
+            dateER.setEnabled(true);
+        }
+        checkAll.setEnabled(true);
+        
+        labelReference.setEnabled(false);
+        btnFindCust.setEnabled(false);
+        comboCustomers.setEnabled(false);
+        
         btnCreate.setEnabled(true);
-    }//GEN-LAST:event_btnWarehouseStockReportActionPerformed
+    }//GEN-LAST:event_btnAllCustomersActionPerformed
+
+    private void checkAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkAllActionPerformed
+        if(checkAll.isSelected())
+        {
+            dateSR.setEnabled(false);
+            dateER.setEnabled(false);
+        }
+        else
+        {
+            dateSR.setEnabled(true);
+            dateER.setEnabled(true);
+        }
+    }//GEN-LAST:event_checkAllActionPerformed
+
+    private void btnCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomersActionPerformed
+        btnAvailableStockReport.setSelected(false);
+        btnWarehouseStockReport.setSelected(false);
+        btnOutOfStockReport.setSelected(false);
+        btnPOMadeDate.setSelected(false);
+        btnSOMadeDate.setSelected(false);
+        btnSOMadeProd.setSelected(false);
+        btnAllCustomers.setSelected(false);
+        btnCustomers.setSelected(true);
+        
+        dateSPO.setEnabled(false);
+        dateEPO.setEnabled(false);
+        
+        dateSSO.setEnabled(false);
+        dateESO.setEnabled(false);
+        
+        labelProduct.setEnabled(false);
+        btnFindProd.setEnabled(false);
+        comboProducts.setEnabled(false);
+        
+        if(!checkAll.isSelected())
+        {
+            dateSR.setEnabled(true);
+            dateER.setEnabled(true);
+        }
+        checkAll.setEnabled(true);
+        
+        labelReference.setEnabled(true);
+        btnFindCust.setEnabled(true);
+        comboCustomers.setEnabled(true);
+        
+        btnCreate.setEnabled(true);
+    }//GEN-LAST:event_btnCustomersActionPerformed
+
+    private void btnFindCustActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindCustActionPerformed
+        ArrayList<String> customers = new ArrayList<>();
+        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        {
+            ResultSet rs = statement.executeQuery("SELECT distinct reference FROM customers WHERE reference LIKE '%" + labelReference.getText() + "%' ORDER BY reference ASC");
+            while (rs.next())
+            {
+                customers.add(rs.getString("reference"));
+            }
+
+            comboCustomers.setVisible(true);
+            comboCustomers.setModel(new javax.swing.DefaultComboBoxModel(customers.toArray()));
+        }
+        catch (SQLException e)
+        {
+            JOptionPane.showMessageDialog(Reports.this, e.getMessage());
+        }
+    }//GEN-LAST:event_btnFindCustActionPerformed
+
+    private void comboCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCustomersActionPerformed
+        labelReference.setText((String) comboCustomers.getSelectedItem());
+    }//GEN-LAST:event_comboCustomersActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton btnAllCustomers;
     private javax.swing.JRadioButton btnAvailableStockReport;
     private javax.swing.JButton btnCreate;
     private javax.swing.JRadioButton btnCustomers;
-    private javax.swing.JButton btnFind;
+    private javax.swing.JButton btnFindCust;
+    private javax.swing.JButton btnFindProd;
     private javax.swing.JRadioButton btnOutOfStockReport;
     private javax.swing.JRadioButton btnPOMadeDate;
     private javax.swing.JRadioButton btnSOMadeDate;
     private javax.swing.JRadioButton btnSOMadeProd;
     private javax.swing.JRadioButton btnWarehouseStockReport;
     private javax.swing.ButtonGroup buttonGroup1;
+    private javax.swing.JCheckBox checkAll;
+    private javax.swing.JComboBox comboCustomers;
     private javax.swing.JComboBox comboProducts;
     private com.toedter.calendar.JDateChooser dateEPO;
+    private com.toedter.calendar.JDateChooser dateER;
     private com.toedter.calendar.JDateChooser dateESO;
     private com.toedter.calendar.JDateChooser dateSPO;
+    private com.toedter.calendar.JDateChooser dateSR;
     private com.toedter.calendar.JDateChooser dateSSO;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
@@ -1089,5 +1603,6 @@ public class Reports extends javax.swing.JInternalFrame
     private javax.swing.JSeparator jSeparator6;
     private javax.swing.JSeparator jSeparator7;
     private javax.swing.JTextField labelProduct;
+    private javax.swing.JTextField labelReference;
     // End of variables declaration//GEN-END:variables
 }

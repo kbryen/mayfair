@@ -30,10 +30,12 @@ public class MayfairConstants
     public static final String STOCK_REPORT_TEMPLATE = TEMPLATES_DIR + "StockReport.xls";
     public static final String WAREHOUSE_STOCK_REPORT_TEMPLATE = TEMPLATES_DIR + "WarehouseStockReport.xls";
     public static final String PROD_SALES_TEMPLATE = TEMPLATES_DIR + "ProdSalesOrders.xls";
+    public static final String CUSTOMERS_TEMPLATE = TEMPLATES_DIR + "Customers.xls";
     public static final String REPORTS_DIR = "S://STOCK SYSTEM/";
     public static final String PROD_SALES_ORDERS_DIR = REPORTS_DIR + "Product Sales Orders/";
     public static final String PURCHASE_ORDERS_DIR = REPORTS_DIR + "Purchase Orders/";
     public static final String SALES_PURCHASE_ORDERS_DIR = REPORTS_DIR + "Sales & Purchase Order Reports/";
     public static final String STOCK_REPORTS_DIR = REPORTS_DIR + "Stock Reports/";
     public static final String DISPATCH_NOTES_DIR = REPORTS_DIR + "Dispatch Notes/";
+    public static final String CUSTOMER_REPORTS_DIR = REPORTS_DIR + "Customer Reports/";
 }

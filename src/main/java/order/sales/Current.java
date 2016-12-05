@@ -23,6 +23,8 @@ import main.java.MayfairConstants;
 import static main.java.MayfairConstants.DISPATCH_NOTES_DIR;
 import static main.java.MayfairConstants.DISPATCH_NOTE_TEMPLATE;
 import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -667,6 +669,10 @@ public class Current extends javax.swing.JInternalFrame
             {
                 HSSFWorkbook wb = db.getHSSFWorkbook(DISPATCH_NOTE_TEMPLATE);
                 HSSFSheet worksheet = wb.getSheet("Order Details");
+                
+                HSSFDataFormat format = wb.createDataFormat();
+                HSSFCellStyle numberStyle = wb.createCellStyle();
+                numberStyle.setDataFormat(format.getFormat("0"));
 
                 int i = 1;
                 try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
@@ -685,6 +691,7 @@ public class Current extends javax.swing.JInternalFrame
 
                         HSSFCell orderRef = main.createCell(2);
                         orderRef.setCellValue(ordNum);
+                        orderRef.setCellStyle(numberStyle);
                         
                         HSSFCell customerRef = main.createCell(3);
                         customerRef.setCellValue(custRef);
@@ -717,12 +724,14 @@ public class Current extends javax.swing.JInternalFrame
                         
                         HSSFCell lineNum = main.createCell(13);
                         lineNum.setCellValue(i - 1);
+                        lineNum.setCellStyle(numberStyle);
                         
                         HSSFCell prod = main.createCell(14);
                         prod.setCellValue(rs.getString("code"));
                         
                         HSSFCell quant = main.createCell(15);
                         quant.setCellValue(String.valueOf(rs.getInt("quantity")));
+                        quant.setCellStyle(numberStyle);
                         
                         HSSFCell email = main.createCell(16);
                         email.setCellValue(custEmail);
