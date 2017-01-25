@@ -1036,7 +1036,7 @@ public class Reports extends javax.swing.JInternalFrame
                 if(!checkAll.isSelected())
                 {
                     fileName.append(" - ").append(df1.format(startDate)) .append(" ") .append(df1.format(endDate));
-                    whereClauseDates = " AND ord_date >= '" + df2.format(startDate) + "' AND ord_date <= '" + df2.format(endDate) + "'";
+                    whereClauseDates = " AND del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'";
                 }
                 
                 fileName.append(".xls");
