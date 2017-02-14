@@ -574,11 +574,11 @@ public class Current extends javax.swing.JInternalFrame
                     // CHECK FOR UNDELIVERED PURCHASE ORDER
                     StringBuilder message = new StringBuilder();
                     boolean onPO = false;
-                    ResultSet rs = statement2.executeQuery("SELECT po_num, quantity FROM purchase_sales_order WHERE so_num = " + fieldOrderNumber.getText());
+                    ResultSet rs = statement2.executeQuery("SELECT po_num, prod_num, quantity FROM purchase_sales_order WHERE so_num = " + fieldOrderNumber.getText());
                     while (rs.next())
                     {
                         onPO = true;
-                        message.append("Order Num - ").append(rs.getString("po_num")).append(" Product Number - ").append(rs.getString("po_num")).append(" Quantity - ").append(rs.getInt("quantity")).append("\n");
+                        message.append("Order Num - ").append(rs.getString("po_num")).append(" Product Number - ").append(rs.getString("prod_num")).append(" Quantity - ").append(rs.getInt("quantity")).append("\n");
                     }
 
                     if (onPO)
