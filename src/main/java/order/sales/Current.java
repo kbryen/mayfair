@@ -670,9 +670,8 @@ public class Current extends javax.swing.JInternalFrame
                 HSSFWorkbook wb = db.getHSSFWorkbook(DISPATCH_NOTE_TEMPLATE);
                 HSSFSheet worksheet = wb.getSheet("Order Details");
                 
-                HSSFDataFormat format = wb.createDataFormat();
                 HSSFCellStyle numberStyle = wb.createCellStyle();
-                numberStyle.setDataFormat(format.getFormat("0"));
+                numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
 
                 int i = 1;
                 try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
@@ -730,7 +729,7 @@ public class Current extends javax.swing.JInternalFrame
                         prod.setCellValue(rs.getString("code"));
                         
                         HSSFCell quant = main.createCell(15);
-                        quant.setCellValue(String.valueOf(rs.getInt("quantity")));
+                        quant.setCellValue(rs.getInt("quantity"));
                         quant.setCellStyle(numberStyle);
                         
                         HSSFCell email = main.createCell(16);

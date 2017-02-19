@@ -447,9 +447,8 @@ public class Reports extends javax.swing.JInternalFrame
                 HSSFWorkbook workBook = db.getHSSFWorkbook(STOCK_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Stock Report");
                 
-                HSSFDataFormat format = workBook.createDataFormat();
                 HSSFCellStyle numberStyle = workBook.createCellStyle();
-                numberStyle.setDataFormat(format.getFormat("0"));
+                numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
                 
                 // Create bold style
                 HSSFCellStyle bold = workBook.createCellStyle();
@@ -585,9 +584,8 @@ public class Reports extends javax.swing.JInternalFrame
                 HSSFWorkbook workBook = db.getHSSFWorkbook(WAREHOUSE_STOCK_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Warehouse Stock Report");
                 
-                HSSFDataFormat format = workBook.createDataFormat();
                 HSSFCellStyle numberStyle = workBook.createCellStyle();
-                numberStyle.setDataFormat(format.getFormat("0"));
+                numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
                 
                 // Create bold style
                 HSSFCellStyle bold = workBook.createCellStyle();
@@ -679,9 +677,8 @@ public class Reports extends javax.swing.JInternalFrame
                 HSSFWorkbook workBook = db.getHSSFWorkbook(OUT_OF_STOCK_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Out of Stock Report");
                 
-                HSSFDataFormat format = workBook.createDataFormat();
                 HSSFCellStyle numberStyle = workBook.createCellStyle();
-                numberStyle.setDataFormat(format.getFormat("0"));
+                numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
                 
                 try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
@@ -699,7 +696,7 @@ public class Reports extends javax.swing.JInternalFrame
                     {
                         row = sheet.createRow(rowCount++);
                         cell = row.createCell(0);
-                        cell.setCellValue(rs.getString("prod_num"));
+                        cell.setCellValue(rs.getInt("prod_num"));
                         cell.setCellStyle(numberStyle);
                         cell = row.createCell(1);
                         cell.setCellValue(rs.getString("code"));
@@ -750,9 +747,8 @@ public class Reports extends javax.swing.JInternalFrame
                     {
                         HSSFWorkbook workBook = db.getHSSFWorkbook(ALL_PURCHASE_TEMPLATE);
                         
-                        HSSFDataFormat format = workBook.createDataFormat();
                         HSSFCellStyle numberStyle = workBook.createCellStyle();
-                        numberStyle.setDataFormat(format.getFormat("0"));
+                        numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
                         
                         HSSFSheet sheet = workBook.getSheet("Purchase Orders Made");
 
@@ -835,9 +831,8 @@ public class Reports extends javax.swing.JInternalFrame
                         HSSFWorkbook workBook = db.getHSSFWorkbook(ALL_SALES_TEMPLATE);
                         HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
 
-                        HSSFDataFormat format = workBook.createDataFormat();
                         HSSFCellStyle numberStyle = workBook.createCellStyle();
-                        numberStyle.setDataFormat(format.getFormat("0"));
+                        numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
                 
                         HSSFRow row;
                         int rowCount = 0;
@@ -858,14 +853,14 @@ public class Reports extends javax.swing.JInternalFrame
                         {
                             // num
                             cell = row.createCell(0);
-                            cell.setCellValue(rs.getString("prod_num"));
+                            cell.setCellValue(rs.getInt("prod_num"));
                             cell.setCellStyle(numberStyle);
                             // code
                             cell = row.createCell(1);
                             cell.setCellValue(rs.getString("code"));
                             // quant
                             cell = row.createCell(2);
-                            cell.setCellValue(rs.getString("quantity"));
+                            cell.setCellValue(rs.getInt("quantity"));
                             cell.setCellStyle(numberStyle);
                             
                             row = sheet.createRow(rowCount++);
@@ -919,9 +914,8 @@ public class Reports extends javax.swing.JInternalFrame
                             HSSFWorkbook workBook = db.getHSSFWorkbook(PROD_SALES_TEMPLATE);
                             HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
 
-                            HSSFDataFormat format = workBook.createDataFormat();
                             HSSFCellStyle numberStyle = workBook.createCellStyle();
-                            numberStyle.setDataFormat(format.getFormat("0"));
+                            numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
                 
                             HSSFRow row;
                             int rowCount = 3;
@@ -938,7 +932,7 @@ public class Reports extends javax.swing.JInternalFrame
                                 row = sheet.createRow(rowCount++);
 
                                 cell = row.createCell(0);
-                                cell.setCellValue(rs.getString("ord_num"));
+                                cell.setCellValue(rs.getInt("ord_num"));
                                 cell.setCellStyle(numberStyle);
 
                                 cell = row.createCell(1);
@@ -970,7 +964,7 @@ public class Reports extends javax.swing.JInternalFrame
                                 }
 
                                 cell = row.createCell(6);
-                                cell.setCellValue(rs.getString("quantity"));
+                                cell.setCellValue(rs.getInt("quantity"));
                                 cell.setCellStyle(numberStyle);
                             }
 
