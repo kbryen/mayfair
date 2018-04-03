@@ -56,28 +56,6 @@ public class Database {
         }
     }
     
-    public XSSFWorkbook getXSSFWorkbook(String file)
-    {
-        if (file != null)
-        {
-            try (InputStream inp = new FileInputStream(file))
-            {
-                XSSFWorkbook workbook;
-                Workbook wb = WorkbookFactory.create(inp);
-                workbook = (XSSFWorkbook) wb;
-                return workbook;
-            }
-            catch (IOException | InvalidFormatException ex)
-            {
-                return new XSSFWorkbook();
-            }
-        }
-        else
-        {
-            return new XSSFWorkbook();
-        }
-    }
-    
     public HSSFWorkbook getHSSFWorkbook(String file)
     {
         if (file != null)

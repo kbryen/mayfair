@@ -11,6 +11,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
@@ -22,9 +25,10 @@ import main.java.Database;
 import main.java.MayfairConstants;
 import static main.java.MayfairConstants.DISPATCH_NOTES_DIR;
 import static main.java.MayfairConstants.DISPATCH_NOTE_TEMPLATE;
+import main.java.report.DispatchNote;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -44,12 +48,7 @@ public class Current extends javax.swing.JInternalFrame
     public Current(JDesktopPane desktop)
     {
         initComponents();
-        this.setTitle("Current Sales Orders");
         this.desktop = desktop;
-
-        table.getColumnModel().getColumn(1).setHeaderValue("Customer");
-        labelName.setText("Customer Name");
-
         scrollPane.setVisible(false);
         btnViewSummary.setVisible(false);
         btnEdit.setVisible(false);
@@ -58,6 +57,7 @@ public class Current extends javax.swing.JInternalFrame
         btnMarkDelivered.setVisible(false);
         btnDispatch.setVisible(false);
         btnExcelSummary.setVisible(false);
+        btnFindActionPerformed(null);
     }
 
     /**
@@ -93,9 +93,10 @@ public class Current extends javax.swing.JInternalFrame
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
+        setTitle("Current Sales Orders");
 
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
-        jLabel1.setText("View Order");
+        jLabel1.setText("Sales Orders");
 
         btnViewSummary.setBackground(new java.awt.Color(153, 204, 255));
         btnViewSummary.setText("View Summary");
@@ -122,7 +123,7 @@ public class Current extends javax.swing.JInternalFrame
                 {null, null, null, null, null, null, null}
             },
             new String [] {
-                "Number", "", "Ordered", "Expected Delivery", "Total (£)", "Dispatched", "Date"
+                "Number", "Customer", "Ordered", "Expected Delivery", "Total (£)", "Dispatched", "Dispatched Date"
             }
         ) {
             Class[] types = new Class [] {
@@ -158,6 +159,8 @@ public class Current extends javax.swing.JInternalFrame
         });
 
         jLabel4.setText("OR");
+
+        labelName.setText("Customer Name");
 
         btnCancel.setText("Cancel Order");
         btnCancel.addActionListener(new java.awt.event.ActionListener() {
@@ -214,51 +217,45 @@ public class Current extends javax.swing.JInternalFrame
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jSeparator2))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(btnMarkDispatched)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnMarkDelivered))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(btnExcelSummary, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnDispatch))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(btnCancel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnEdit))
+                            .addComponent(btnViewSummary, javax.swing.GroupLayout.Alignment.TRAILING)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 537, Short.MAX_VALUE)
-                            .addComponent(jSeparator1, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jLabel1)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
-                                .addComponent(jSeparator2))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addComponent(btnFind)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel3)
-                                            .addComponent(labelName))
-                                        .addGap(18, 18, 18)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(fieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(fieldOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                .addGap(0, 210, Short.MAX_VALUE))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addComponent(btnMarkDispatched)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnMarkDelivered))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addComponent(btnExcelSummary, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnDispatch))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addComponent(btnCancel)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnEdit)))))
-                        .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(36, 36, 36)
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnClear)
-                        .addGap(47, 47, 47))))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnViewSummary)
+                                .addComponent(jLabel3)
+                                .addGap(18, 18, 18)
+                                .addComponent(fieldOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(labelName)
+                                .addGap(18, 18, 18)
+                                .addComponent(fieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnFind)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(btnClear)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -271,22 +268,17 @@ public class Current extends javax.swing.JInternalFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(fieldOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(7, 7, 7)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4)
-                    .addComponent(btnClear))
-                .addGap(4, 4, 4)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fieldOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(labelName)
-                    .addComponent(fieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(btnFind)
-                .addGap(18, 18, 18)
-                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 96, Short.MAX_VALUE)
+                    .addComponent(fieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4)
+                    .addComponent(btnFind)
+                    .addComponent(btnClear))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 333, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(23, 23, 23)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnMarkDispatched)
                     .addComponent(btnMarkDelivered))
@@ -318,11 +310,11 @@ public class Current extends javax.swing.JInternalFrame
             ResultSet rs;
             if (!fieldOrderNumber.getText().equals(""))
             {
-                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, sales_order.ord_date, sales_order.del_date, sales_order.price, sales_order.dispatched, sales_order.dispatched_date FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ORDER BY sales_order.ord_num DESC");
+                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%a %d/%m/%Y'), DATE_FORMAT(sales_order.del_date,'%a %d/%m/%Y'), sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%a %d/%m/%Y') FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC");
             }
             else
             {
-                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, sales_order.ord_date, sales_order.del_date, sales_order.price, sales_order.dispatched, sales_order.dispatched_date FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE customers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ORDER BY sales_order.ord_num DESC");
+                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%a %d/%m/%Y'), DATE_FORMAT(sales_order.del_date,'%a %d/%m/%Y'), sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%a %d/%m/%Y') FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE customers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC");
             }
 
             scrollPane.setVisible(true);
@@ -549,7 +541,6 @@ public class Current extends javax.swing.JInternalFrame
                     fieldName.setText("");
                 }
 
-                btnFindActionPerformed(null);
             }
             catch (SQLException e)
             {
@@ -608,166 +599,57 @@ public class Current extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnMarkDeliveredActionPerformed
 
     private void btnDispatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDispatchActionPerformed
-        int ordNum = (int) table.getValueAt(table.getSelectedRow(), 0);
-        int selectedOption = JOptionPane.showConfirmDialog(null, "<html> Are you sure you want to create a dispatch note for order <b>" + ordNum + "</b>?", "Dispatch Note", YES_NO_OPTION);
+        int ord_num = (Integer) table.getValueAt(table.getSelectedRow(), 0);
+        String cust_name = (String) table.getValueAt(table.getSelectedRow(), 1);
+        int selectedOption = JOptionPane.showConfirmDialog(null, "<html> Are you sure you want to create a dispatch note for order <b>" + ord_num + "</b>?", "Dispatch Note", YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            String custName = (String) table.getValueAt(table.getSelectedRow(), 1);
-            String custRef = "";
-            String custEmail = "";
-            String custTel = "";
-            String custCountry = "";
-            String temp[];
-            String ordDate = "";
-            String delDate = "";
-            String address[] = new String[5];
-            String postCode = "";
-            String delIns = "";
-            Boolean pro;
-            String instructions = "";
+            DispatchNote dispatchNote = new DispatchNote();
+            dispatchNote.setLoggingComponent(this);
+            dispatchNote.setOrd_num(ord_num);
+            dispatchNote.setCust_name(cust_name);
 
+            // Select order information
             try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                ResultSet rs = statement.executeQuery("SELECT reference, del_address, country, email, tel, delivery, proforma FROM customers WHERE name = '" + custName + "'");
+                ResultSet rs = statement.executeQuery(
+                        "SELECT DATE_FORMAT(sales_order.del_date,'%a %d/%m/%Y') AS del_date, customers.cust_num, customers.reference, customers.del_address "
+                        + "FROM sales_order JOIN customers ON sales_order.cust_num = customers.cust_num "
+                        + "WHERE sales_order.ord_num = " + ord_num);
                 rs.next();
-                // Customer
-                custRef = rs.getString("reference");
-                custEmail = rs.getString("email");
-                custTel = rs.getString("tel");
-                custCountry = rs.getString("country");
-                delIns = rs.getString("delivery");
-                pro = rs.getBoolean("proforma");
-                // Address
-                temp = rs.getString("del_address").split(",");
-                int length = temp.length;
-                postCode = temp[length - 1];
-                System.arraycopy(temp, 0, address, 0, length - 1);
-                // Date
-                rs = statement.executeQuery("SELECT ord_date, del_date FROM sales_order WHERE ord_num = " + ordNum);
-                rs.next();
-                temp = rs.getString("ord_date").split(" ");
-                ordDate = temp[0];
-                delDate = rs.getString("del_date");
-                // Delivery Instructions
-                if (pro)
-                {
-                    instructions = delDate + " - Please pick and pack. Await delivery instructions.";
-                }
-                else
-                {
-                    instructions = delDate + " - " + delIns;
-                }
+                dispatchNote.setDel_date(rs.getString("del_date"));
+                dispatchNote.setCust_num(rs.getInt("customers.cust_num"));
+                dispatchNote.setCust_reference(rs.getString("customers.reference"));
+                dispatchNote.setDel_address(rs.getString("customers.del_address"));
             }
             catch (SQLException e)
             {
                 JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
                 JOptionPane.showMessageDialog(Current.this, e);
             }
-            
-            String fileName = DISPATCH_NOTES_DIR + "RIF ORDER " + ordNum + " - " + custRef + " " + ordDate + ".xls";
-            try (FileOutputStream fileOut = new FileOutputStream(fileName))
+
+            // Select Products
+            Map<String, Integer> products = new HashMap();
+            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                HSSFWorkbook wb = db.getHSSFWorkbook(DISPATCH_NOTE_TEMPLATE);
-                HSSFSheet worksheet = wb.getSheet("Order Details");
-                
-                HSSFCellStyle numberStyle = wb.createCellStyle();
-                numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-
-                int i = 1;
-                try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+                ResultSet rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity "
+                        + "FROM sales_order_details JOIN products ON sales_order_details.prod_num = products.prod_num "
+                        + "WHERE sales_order_details.ord_num = " + ord_num + " "
+                        + "ORDER BY products.code");
+                while (rs.next())
                 {
-                    ResultSet rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity FROM sales_order_details JOIN products ON sales_order_details.prod_num = products.prod_num WHERE sales_order_details.ord_num = " + ordNum);
-                    // Main Rows
-                    while (rs.next())
-                    {
-                        HSSFRow main = worksheet.createRow(i++);
-                         
-                        HSSFCell customer = main.createCell(0);
-                        customer.setCellValue("MTC");
-                        
-                        HSSFCell prefix = main.createCell(1);
-                        prefix.setCellValue("J");
-
-                        HSSFCell orderRef = main.createCell(2);
-                        orderRef.setCellValue(ordNum);
-                        orderRef.setCellStyle(numberStyle);
-                        
-                        HSSFCell customerRef = main.createCell(3);
-                        customerRef.setCellValue(custRef);
-                        
-                        HSSFCell addName = main.createCell(4);
-                        addName.setCellValue(custName);
-                        
-                        HSSFCell add1 = main.createCell(5);
-                        add1.setCellValue(address[0]);
-
-                        HSSFCell add2 = main.createCell(6);
-                        add2.setCellValue(address[1]);
-
-                        HSSFCell add3 = main.createCell(7);
-                        add3.setCellValue(address[2]);
-
-                        HSSFCell add4 = main.createCell(8);
-                        add4.setCellValue(address[3]);
-                        
-                        // add5
-                        
-                        HSSFCell postcode = main.createCell(10);
-                        postcode.setCellValue(postCode);
-                        
-                        HSSFCell country = main.createCell(11);
-                        country.setCellValue(custCountry.isEmpty() ? "GB" : custCountry);
-                        
-                        HSSFCell ins = main.createCell(12);
-                        ins.setCellValue(instructions);
-                        
-                        HSSFCell lineNum = main.createCell(13);
-                        lineNum.setCellValue(i - 1);
-                        lineNum.setCellStyle(numberStyle);
-                        
-                        HSSFCell prod = main.createCell(14);
-                        prod.setCellValue(rs.getString("code"));
-                        
-                        HSSFCell quant = main.createCell(15);
-                        quant.setCellValue(rs.getInt("quantity"));
-                        quant.setCellStyle(numberStyle);
-                        
-                        HSSFCell email = main.createCell(16);
-                        email.setCellValue(custEmail);
-                        
-                        HSSFCell tell = main.createCell(17);
-                        tell.setCellValue(custTel);
-                    }
+                    products.put(rs.getString("products.code"), rs.getInt("sales_order_details.quantity"));
                 }
-                catch (Exception e)
-                {
-                    JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                    JOptionPane.showMessageDialog(Current.this, e.getStackTrace());
-                }
-
-//                // Quant total
-//                i++;
-//                HSSFRow quantRow = worksheet.getRow(i);
-//                HSSFCell quantCell = quantRow.getCell(16);
-//                quantCell.setCellValue(String.valueOf(total));
-
-                // Auto Size Columns
-                for (int k = 0; k < 17; k++)
-                {
-                    worksheet.autoSizeColumn(k);
-                }
-                
-                wb.write(fileOut);
-                fileOut.flush();
-                fileOut.close();
-
-                JOptionPane.showMessageDialog(Current.this, "<html> <b>Dispatch note created successfully.</b> \n<html> <i> " + fileName + " </i>", "Dispatch Note Created", INFORMATION_MESSAGE);
+                dispatchNote.setProducts(products);
             }
-            catch (IOException e) 
+            catch (SQLException e)
             {
                 JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Current.this, e);
+                JOptionPane.showMessageDialog(Current.this, e.getStackTrace());
             }
+            
+            dispatchNote.populateWorkbook();
+            dispatchNote.save(dispatchNote.getFilename());
         }
     }//GEN-LAST:event_btnDispatchActionPerformed
 
@@ -803,84 +685,84 @@ public class Current extends javax.swing.JInternalFrame
                 name = rs.getString("name");
 
                 String fileName = "S://SALES ORDERS/SALES ORDER - " + ordNum + ".xls";
-                try (FileOutputStream fileOut = new FileOutputStream(fileName)) 
+                try (FileOutputStream fileOut = new FileOutputStream(fileName))
                 {
                     HSSFWorkbook wb = new HSSFWorkbook();
                     HSSFSheet worksheet = wb.createSheet(String.valueOf(ordNum));
                     CellStyle editableStyle = wb.createCellStyle();
                     editableStyle.setLocked(false);
-                    
+
                     HSSFRow row = worksheet.createRow((short) 0);
                     HSSFCell cell = row.createCell(0);
                     cell.setCellValue("Order Number");
                     cell = row.createCell(1);
                     cell.setCellValue(ordNum);
-                    
+
                     row = worksheet.createRow((short) 1);
                     cell = row.createCell(0);
                     cell.setCellValue("Delivery Date");
                     cell = row.createCell(1);
                     cell.setCellValue(del_date);
-                    
+
                     row = worksheet.createRow((short) 3);
                     cell = row.createCell(0);
                     cell.setCellValue("Customer Number");
                     cell = row.createCell(1);
                     cell.setCellValue(cust_num);
-                    
+
                     row = worksheet.createRow((short) 4);
                     cell = row.createCell(0);
                     cell.setCellValue("Customer Name");
                     cell = row.createCell(1);
                     cell.setCellValue(name);
-                    
+
                     row = worksheet.createRow((short) 6);
                     cell = row.createCell(0);
                     cell.setCellValue("Product Code");
                     cell = row.createCell(1);
                     cell.setCellValue("Quantity");
-                    
+
                     int i = 7;
                     rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity FROM sales_order_details JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + ordNum);
                     while (rs.next())
                     {
                         String code = rs.getString("code");
                         int quantity = rs.getInt("quantity");
-                        
+
                         row = worksheet.createRow((short) i);
                         cell = row.createCell(0);
                         cell.setCellValue(code);
                         cell = row.createCell(1);
                         cell.setCellValue(quantity);
-                        
+
                         i++;
                     }
-                    
+
                     row = worksheet.createRow((short) i + 1);
                     cell = row.createCell(0);
                     cell.setCellValue("Order Price");
                     cell = row.createCell(1);
                     cell.setCellValue(price);
-                    
+
                     rs = statement.executeQuery("SELECT SUM(quantity) as total FROM sales_order_details WHERE ord_num = " + ordNum);
                     rs.next();
-                    
+
                     row = worksheet.createRow((short) i + 2);
                     cell = row.createCell(0);
                     cell.setCellValue("Total Units");
                     cell = row.createCell(1);
                     cell.setCellValue(rs.getInt("total"));
-                    
+
                     // Auto Size Columns
                     for (int k = 0; k < 2; k++)
                     {
                         worksheet.autoSizeColumn(k);
                         worksheet.setDefaultColumnStyle(i + 4, editableStyle);
                     }
-                    
+
                     wb.write(fileOut);
                     fileOut.flush();
-                    
+
                     JOptionPane.showMessageDialog(Current.this, "<html> <b>Excel summary created successfully.</b> \n<html> <i> " + fileName + " </i>", "Excel Summary Created", INFORMATION_MESSAGE);
                 }
             }

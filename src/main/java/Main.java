@@ -7,6 +7,8 @@ package main.java;
 import main.java.customer.Customers;
 import main.java.product.Products;
 import java.beans.PropertyVetoException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import main.java.report.Reports;
@@ -17,6 +19,11 @@ import main.java.report.Reports;
  */
 public class Main extends javax.swing.JFrame
 {
+    public static String formatDate(String datetime)
+    {
+        LocalDateTime localDateTime = LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"));
+        return localDateTime.format(DateTimeFormatter.ofPattern("E dd MMM yyyy"));
+    }
 
     public Main()
     {
@@ -224,12 +231,28 @@ public class Main extends javax.swing.JFrame
     private void btnNewSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewSOActionPerformed
         main.java.order.sales.CustomerNumber salesOrder = new main.java.order.sales.CustomerNumber(desktop);
         desktop.add(salesOrder);
+        try
+        {
+            salesOrder.setMaximum(true);
+        }
+        catch (PropertyVetoException ex)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
         salesOrder.show();
     }//GEN-LAST:event_btnNewSOActionPerformed
 
     private void btnCurrentSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCurrentSOActionPerformed
         main.java.order.sales.Current salesOrder = new main.java.order.sales.Current(desktop);
         desktop.add(salesOrder);
+        try
+        {
+            salesOrder.setMaximum(true);
+        }
+        catch (PropertyVetoException ex)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
         salesOrder.show();
     }//GEN-LAST:event_btnCurrentSOActionPerformed
 
@@ -242,6 +265,14 @@ public class Main extends javax.swing.JFrame
     private void btnCurrentPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCurrentPOActionPerformed
         main.java.order.purchase.Current purchaseOrder = new main.java.order.purchase.Current(desktop);
         desktop.add(purchaseOrder);
+        try
+        {
+            purchaseOrder.setMaximum(true);
+        }
+        catch (PropertyVetoException ex)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
         purchaseOrder.show();
     }//GEN-LAST:event_btnCurrentPOActionPerformed
 
@@ -276,13 +307,29 @@ public class Main extends javax.swing.JFrame
     private void btnPastSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPastSOActionPerformed
         main.java.order.sales.Past salesOrder = new main.java.order.sales.Past(desktop);
         desktop.add(salesOrder);
+        try
+        {
+            salesOrder.setMaximum(true);
+        }
+        catch (PropertyVetoException ex)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
         salesOrder.show();
     }//GEN-LAST:event_btnPastSOActionPerformed
 
     private void btnPastPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPastPOActionPerformed
-        main.java.order.purchase.Past salesOrder = new main.java.order.purchase.Past(desktop);
-        desktop.add(salesOrder);
-        salesOrder.show();
+        main.java.order.purchase.Past purchaseOrder = new main.java.order.purchase.Past(desktop);
+        desktop.add(purchaseOrder);
+        try
+        {
+            purchaseOrder.setMaximum(true);
+        }
+        catch (PropertyVetoException ex)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        purchaseOrder.show();
     }//GEN-LAST:event_btnPastPOActionPerformed
 
     private void btnReportsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportsActionPerformed
@@ -337,7 +384,6 @@ public class Main extends javax.swing.JFrame
             new Main().setVisible(true);
         });
     }
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCurrentPO;

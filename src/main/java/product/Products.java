@@ -90,17 +90,17 @@ public class Products extends javax.swing.JInternalFrame
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "Product Number", "Code", "Barcode", "Purchase Price", "Sales Price", "Avaliable Stock", "PO Stock", "Potential Stock", "Warehouse Stock", "Season", "Discontinued"
+                "Product Number", "Code", "Purchase Price", "Sales Price", "Avaliable Stock", "PO Stock", "Potential Stock", "Warehouse Stock", "Season", "Discontinued"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.Float.class, java.lang.Float.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.Boolean.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -121,7 +121,7 @@ public class Products extends javax.swing.JInternalFrame
         scrollPane.setViewportView(table);
         table.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
         if (table.getColumnModel().getColumnCount() > 0) {
-            table.getColumnModel().getColumn(10).setResizable(false);
+            table.getColumnModel().getColumn(9).setResizable(false);
         }
 
         jLabel3.setText("Season : ");
@@ -257,11 +257,11 @@ public class Products extends javax.swing.JInternalFrame
             ResultSet rs;
             if (!comboSeason.getSelectedItem().equals("Discontinued"))
             {
-                rs = statement.executeQuery("SELECT prod_num AS prodNum FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' AND SSAW LIKE '%" + comboSeason.getSelectedItem() + "%' ORDER BY discon ASC, code, total");
+                rs = statement.executeQuery("SELECT prod_num AS prodNum FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' AND SSAW LIKE '%" + comboSeason.getSelectedItem() + "%' ORDER BY discon, total DESC, code");
             }
             else
             {
-                rs = statement.executeQuery("SELECT prod_num AS prodNum FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' AND discon = true ORDER BY discon ASC, code, total");
+                rs = statement.executeQuery("SELECT prod_num AS prodNum FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' AND discon = true ORDER BY discon, total DESC, code");
             }
             
             while(rs.next())
@@ -281,7 +281,7 @@ public class Products extends javax.swing.JInternalFrame
             
             for(String prodNum : prodNums)
             {
-                rs = statement.executeQuery("SELECT products.prod_num AS prodNum, products.code AS code, products.barcode AS barcode, products.purchase_price AS purchasePrice, products.sales_price AS salesPrice, products.in_stock AS availableStock, products.in_order AS purchaseOrderStock, products.total AS potentialStock, (IFNULL(SUM(sales_order_details.fromStock), 0)  + products.in_stock) AS warehouseStock, products.SSAW AS season, products.discon AS discontinued FROM sales_order_details LEFT JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num RIGHT JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.dispatched = false AND sales_order.delivered = false AND products.prod_num = " + prodNum);
+                rs = statement.executeQuery("SELECT products.prod_num AS prodNum, products.code AS code, products.purchase_price AS purchasePrice, products.sales_price AS salesPrice, products.in_stock AS availableStock, products.in_order AS purchaseOrderStock, products.total AS potentialStock, (IFNULL(SUM(sales_order_details.fromStock), 0)  + products.in_stock) AS warehouseStock, products.SSAW AS season, products.discon AS discontinued FROM sales_order_details LEFT JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num RIGHT JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.dispatched = false AND sales_order.delivered = false AND products.prod_num = " + prodNum);
             
                 int columns = rs.getMetaData().getColumnCount();
                 while (rs.next())
@@ -319,7 +319,7 @@ public class Products extends javax.swing.JInternalFrame
         fieldProdCode.setText((String) table.getValueAt(table.getSelectedRow(), 1));
 
         btnDiscontinue.setVisible(true);
-        if ((boolean) table.getValueAt(table.getSelectedRow(), 10))
+        if ((boolean) table.getValueAt(table.getSelectedRow(), 9))
         {
             btnDiscontinue.setText("Undiscontinue");
         }
