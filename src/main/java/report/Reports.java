@@ -34,7 +34,6 @@ import static main.java.MayfairConstants.PROD_SALES_TEMPLATE;
 import static main.java.MayfairConstants.SALES_PURCHASE_ORDERS_DIR;
 import static main.java.MayfairConstants.STOCK_REPORTS_DIR;
 import static main.java.MayfairConstants.STOCK_REPORT_TEMPLATE;
-import static main.java.MayfairConstants.WAREHOUSE_STOCK_REPORT_TEMPLATE;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -43,6 +42,7 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import static org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD;
+import static main.java.MayfairConstants.WHS_REPORT_TEMPLATE;
 
 /**
  *
@@ -594,7 +594,7 @@ public class Reports extends javax.swing.JInternalFrame
             String fileName = STOCK_REPORTS_DIR + "Warehouse Stock Report " + date + ".xls";
             try (FileOutputStream fileOut = new FileOutputStream(fileName))
             {
-                HSSFWorkbook workBook = db.getHSSFWorkbook(WAREHOUSE_STOCK_REPORT_TEMPLATE);
+                HSSFWorkbook workBook = db.getHSSFWorkbook(WHS_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Warehouse Stock Report");
 
                 HSSFCellStyle numberStyle = workBook.createCellStyle();

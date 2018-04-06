@@ -25,7 +25,7 @@ import main.java.Database;
 import main.java.MayfairConstants;
 import static main.java.MayfairConstants.DISPATCH_NOTES_DIR;
 import static main.java.MayfairConstants.DISPATCH_NOTE_TEMPLATE;
-import main.java.report.DispatchNote;
+import main.java.report.DispatchNoteXls;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -605,7 +605,7 @@ public class Current extends javax.swing.JInternalFrame
         int selectedOption = JOptionPane.showConfirmDialog(null, "<html> Are you sure you want to create a dispatch note for order <b>" + ord_num + "</b>?", "Dispatch Note", YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            DispatchNote dispatchNote = new DispatchNote();
+            DispatchNoteXls dispatchNote = new DispatchNoteXls();
             dispatchNote.setLoggingComponent(this);
             dispatchNote.setOrd_num(ord_num);
             dispatchNote.setCust_name(cust_name);
