@@ -39,6 +39,8 @@ public class EditMain extends javax.swing.JInternalFrame
         btnQuant.setVisible(false);
         btnDelete.setEnabled(false);
 
+        table.setAutoCreateRowSorter(true);
+        
         FillLabels();
     }
 

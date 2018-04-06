@@ -28,6 +28,7 @@ public class Customers extends javax.swing.JInternalFrame
         desktop = pane;
         btnFindActionPerformed(null);
         btnEdit.setEnabled(false);
+        table.setAutoCreateRowSorter(true);
     }
 
     /**

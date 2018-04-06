@@ -446,24 +446,37 @@ public class Reports extends javax.swing.JInternalFrame
             {
                 HSSFWorkbook workBook = db.getHSSFWorkbook(STOCK_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Stock Report");
-                
+
                 HSSFCellStyle numberStyle = workBook.createCellStyle();
                 numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-                
+
                 // Create bold style
                 HSSFCellStyle bold = workBook.createCellStyle();
                 HSSFFont boldFont = workBook.createFont();
                 boldFont.setBoldweight(BOLDWEIGHT_BOLD);
                 bold.setFont(boldFont);
-                
+
                 int finalCellCount = 0;
                 try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
+//                    Map<String, Map<String, Integer>> productsMap = new HashMap();
+//                    
+//                    ResultSet rs = statement.executeQuery("SELECT ord_num FROM purchase_order WHERE delivered = false");
+//                    ArrayList<String> orderNumbers = new ArrayList();
+//                    while (rs.next())
+//                    {
+//                        String orderNumber = rs.getString("ord_num");
+//                        orderNumbers.add(orderNumber);
+//                    }
+//                    
+//                    
+//                    
+                    
                     HSSFRow row;
                     int rowCount = 0;
                     HSSFCell cell;
                     int cellCount = 3;
-                    
+
                     // Date row
                     row = sheet.getRow(rowCount++);
                     cell = row.getCell(1);
@@ -471,7 +484,7 @@ public class Reports extends javax.swing.JInternalFrame
 
                     // Headings row
                     row = sheet.getRow(rowCount++);
-                                        
+
                     // Each undelivered purchase order becomes a header
                     ResultSet rs = statement.executeQuery("SELECT ord_num FROM purchase_order WHERE delivered = false");
                     ArrayList<String> orderNumbers = new ArrayList();
@@ -479,17 +492,17 @@ public class Reports extends javax.swing.JInternalFrame
                     {
                         String orderNumber = rs.getString("ord_num");
                         orderNumbers.add(orderNumber);
-                        
+
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(orderNumber);
                         cell.setCellStyle(bold);
                     }
-                    
+
                     cell = row.createCell(cellCount);
                     cell.setCellValue("Potential");
                     cell.setCellStyle(bold);
                     finalCellCount = cellCount;
-                    
+
                     rs = statement.executeQuery("SELECT prod_num, code, in_stock FROM products");
                     HashMap<Integer, Pair<String, Integer>> products = new HashMap();
                     while (rs.next())
@@ -506,16 +519,16 @@ public class Reports extends javax.swing.JInternalFrame
                         // Reset cell count 
                         cellCount = 0;
                         row = sheet.createRow(rowCount++);
-                        
+
                         // Cell 1 - prod num
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(prod_num);
                         cell.setCellStyle(numberStyle);
-                        
+
                         // Cell 2 - prod code
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(code);
-                        
+
                         // Cell 3 - available
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(in_stock);
@@ -540,7 +553,7 @@ public class Reports extends javax.swing.JInternalFrame
 
                             total = total + avaliable;
                         }
-                        
+
                         // Cell last - total
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(total);
@@ -571,7 +584,7 @@ public class Reports extends javax.swing.JInternalFrame
             }
         }
     }
-    
+
     private void createWarehouseStockReport()
     {
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a warehouse stock report?", "Warehouse Stock Report", JOptionPane.YES_NO_OPTION);
@@ -583,22 +596,22 @@ public class Reports extends javax.swing.JInternalFrame
             {
                 HSSFWorkbook workBook = db.getHSSFWorkbook(WAREHOUSE_STOCK_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Warehouse Stock Report");
-                
+
                 HSSFCellStyle numberStyle = workBook.createCellStyle();
                 numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-                
+
                 // Create bold style
                 HSSFCellStyle bold = workBook.createCellStyle();
                 HSSFFont boldFont = workBook.createFont();
                 boldFont.setBoldweight(BOLDWEIGHT_BOLD);
                 bold.setFont(boldFont);
-                
+
                 try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
                     HSSFRow row;
                     int rowCount = 2;
                     HSSFCell cell;
-                    
+
                     // Date row
                     row = sheet.getRow(0);
                     cell = row.getCell(1);
@@ -606,12 +619,12 @@ public class Reports extends javax.swing.JInternalFrame
 
                     List<String> prodNums = new ArrayList();
                     ResultSet rs = statement.executeQuery("SELECT prod_num FROM products");
-                    while(rs.next())
+                    while (rs.next())
                     {
                         prodNums.add(rs.getString("prod_num"));
                     }
-                    
-                    for(String prodNum : prodNums)
+
+                    for (String prodNum : prodNums)
                     {
                         rs = statement.executeQuery("SELECT products.prod_num AS prodNum, products.code AS code, (IFNULL(SUM(sales_order_details.fromStock), 0) + products.in_stock) AS warehouseStock FROM sales_order_details LEFT JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num RIGHT JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order.dispatched = false AND sales_order.delivered = false AND products.prod_num = " + prodNum + " AND sales_order_details.prod_num = " + prodNum);
                         HashMap<Integer, Pair<String, Integer>> products = new HashMap();
@@ -664,7 +677,7 @@ public class Reports extends javax.swing.JInternalFrame
             }
         }
     }
-    
+
     private void createOutOfStockReport()
     {
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create an out of stock report?", "Out of Stock Report", JOptionPane.YES_NO_OPTION);
@@ -676,16 +689,16 @@ public class Reports extends javax.swing.JInternalFrame
             {
                 HSSFWorkbook workBook = db.getHSSFWorkbook(OUT_OF_STOCK_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Out of Stock Report");
-                
+
                 HSSFCellStyle numberStyle = workBook.createCellStyle();
                 numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-                
+
                 try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
                     HSSFRow row;
                     int rowCount = 2;
                     HSSFCell cell;
-                    
+
                     // Date row
                     row = sheet.getRow(0);
                     cell = row.getCell(1);
@@ -726,7 +739,7 @@ public class Reports extends javax.swing.JInternalFrame
             }
         }
     }
-    
+
     private void createPurchaseOrderReportByDates()
     {
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a purchase orders report?", "Purchase Orders Report", JOptionPane.YES_NO_OPTION);
@@ -739,17 +752,17 @@ public class Reports extends javax.swing.JInternalFrame
                 Date startDate = dateSPO.getDate();
                 Date endDate = dateEPO.getDate();
 
-                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, purchase_order_details.quantity FROM purchase_order_details JOIN purchase_order ON purchase_order_details.ord_num = purchase_order.ord_num JOIN products ON purchase_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");           
-                if(rs.isBeforeFirst())
+                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, purchase_order_details.quantity FROM purchase_order_details JOIN purchase_order ON purchase_order_details.ord_num = purchase_order.ord_num JOIN products ON purchase_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");
+                if (rs.isBeforeFirst())
                 {
                     String fileName = SALES_PURCHASE_ORDERS_DIR + "Purchase Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
                     try (FileOutputStream fileOut = new FileOutputStream(fileName))
                     {
                         HSSFWorkbook workBook = db.getHSSFWorkbook(ALL_PURCHASE_TEMPLATE);
-                        
+
                         HSSFCellStyle numberStyle = workBook.createCellStyle();
                         numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-                        
+
                         HSSFSheet sheet = workBook.getSheet("Purchase Orders Made");
 
                         HSSFRow row;
@@ -767,7 +780,7 @@ public class Reports extends javax.swing.JInternalFrame
                         cell.setCellValue(df1.format(endDate));
 
                         // Fill table
-                        while(rs.next())
+                        while (rs.next())
                         {
                             // num
                             cell = row.createCell(0);
@@ -809,7 +822,7 @@ public class Reports extends javax.swing.JInternalFrame
             }
         }
     }
-    
+
     private void createSalesOrderReportByDates()
     {
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a sales orders report?", "Sales Orders Report", JOptionPane.YES_NO_OPTION);
@@ -822,8 +835,8 @@ public class Reports extends javax.swing.JInternalFrame
                 Date startDate = dateSSO.getDate();
                 Date endDate = dateESO.getDate();
 
-                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, sales_order_details.quantity FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num JOIN products ON sales_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");           
-                if(rs.isBeforeFirst())
+                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, sales_order_details.quantity FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num JOIN products ON sales_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");
+                if (rs.isBeforeFirst())
                 {
                     String fileName = SALES_PURCHASE_ORDERS_DIR + "Sales Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
                     try (FileOutputStream fileOut = new FileOutputStream(fileName))
@@ -833,7 +846,7 @@ public class Reports extends javax.swing.JInternalFrame
 
                         HSSFCellStyle numberStyle = workBook.createCellStyle();
                         numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-                
+
                         HSSFRow row;
                         int rowCount = 0;
                         HSSFCell cell;
@@ -849,7 +862,7 @@ public class Reports extends javax.swing.JInternalFrame
                         cell.setCellValue(df1.format(endDate));
 
                         // Fill table
-                        while(rs.next())
+                        while (rs.next())
                         {
                             // num
                             cell = row.createCell(0);
@@ -862,7 +875,7 @@ public class Reports extends javax.swing.JInternalFrame
                             cell = row.createCell(2);
                             cell.setCellValue(rs.getInt("quantity"));
                             cell.setCellStyle(numberStyle);
-                            
+
                             row = sheet.createRow(rowCount++);
                         }
 
@@ -891,7 +904,7 @@ public class Reports extends javax.swing.JInternalFrame
             }
         }
     }
-    
+
     private void createSalesOrderReportByProduct(String prodCode)
     {
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a sales orders report?", "Sales Orders Report", JOptionPane.YES_NO_OPTION);
@@ -900,12 +913,12 @@ public class Reports extends javax.swing.JInternalFrame
             try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
                 ResultSet rs = statement.executeQuery("SELECT prod_num FROM products where code = '" + prodCode + "'");
-                if(rs.next())
+                if (rs.next())
                 {
                     String prodNum = rs.getString("prod_num");
-                    
+
                     rs = statement.executeQuery("SELECT sales_order_details.ord_num, sales_order_details.quantity, sales_order.cust_num, customers.name, sales_order.ord_date, sales_order.del_date, sales_order.dispatched, sales_order.delivered FROM sales_order JOIN sales_order_details ON sales_order.ord_num=sales_order_details.ord_num JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order_details.prod_num = " + prodNum);
-                    if(rs.isBeforeFirst())  
+                    if (rs.isBeforeFirst())
                     {
                         String fileName = PROD_SALES_ORDERS_DIR + "Sales Orders " + prodCode.replaceAll("/", "") + ".xls";
                         try (FileOutputStream fileOut = new FileOutputStream(fileName))
@@ -916,7 +929,7 @@ public class Reports extends javax.swing.JInternalFrame
 
                             HSSFCellStyle numberStyle = workBook.createCellStyle();
                             numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-                
+
                             HSSFRow row;
                             int rowCount = 3;
                             HSSFCell cell;
@@ -927,7 +940,7 @@ public class Reports extends javax.swing.JInternalFrame
                             cell.setCellValue(prodCode);
 
                             // Fill table
-                            while(rs.next())
+                            while (rs.next())
                             {
                                 row = sheet.createRow(rowCount++);
 
@@ -944,21 +957,21 @@ public class Reports extends javax.swing.JInternalFrame
                                 cell.setCellValue(rs.getString("del_date"));
 
                                 cell = row.createCell(4);
-                                if (rs.getInt("dispatched") == 1) 
+                                if (rs.getInt("dispatched") == 1)
                                 {
                                     cell.setCellValue("yes");
-                                } 
-                                else 
+                                }
+                                else
                                 {
                                     cell.setCellValue("no");
                                 }
 
                                 cell = row.createCell(5);
-                                if (rs.getInt("delivered") == 1) 
+                                if (rs.getInt("delivered") == 1)
                                 {
                                     cell.setCellValue("yes");
-                                } 
-                                else 
+                                }
+                                else
                                 {
                                     cell.setCellValue("no");
                                 }
@@ -988,7 +1001,7 @@ public class Reports extends javax.swing.JInternalFrame
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(Reports.this, "<html>Product does not exist - <b>" + prodCode + "</b> \nPlease select from drop down box", "Unknown Product",WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(Reports.this, "<html>Product does not exist - <b>" + prodCode + "</b> \nPlease select from drop down box", "Unknown Product", WARNING_MESSAGE);
                 }
             }
             catch (Exception e)
@@ -998,17 +1011,17 @@ public class Reports extends javax.swing.JInternalFrame
             }
         }
     }
-    
+
     private void createCustomerReport()
     {
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a customer report?", "Customer Report", JOptionPane.YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            if(!btnCustomers.isSelected())
+            if (!btnCustomers.isSelected())
             {
-                JOptionPane.showMessageDialog(Reports.this, "<html><b>WARNING:</b>This report can take up to <b>3 minutes</b> to create.</html>\nPlease do not use the system and ensure no one else is while the report is created.","Warning",WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, "<html><b>WARNING:</b>This report can take up to <b>3 minutes</b> to create.</html>\nPlease do not use the system and ensure no one else is while the report is created.", "Warning", WARNING_MESSAGE);
             }
-            
+
             try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
                 SimpleDateFormat df1 = new SimpleDateFormat("dd-MM-yy");
@@ -1018,52 +1031,52 @@ public class Reports extends javax.swing.JInternalFrame
 
                 StringBuilder fileName = new StringBuilder();
                 fileName.append(CUSTOMER_REPORTS_DIR).append("Customer Report");
-                
+
                 String whereClauseReference = "";
-                if(btnCustomers.isSelected())
+                if (btnCustomers.isSelected())
                 {
                     fileName.append(" - ").append(labelReference.getText());
                     whereClauseReference = " WHERE reference = '" + labelReference.getText() + "'";
                 }
-                
+
                 String whereClauseDates = "";
-                if(!checkAll.isSelected())
+                if (!checkAll.isSelected())
                 {
-                    fileName.append(" - ").append(df1.format(startDate)) .append(" ") .append(df1.format(endDate));
+                    fileName.append(" - ").append(df1.format(startDate)).append(" ").append(df1.format(endDate));
                     whereClauseDates = " AND del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'";
                 }
-                
+
                 fileName.append(".xls");
-                
+
                 try (FileOutputStream fileOut = new FileOutputStream(fileName.toString()))
                 {
                     HSSFWorkbook workBook = db.getHSSFWorkbook(CUSTOMERS_TEMPLATE);
                     HSSFSheet sheet = workBook.getSheet("Customers");
-                    
+
                     HSSFRow row;
                     HSSFCell cell;
-                    
+
                     // Products
                     int rowCount = 1;
                     Map<Integer, Integer> prodCellIndexes = new HashMap();
                     Map<Integer, String> disconProds = new HashMap();
-                    ResultSet rs = statement.executeQuery("SELECT prod_num, code, sales_price, purchase_price, discon FROM products ORDER BY prod_num");           
-                    while(rs.next())
+                    ResultSet rs = statement.executeQuery("SELECT prod_num, code, sales_price, purchase_price, discon FROM products ORDER BY prod_num");
+                    while (rs.next())
                     {
                         int prodNum = rs.getInt("prod_num");
                         String code = rs.getString("code");
                         String salesPrice = "£" + rs.getBigDecimal("sales_price").setScale(2, RoundingMode.CEILING).toPlainString();
                         String purchasePrice = "£" + rs.getBigDecimal("purchase_price").setScale(2, RoundingMode.CEILING).toPlainString();
                         boolean discon = rs.getBoolean("discon");
-                        
-                        if(discon)
+
+                        if (discon)
                         {
                             disconProds.put(prodNum, code + COMMA + salesPrice + COMMA + purchasePrice);
                         }
                         else
                         {
                             prodCellIndexes.put(prodNum, rowCount);
-                            
+
                             row = sheet.createRow(rowCount++);
                             cell = row.createCell(0);
                             cell.setCellValue(prodNum);
@@ -1075,45 +1088,45 @@ public class Reports extends javax.swing.JInternalFrame
                             cell.setCellValue(purchasePrice);
                         }
                     }
-                    
+
                     // Discontinuted                  
                     rowCount++;
                     row = sheet.createRow(rowCount++);
                     cell = row.createCell(0);
                     cell.setCellValue("DISCONTINUED");
                     rowCount++;
-                    for(Map.Entry<Integer, String> discon : disconProds.entrySet())
+                    for (Map.Entry<Integer, String> discon : disconProds.entrySet())
                     {
                         int prodNum = discon.getKey();
                         prodCellIndexes.put(prodNum, rowCount);
-                        
+
                         String prod = discon.getValue();
                         row = sheet.createRow(rowCount++);
                         int cellCount = 0;
-                        
-                        cell = row.createCell(cellCount++); 
+
+                        cell = row.createCell(cellCount++);
                         cell.setCellValue(prodNum);
-                        for(String info : prod.split(COMMA))
+                        for (String info : prod.split(COMMA))
                         {
-                            cell = row.createCell(cellCount++); 
+                            cell = row.createCell(cellCount++);
                             cell.setCellValue(info);
                         }
                     }
-                    
+
                     // Auto Size Columns
                     for (int i = 0; i < 5; i++)
                     {
                         sheet.autoSizeColumn(i);
                     }
-                    
+
                     // Customers
                     row = sheet.getRow(0);
                     HSSFCellStyle rotate = workBook.createCellStyle();
-                    rotate.setRotation((short)90);
+                    rotate.setRotation((short) 90);
                     int columnCount = 5;
                     Map<Integer, Integer> custCellIndexes = new HashMap();
-                    rs = statement.executeQuery("SELECT cust_num, name FROM customers" + whereClauseReference + " ORDER BY cust_num");           
-                    while(rs.next())
+                    rs = statement.executeQuery("SELECT cust_num, name FROM customers" + whereClauseReference + " ORDER BY cust_num");
+                    while (rs.next())
                     {
                         int custNum = rs.getInt("cust_num");
                         String name = rs.getString("name");
@@ -1123,23 +1136,23 @@ public class Reports extends javax.swing.JInternalFrame
                         cell.setCellStyle(rotate);
                         sheet.autoSizeColumn(columnCount - 1);
                     }
-                    
+
                     // Orders made
-                    for(Map.Entry<Integer, Integer> product : prodCellIndexes.entrySet())
+                    for (Map.Entry<Integer, Integer> product : prodCellIndexes.entrySet())
                     {
                         int prodNum = product.getKey();
                         int rowNum = product.getValue();
                         int total = 0;
-                        for(Map.Entry<Integer, Integer> customer : custCellIndexes.entrySet())
+                        for (Map.Entry<Integer, Integer> customer : custCellIndexes.entrySet())
                         {
                             int custNum = customer.getKey();
                             int columnNum = customer.getValue();
-                            rs = statement.executeQuery("SELECT SUM(quantity) AS total FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.cust_num = " + custNum + whereClauseDates); 
-                            if(rs.isBeforeFirst())
+                            rs = statement.executeQuery("SELECT SUM(quantity) AS total FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.cust_num = " + custNum + whereClauseDates);
+                            if (rs.isBeforeFirst())
                             {
                                 rs.next();
                                 int quantity = rs.getInt("total");
-                                if(quantity != 0)
+                                if (quantity != 0)
                                 {
                                     cell = sheet.getRow(rowNum).createCell(columnNum);
                                     cell.setCellValue(quantity);
@@ -1150,7 +1163,7 @@ public class Reports extends javax.swing.JInternalFrame
                         cell = sheet.getRow(rowNum).createCell(4);
                         cell.setCellValue(total);
                     }
-                    
+
                     workBook.write(fileOut);
                     fileOut.flush();
                     fileOut.close();
@@ -1165,23 +1178,23 @@ public class Reports extends javax.swing.JInternalFrame
             }
         }
     }
-    
+
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
-        if(btnAvailableStockReport.isSelected())
+        if (btnAvailableStockReport.isSelected())
         {
             createAvailableStockReport();
         }
-        if(btnWarehouseStockReport.isSelected())
+        if (btnWarehouseStockReport.isSelected())
         {
             createWarehouseStockReport();
         }
-        if(btnOutOfStockReport.isSelected())
+        if (btnOutOfStockReport.isSelected())
         {
             createOutOfStockReport();
         }
-        if(btnPOMadeDate.isSelected())
+        if (btnPOMadeDate.isSelected())
         {
-            if(dateSPO.getDate() == null || dateEPO.getDate() == null)
+            if (dateSPO.getDate() == null || dateEPO.getDate() == null)
             {
                 JOptionPane.showMessageDialog(Reports.this, "Please select start and end date", "Missing information", QUESTION_MESSAGE);
             }
@@ -1190,9 +1203,9 @@ public class Reports extends javax.swing.JInternalFrame
                 createPurchaseOrderReportByDates();
             }
         }
-        if(btnSOMadeDate.isSelected())
+        if (btnSOMadeDate.isSelected())
         {
-            if(dateSSO.getDate() == null || dateESO.getDate() == null)
+            if (dateSSO.getDate() == null || dateESO.getDate() == null)
             {
                 JOptionPane.showMessageDialog(Reports.this, "Please select start and end date", "Missing information", QUESTION_MESSAGE);
             }
@@ -1201,22 +1214,22 @@ public class Reports extends javax.swing.JInternalFrame
                 createSalesOrderReportByDates();
             }
         }
-        if(btnSOMadeProd.isSelected())
+        if (btnSOMadeProd.isSelected())
         {
             String prodCode = labelProduct.getText();
-            
-            if(prodCode.isEmpty())
+
+            if (prodCode.isEmpty())
             {
-               JOptionPane.showMessageDialog(Reports.this, "Please select a product", "Missing information", QUESTION_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, "Please select a product", "Missing information", QUESTION_MESSAGE);
             }
             else
             {
                 createSalesOrderReportByProduct(prodCode);
             }
         }
-        if(btnAllCustomers.isSelected())
+        if (btnAllCustomers.isSelected())
         {
-            if(!checkAll.isSelected() && (dateSR.getDate() == null || dateER.getDate() == null))
+            if (!checkAll.isSelected() && (dateSR.getDate() == null || dateER.getDate() == null))
             {
                 JOptionPane.showMessageDialog(Reports.this, "Please select start and end date or 'All Dates'", "Missing information", QUESTION_MESSAGE);
             }
@@ -1225,10 +1238,10 @@ public class Reports extends javax.swing.JInternalFrame
                 createCustomerReport();
             }
         }
-        if(btnCustomers.isSelected())
+        if (btnCustomers.isSelected())
         {
             String reference = labelReference.getText();
-            if(!checkAll.isSelected() && (dateSR.getDate() == null || dateER.getDate() == null))
+            if (!checkAll.isSelected() && (dateSR.getDate() == null || dateER.getDate() == null))
             {
                 JOptionPane.showMessageDialog(Reports.this, "Please select start and end date or 'All Dates'", "Missing information", QUESTION_MESSAGE);
             }
@@ -1252,25 +1265,25 @@ public class Reports extends javax.swing.JInternalFrame
         btnSOMadeProd.setSelected(false);
         btnAllCustomers.setSelected(false);
         btnCustomers.setSelected(false);
-        
+
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
-        
+
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
-        
+
         labelProduct.setEnabled(false);
         btnFindProd.setEnabled(false);
         comboProducts.setEnabled(false);
-        
+
         dateSR.setEnabled(false);
         dateER.setEnabled(false);
         checkAll.setEnabled(false);
-        
+
         labelReference.setEnabled(false);
         btnFindCust.setEnabled(false);
         comboCustomers.setEnabled(false);
-        
+
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnAvailableStockReportActionPerformed
 
@@ -1283,25 +1296,25 @@ public class Reports extends javax.swing.JInternalFrame
         btnSOMadeProd.setSelected(false);
         btnAllCustomers.setSelected(false);
         btnCustomers.setSelected(false);
-        
+
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
-        
+
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
-        
+
         labelProduct.setEnabled(false);
         btnFindProd.setEnabled(false);
         comboProducts.setEnabled(false);
-        
+
         dateSR.setEnabled(false);
         dateER.setEnabled(false);
         checkAll.setEnabled(false);
-        
+
         labelReference.setEnabled(false);
         btnFindCust.setEnabled(false);
         comboCustomers.setEnabled(false);
-        
+
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnWarehouseStockReportActionPerformed
 
@@ -1314,25 +1327,25 @@ public class Reports extends javax.swing.JInternalFrame
         btnSOMadeProd.setSelected(false);
         btnAllCustomers.setSelected(false);
         btnCustomers.setSelected(false);
-        
+
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
-        
+
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
-        
+
         labelProduct.setEnabled(false);
         btnFindProd.setEnabled(false);
         comboProducts.setEnabled(false);
-        
+
         dateSR.setEnabled(false);
         dateER.setEnabled(false);
         checkAll.setEnabled(false);
-        
+
         labelReference.setEnabled(false);
         btnFindCust.setEnabled(false);
         comboCustomers.setEnabled(false);
-        
+
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnOutOfStockReportActionPerformed
 
@@ -1345,25 +1358,25 @@ public class Reports extends javax.swing.JInternalFrame
         btnSOMadeProd.setSelected(false);
         btnAllCustomers.setSelected(false);
         btnCustomers.setSelected(false);
-        
+
         dateSPO.setEnabled(true);
         dateEPO.setEnabled(true);
-        
+
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
-        
+
         labelProduct.setEnabled(false);
         btnFindProd.setEnabled(false);
         comboProducts.setEnabled(false);
-        
+
         dateSR.setEnabled(false);
         dateER.setEnabled(false);
         checkAll.setEnabled(false);
-        
+
         labelReference.setEnabled(false);
         btnFindCust.setEnabled(false);
         comboCustomers.setEnabled(false);
-        
+
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnPOMadeDateActionPerformed
 
@@ -1376,25 +1389,25 @@ public class Reports extends javax.swing.JInternalFrame
         btnSOMadeProd.setSelected(false);
         btnAllCustomers.setSelected(false);
         btnCustomers.setSelected(false);
-        
+
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
-        
+
         dateSSO.setEnabled(true);
         dateESO.setEnabled(true);
-        
+
         labelProduct.setEnabled(false);
         btnFindProd.setEnabled(false);
         comboProducts.setEnabled(false);
-        
+
         dateSR.setEnabled(false);
         dateER.setEnabled(false);
         checkAll.setEnabled(false);
-        
+
         labelReference.setEnabled(false);
         btnFindCust.setEnabled(false);
         comboCustomers.setEnabled(false);
-        
+
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnSOMadeDateActionPerformed
 
@@ -1407,30 +1420,30 @@ public class Reports extends javax.swing.JInternalFrame
         btnSOMadeProd.setSelected(true);
         btnAllCustomers.setSelected(false);
         btnCustomers.setSelected(false);
-        
+
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
-        
+
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
-        
+
         labelProduct.setEnabled(true);
         btnFindProd.setEnabled(true);
         comboProducts.setEnabled(true);
-        
+
         dateSR.setEnabled(false);
         dateER.setEnabled(false);
         checkAll.setEnabled(false);
-        
+
         labelReference.setEnabled(false);
         btnFindCust.setEnabled(false);
         comboCustomers.setEnabled(false);
-        
+
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnSOMadeProdActionPerformed
 
     private void btnFindProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindProdActionPerformed
-         try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             ArrayList<String> products = new ArrayList<>();
             ResultSet rs = statement.executeQuery("SELECT code FROM products WHERE code LIKE '%" + labelProduct.getText() + "%' ORDER BY code ASC");
@@ -1438,14 +1451,14 @@ public class Reports extends javax.swing.JInternalFrame
             {
                 products.add(rs.getString("code"));
             }
-            
+
             comboProducts.setModel(new javax.swing.DefaultComboBoxModel(products.toArray()));
         }
-        catch (SQLException e) 
+        catch (SQLException e)
         {
             JOptionPane.showMessageDialog(Reports.this, "Error while searching products, please try again.");
             JOptionPane.showMessageDialog(Reports.this, e);
-        } 
+        }
     }//GEN-LAST:event_btnFindProdActionPerformed
 
     private void comboProductsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboProductsActionPerformed
@@ -1462,33 +1475,33 @@ public class Reports extends javax.swing.JInternalFrame
         btnSOMadeProd.setSelected(false);
         btnAllCustomers.setSelected(true);
         btnCustomers.setSelected(false);
-        
+
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
-        
+
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
-        
+
         labelProduct.setEnabled(false);
         btnFindProd.setEnabled(false);
         comboProducts.setEnabled(false);
-        
-        if(!checkAll.isSelected())
+
+        if (!checkAll.isSelected())
         {
             dateSR.setEnabled(true);
             dateER.setEnabled(true);
         }
         checkAll.setEnabled(true);
-        
+
         labelReference.setEnabled(false);
         btnFindCust.setEnabled(false);
         comboCustomers.setEnabled(false);
-        
+
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnAllCustomersActionPerformed
 
     private void checkAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkAllActionPerformed
-        if(checkAll.isSelected())
+        if (checkAll.isSelected())
         {
             dateSR.setEnabled(false);
             dateER.setEnabled(false);
@@ -1509,28 +1522,28 @@ public class Reports extends javax.swing.JInternalFrame
         btnSOMadeProd.setSelected(false);
         btnAllCustomers.setSelected(false);
         btnCustomers.setSelected(true);
-        
+
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
-        
+
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
-        
+
         labelProduct.setEnabled(false);
         btnFindProd.setEnabled(false);
         comboProducts.setEnabled(false);
-        
-        if(!checkAll.isSelected())
+
+        if (!checkAll.isSelected())
         {
             dateSR.setEnabled(true);
             dateER.setEnabled(true);
         }
         checkAll.setEnabled(true);
-        
+
         labelReference.setEnabled(true);
         btnFindCust.setEnabled(true);
         comboCustomers.setEnabled(true);
-        
+
         btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnCustomersActionPerformed
 

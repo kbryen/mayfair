@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class EditMain extends javax.swing.JInternalFrame
     private String sql;
     private final int orderNum;
     private final JDesktopPane desktop;
+    private final DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
     public EditMain(int orderNum, JDesktopPane desktop)
     {
@@ -44,6 +46,7 @@ public class EditMain extends javax.swing.JInternalFrame
         FillLabels();
         btnQuant.setVisible(false);
         btnDelete.setEnabled(false);
+        table.setAutoCreateRowSorter(true);
     }
 
     /**
@@ -320,7 +323,7 @@ public class EditMain extends javax.swing.JInternalFrame
             labelOrdNum.setText(rs.getString("ord_num"));
             Date delDate = rs.getDate("del_date");
             String date;
-            if(delDate == null)
+            if (delDate == null)
             {
                 delDate = new Date();
                 date = "";
@@ -518,14 +521,14 @@ public class EditMain extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnFinishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinishActionPerformed
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
         String date = ((JTextField) calDelDate.getDateEditor().getUiComponent()).getText();
         if (!date.equals(""))
         {
             try
             {
                 Date minDate = getMinDelDate(orderNum);
-                if (format.parse(date).after(minDate))
+                Date orderDate = formatter.parse(date);
+                if (orderDate.after(minDate) || orderDate.equals(minDate))
                 {
                     try (Statement statement = db.getConnection().createStatement())
                     {
@@ -550,9 +553,9 @@ public class EditMain extends javax.swing.JInternalFrame
                     JOptionPane.showMessageDialog(EditMain.this, "Delivery Date needs to be after " + minDate);
                 }
             }
-            catch (ParseException ex)
+            catch (ParseException e)
             {
-                Logger.getLogger(Finish.class.getName()).log(Level.SEVERE, null, ex);
+                JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
             }
         }
         else
@@ -563,24 +566,29 @@ public class EditMain extends javax.swing.JInternalFrame
 
     private Date getMinDelDate(int salesOrderNum)
     {
-        Date date = new Date();
         try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
+            Date datetime = new Date();
+            datetime = formatter.parse(formatter.format(datetime));
+            
             ResultSet rs = statement.executeQuery("SELECT purchase_order.del_date FROM purchase_order JOIN purchase_sales_order ON purchase_order.ord_num = purchase_sales_order.po_num WHERE purchase_sales_order.so_num = " + salesOrderNum);
             while (rs.next())
             {
                 Date delivery_date = rs.getDate("del_date");
-                if (delivery_date.after(date))
+                delivery_date = formatter.parse(formatter.format(delivery_date));
+                if (delivery_date.after(datetime))
                 {
-                    date = delivery_date;
+                    datetime = delivery_date;
                 }
             }
+            
+            return datetime;
         }
-        catch (SQLException e)
+        catch (ParseException | SQLException e)
         {
             JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
+            return new Date();
         }
-        return date;
     }
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked

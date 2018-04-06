@@ -39,6 +39,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
 
         scrollPane.setVisible(false);
         btnAdd.setEnabled(false);
+        table.setAutoCreateRowSorter(true);
     }
 
     /**

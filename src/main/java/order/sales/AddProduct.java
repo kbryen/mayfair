@@ -64,6 +64,8 @@ public class AddProduct extends javax.swing.JInternalFrame
         scrollPane.setVisible(false);
         btnAddPO.setEnabled(false);
         btnAddStock.setEnabled(false);
+        table.setAutoCreateRowSorter(true);
+        table2.setAutoCreateRowSorter(true);
 
     }
 

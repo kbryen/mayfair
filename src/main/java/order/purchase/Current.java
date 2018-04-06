@@ -49,6 +49,7 @@ public class Current extends javax.swing.JInternalFrame
         btnExcelSummary.setVisible(false);
         btnPOStatus.setVisible(false);
         btnFindActionPerformed(null);
+        table.setAutoCreateRowSorter(true);
     }
 
     /**

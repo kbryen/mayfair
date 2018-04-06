@@ -43,6 +43,7 @@ public class View extends javax.swing.JInternalFrame
         initComponents();
         requestDB();
         updateLabels();
+        table.setAutoCreateRowSorter(true);
     }
 
     private void requestDB()
@@ -98,7 +99,7 @@ public class View extends javax.swing.JInternalFrame
         if(onOrder == 0)
         {
             scrollPane.setVisible(false);
-            tableOnOrder.setVisible(false);
+            table.setVisible(false);
         }
         else
         {
@@ -107,12 +108,12 @@ public class View extends javax.swing.JInternalFrame
                 ResultSet rs = statement.executeQuery("SELECT purchase_order.ord_num, purchase_order_details.avaliable, DATE(purchase_order.del_date) AS del_date FROM purchase_order JOIN purchase_order_details ON purchase_order.ord_num = purchase_order_details.ord_num WHERE purchase_order.delivered=false AND purchase_order_details.prod_num = " + prodNum);
             
                 scrollPane.setVisible(true);
-                tableOnOrder.setVisible(true);
+                table.setVisible(true);
                 getContentPane().validate();
                 getContentPane().repaint();
-                while (tableOnOrder.getRowCount() > 0)
+                while (table.getRowCount() > 0)
                 {
-                    ((DefaultTableModel) tableOnOrder.getModel()).removeRow(0);
+                    ((DefaultTableModel) table.getModel()).removeRow(0);
                 }
                 int columns = rs.getMetaData().getColumnCount();
                 while (rs.next())
@@ -122,11 +123,11 @@ public class View extends javax.swing.JInternalFrame
                     {
                         row[i - 1] = rs.getObject(i);
                     }
-                    ((DefaultTableModel) tableOnOrder.getModel()).insertRow(rs.getRow() - 1, row);
+                    ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
                 }
                 
-                tableOnOrder.setSize(tableOnOrder.getWidth(),tableOnOrder.getRowCount() * tableOnOrder.getRowHeight());
-                scrollPane.setSize(tableOnOrder.getSize());
+                table.setSize(table.getWidth(),table.getRowCount() * table.getRowHeight());
+                scrollPane.setSize(table.getSize());
                 getContentPane().setSize(scrollPane.getSize());
             }
             catch (SQLException e)
@@ -143,7 +144,8 @@ public class View extends javax.swing.JInternalFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         labelHeader = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
@@ -185,7 +187,7 @@ public class View extends javax.swing.JInternalFrame
         btnWarehouseStock = new javax.swing.JButton();
         btnOnOrder = new javax.swing.JButton();
         scrollPane = new javax.swing.JScrollPane();
-        tableOnOrder = new javax.swing.JTable();
+        table = new javax.swing.JTable();
 
         setClosable(true);
         setIconifiable(true);
@@ -213,8 +215,10 @@ public class View extends javax.swing.JInternalFrame
         jLabel8.setText("Comments:");
 
         btnClose.setText("Close");
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnClose.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCloseActionPerformed(evt);
             }
         });
@@ -250,8 +254,10 @@ public class View extends javax.swing.JInternalFrame
         jLabel13.setText("On Order:");
 
         btnViewSales.setText("View Sales");
-        btnViewSales.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnViewSales.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnViewSalesActionPerformed(evt);
             }
         });
@@ -270,55 +276,68 @@ public class View extends javax.swing.JInternalFrame
 
         btnInStock.setFont(new java.awt.Font("Lucida Grande", 0, 8)); // NOI18N
         btnInStock.setText("?");
-        btnInStock.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnInStock.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnInStockActionPerformed(evt);
             }
         });
 
         btnWarehouseStock.setFont(new java.awt.Font("Lucida Grande", 0, 8)); // NOI18N
         btnWarehouseStock.setText("?");
-        btnWarehouseStock.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnWarehouseStock.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnWarehouseStockActionPerformed(evt);
             }
         });
 
         btnOnOrder.setFont(new java.awt.Font("Lucida Grande", 0, 8)); // NOI18N
         btnOnOrder.setText("?");
-        btnOnOrder.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnOnOrder.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnOnOrderActionPerformed(evt);
             }
         });
 
-        tableOnOrder.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+        table.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][]
+            {
                 {null, null, null},
                 {null, null, null},
                 {null, null, null},
                 {null, null, null}
             },
-            new String [] {
+            new String []
+            {
                 "Order Number", "Quantity", "Delivery Date"
             }
-        ) {
-            Class[] types = new Class [] {
+        )
+        {
+            Class[] types = new Class []
+            {
                 java.lang.String.class, java.lang.Integer.class, java.lang.Object.class
             };
-            boolean[] canEdit = new boolean [] {
+            boolean[] canEdit = new boolean []
+            {
                 true, false, false
             };
 
-            public Class getColumnClass(int columnIndex) {
+            public Class getColumnClass(int columnIndex)
+            {
                 return types [columnIndex];
             }
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
+            public boolean isCellEditable(int rowIndex, int columnIndex)
+            {
                 return canEdit [columnIndex];
             }
         });
-        scrollPane.setViewportView(tableOnOrder);
+        scrollPane.setViewportView(table);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -565,6 +584,6 @@ public class View extends javax.swing.JInternalFrame
     private javax.swing.JLabel labelStyle;
     private javax.swing.JLabel labelWarehouseStock;
     private javax.swing.JScrollPane scrollPane;
-    private javax.swing.JTable tableOnOrder;
+    private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 }

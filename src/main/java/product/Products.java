@@ -42,6 +42,7 @@ public class Products extends javax.swing.JInternalFrame
         btnView.setEnabled(false);
         btnDelete.setEnabled(false);
         btnEdit.setEnabled(false);
+        table.setAutoCreateRowSorter(true);
     }
 
     /**

@@ -48,6 +48,7 @@ public class Past extends javax.swing.JInternalFrame
         btnViewSummary.setEnabled(false);
         btnExcelSummary.setVisible(false);
         btnFindActionPerformed(null);
+        table.setAutoCreateRowSorter(true);
     }
 
     /**

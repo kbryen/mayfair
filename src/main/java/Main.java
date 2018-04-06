@@ -4,13 +4,13 @@
  */
 package main.java;
 
-import main.java.customer.Customers;
 import main.java.product.Products;
 import java.beans.PropertyVetoException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import main.java.customer.Customers;
 import main.java.report.Reports;
 
 /**
@@ -38,7 +38,8 @@ public class Main extends javax.swing.JFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         panelSelection = new javax.swing.JPanel();
         btnNewSO = new javax.swing.JButton();
@@ -66,40 +67,50 @@ public class Main extends javax.swing.JFrame
 
         btnNewSO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnNewSO.setText("New Order");
-        btnNewSO.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnNewSO.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnNewSOActionPerformed(evt);
             }
         });
 
         btnCurrentSO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnCurrentSO.setText("Current");
-        btnCurrentSO.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnCurrentSO.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCurrentSOActionPerformed(evt);
             }
         });
 
         btnNewPO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnNewPO.setText("New Order");
-        btnNewPO.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnNewPO.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnNewPOActionPerformed(evt);
             }
         });
 
         btnCurrentPO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnCurrentPO.setText("Current");
-        btnCurrentPO.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnCurrentPO.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCurrentPOActionPerformed(evt);
             }
         });
 
         btnProducts.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
         btnProducts.setText("Products");
-        btnProducts.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnProducts.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnProductsActionPerformed(evt);
             }
         });
@@ -110,32 +121,40 @@ public class Main extends javax.swing.JFrame
 
         btnCustomers.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
         btnCustomers.setText("Customers");
-        btnCustomers.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnCustomers.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCustomersActionPerformed(evt);
             }
         });
 
         btnPastSO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnPastSO.setText("Past");
-        btnPastSO.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnPastSO.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnPastSOActionPerformed(evt);
             }
         });
 
         btnPastPO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnPastPO.setText("Past");
-        btnPastPO.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnPastPO.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnPastPOActionPerformed(evt);
             }
         });
 
         btnReports.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
         btnReports.setText("Reports");
-        btnReports.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnReports.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnReportsActionPerformed(evt);
             }
         });

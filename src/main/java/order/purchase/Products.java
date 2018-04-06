@@ -56,6 +56,8 @@ public class Products extends javax.swing.JInternalFrame
 
         scrollPane.setVisible(false);
         btnAdd.setEnabled(false);
+        table.setAutoCreateRowSorter(true);
+        table2.setAutoCreateRowSorter(true);
     }
 
     private void FillLabels()

@@ -27,6 +27,7 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
         initComponents();
         this.orderNum = orderNum;
         labelAddress.setVisible(false);
+        table.setAutoCreateRowSorter(true);
         FillLabels();
     }
 

@@ -34,6 +34,7 @@ public class Past extends javax.swing.JInternalFrame
         fieldName.setVisible(false);
         labelOR.setVisible(false);
         btnFindActionPerformed(null);
+        table.setAutoCreateRowSorter(true);
     }
 
     /**

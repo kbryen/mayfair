@@ -48,6 +48,7 @@ public class EditPickPurchaseOrders extends javax.swing.JInternalFrame
         showLabels(false);
         FillTable();
         btnBack.setVisible(true);
+        table.setAutoCreateRowSorter(true);
     }
 
     private void showLabels(boolean show)
