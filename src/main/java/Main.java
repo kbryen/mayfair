@@ -250,14 +250,6 @@ public class Main extends javax.swing.JFrame
     private void btnNewSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewSOActionPerformed
         main.java.order.sales.CustomerNumber salesOrder = new main.java.order.sales.CustomerNumber(desktop);
         desktop.add(salesOrder);
-        try
-        {
-            salesOrder.setMaximum(true);
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
         salesOrder.show();
     }//GEN-LAST:event_btnNewSOActionPerformed
 

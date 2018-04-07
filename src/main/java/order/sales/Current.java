@@ -632,8 +632,7 @@ public class Current extends javax.swing.JInternalFrame
             {
                 ResultSet rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity "
                         + "FROM sales_order_details JOIN products ON sales_order_details.prod_num = products.prod_num "
-                        + "WHERE sales_order_details.ord_num = " + ord_num + " "
-                        + "ORDER BY products.code");
+                        + "WHERE sales_order_details.ord_num = " + ord_num);
                 while (rs.next())
                 {
                     products.put(rs.getString("products.code"), rs.getInt("sales_order_details.quantity"));

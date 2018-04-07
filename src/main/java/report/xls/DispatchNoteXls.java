@@ -12,7 +12,6 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 
-
 /**
  *
  * @author kian_bryen
@@ -66,45 +65,47 @@ public class DispatchNoteXls extends XlsReport
         cell.setCellValue(ord_num);
 
         // Delivery Address
-        rowCount = 5;
         String[] del_address_parts = del_address.split(",");
         for (String del_address_part : del_address_parts)
         {
             row = sheet.getRow(rowCount++);
-            cell = row.createCell(3);
+            cell = row.createCell(1);
             cell.setCellValue(del_address_part.trim());
             cell.setCellStyle(getStyle(RIGHT));
         }
 
         // Products
-        int maxProdsPerPage = 42;
-        int prodsCount = 8;
-        
-        rowCount = 13;
-        row = sheet.createRow(rowCount++);
-        addProductsHeader(row);
-        
+        int maxProdsPerPage = 41;
+        int prodsCount = 12;
+
+        rowCount = 19;
+//        row = sheet.createRow(rowCount++);
+//        addProductsHeader(row);
+
         for (Entry<String, Integer> product : products.entrySet())
         {
             prodsCount++;
-            
             if (prodsCount == maxProdsPerPage)
             {
                 prodsCount = 0;
                 rowCount += 8;
                 row = sheet.createRow(rowCount++);
-                addProductsHeader(row);
-                
-                row = sheet.createRow(rowCount++);
+
+                cell = row.createCell(0);
+                cell.setCellStyle(getStyle(BOLD + LEFT + BORDER + BOTTOM));
+                cell.setCellValue("Product Code");
+
+                cell = row.createCell(1);
+                cell.setCellStyle(getStyle(BOLD + RIGHT + BORDER + BOTTOM));
+                cell.setCellValue("Quantity");
             }
-            else
-            {
-                row = sheet.createRow(rowCount++);
-            }
-            
+
+            row = sheet.createRow(rowCount++);
             cell = row.createCell(0);
             cell.setCellValue(product.getKey());
+            cell.setCellStyle(getStyle(BORDER + BOTTOM));
             cell = row.createCell(1);
+            cell.setCellStyle(getStyle(BORDER + BOTTOM));
             cell.setCellValue(product.getValue());
         }
 
@@ -117,18 +118,7 @@ public class DispatchNoteXls extends XlsReport
         cell.setCellStyle(getStyle(BOLD + RIGHT));
         cell.setCellValue(products.values().stream().mapToInt(Integer::intValue).sum());
 
-        autoSizeColumns(sheet, 4);
-    }
-
-    private void addProductsHeader(HSSFRow row)
-    {
-        HSSFCell cell = row.createCell(0);
-        cell.setCellStyle(getStyle(BOLD + LEFT));
-        cell.setCellValue("Product Code");
-
-        cell = row.createCell(1);
-        cell.setCellStyle(getStyle(BOLD + RIGHT));
-        cell.setCellValue("Quantity");
+//        autoSizeColumns(sheet, 4);
     }
 
     public void setDel_date(String del_date)
@@ -168,6 +158,6 @@ public class DispatchNoteXls extends XlsReport
 
     public String getFilename()
     {
-        return outputDir + ord_num + "-" + cust_reference + " " + del_date.replace('/', '-') + ".xls";
+        return outputDir + ord_num + " - " + cust_reference + " " + del_date.replace('/', '-') + ".xls";
     }
 }

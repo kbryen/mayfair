@@ -24,7 +24,6 @@ public class AvailableStockReportXls extends XlsReport
 {
 
     private final String outputDir = STOCK_REPORTS_DIR;
-    private final String sheetName = "Stock Report";
     private final String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
     private Map<String, Map<String, Integer>> productCounts = new HashMap();
@@ -37,7 +36,7 @@ public class AvailableStockReportXls extends XlsReport
 
     public void populateWorkbook()
     {
-        HSSFSheet sheet = getWorkbook().createSheet(sheetName);
+        HSSFSheet sheet = getWorkbook().createSheet(getReportName());
         int rowCount = 0;
         HSSFRow row = sheet.createRow(rowCount++);
         int cellCount = 0;

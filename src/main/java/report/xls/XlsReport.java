@@ -41,6 +41,8 @@ public abstract class XlsReport
     public static final String LEFT = "left";
     public static final String RIGHT = "right";
     public static final String NUMBER = "number";
+    public static final String BORDER = "border";
+    public static final String BOTTOM = "bottom";
 
     public XlsReport(HSSFWorkbook workBook)
     {
@@ -100,6 +102,27 @@ public abstract class XlsReport
 //        boldNumberStyle.setDataFormat(0);
         boldRightStyle.setFont(bold);
         styles.put(BOLD + NUMBER, boldNumberStyle);
+
+        // Border Bottom
+        HSSFCellStyle borderBottomStyle = workBook.createCellStyle();
+        borderBottomStyle.setBorderBottom(HSSFCellStyle.BORDER_THIN);
+        styles.put(BORDER + BOTTOM, borderBottomStyle);
+
+        // Bold Left Border Bottom
+        HSSFCellStyle boldRightBorderBottomStyle = workBook.createCellStyle();
+        boldRightBorderBottomStyle.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
+        boldRightBorderBottomStyle.setFont(bold);
+        boldRightBorderBottomStyle.setAlignment(CellStyle.VERTICAL_TOP);
+        boldRightBorderBottomStyle.setAlignment(CellStyle.ALIGN_RIGHT);
+        styles.put(BOLD + RIGHT + BORDER + BOTTOM, boldRightBorderBottomStyle);
+
+        // Bold Right Border Bottom
+        HSSFCellStyle boldLeftBorderBottomStyle = workBook.createCellStyle();
+        boldLeftBorderBottomStyle.setBorderBottom(HSSFCellStyle.BORDER_MEDIUM);
+        boldLeftBorderBottomStyle.setFont(bold);
+        boldLeftBorderBottomStyle.setAlignment(CellStyle.VERTICAL_TOP);
+        boldLeftBorderBottomStyle.setAlignment(CellStyle.ALIGN_LEFT);
+        styles.put(BOLD + LEFT + BORDER + BOTTOM, boldLeftBorderBottomStyle);
     }
 
     public void setLoggingComponent(Component loggingComponent)
@@ -116,7 +139,7 @@ public abstract class XlsReport
     {
         return reportName;
     }
-    
+
     public HSSFCellStyle getStyle(String style)
     {
         return styles.get(style);
