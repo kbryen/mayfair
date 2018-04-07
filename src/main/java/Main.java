@@ -6,19 +6,25 @@ package main.java;
 
 import main.java.product.Products;
 import java.beans.PropertyVetoException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
 import main.java.customer.Customers;
+import main.java.reminders.Reminders;
 import main.java.report.Reports;
 
 /**
- * 
+ *
  * @author kian_bryen
  */
 public class Main extends javax.swing.JFrame
 {
+
     public static String formatDate(String datetime)
     {
         LocalDateTime localDateTime = LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"));
@@ -29,6 +35,7 @@ public class Main extends javax.swing.JFrame
     {
         initComponents();
         setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
+//        btnRemindersActionPerformed(null);
     }
 
     /**
@@ -58,6 +65,8 @@ public class Main extends javax.swing.JFrame
         btnReports = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         jSeparator11 = new javax.swing.JSeparator();
+        btnReminders = new javax.swing.JButton();
+        jSeparator12 = new javax.swing.JSeparator();
         desktop = new javax.swing.JDesktopPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -163,6 +172,16 @@ public class Main extends javax.swing.JFrame
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setText("Purchase Orders");
 
+        btnReminders.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
+        btnReminders.setText("Reminders");
+        btnReminders.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnRemindersActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout panelSelectionLayout = new javax.swing.GroupLayout(panelSelection);
         panelSelection.setLayout(panelSelectionLayout);
         panelSelectionLayout.setHorizontalGroup(
@@ -185,7 +204,9 @@ public class Main extends javax.swing.JFrame
                     .addComponent(btnReports, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jSeparator11))
+                    .addComponent(jSeparator11)
+                    .addComponent(jSeparator12)
+                    .addComponent(btnReminders, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         panelSelectionLayout.setVerticalGroup(
@@ -223,7 +244,11 @@ public class Main extends javax.swing.JFrame
                 .addComponent(btnReports)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator10, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(183, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnReminders)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSeparator12, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(182, Short.MAX_VALUE))
         );
 
         getContentPane().add(panelSelection, java.awt.BorderLayout.LINE_START);
@@ -349,6 +374,22 @@ public class Main extends javax.swing.JFrame
         reports.show();
     }//GEN-LAST:event_btnReportsActionPerformed
 
+    private void btnRemindersActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnRemindersActionPerformed
+    {//GEN-HEADEREND:event_btnRemindersActionPerformed
+
+        try
+        {
+            Reminders reminders = new Reminders(desktop);
+            desktop.add(reminders);
+            reminders.setMaximum(true);
+            reminders.show();
+        }
+        catch (PropertyVetoException ex)
+        {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnRemindersActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -396,6 +437,28 @@ public class Main extends javax.swing.JFrame
         });
     }
 
+    public static void fillTable(JTable table, ResultSet rs) throws SQLException
+    {
+        while (table.getRowCount() > 0)
+        {
+            ((DefaultTableModel) table.getModel()).removeRow(0);
+        }
+
+        int columns = rs.getMetaData().getColumnCount();
+
+        while (rs.next())
+        {
+            Object[] row = new Object[columns];
+
+            for (int i = 1; i <= columns; i++)
+            {
+                row[i - 1] = rs.getObject(i);
+            }
+
+            ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
+        }
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCurrentPO;
     private javax.swing.JButton btnCurrentSO;
@@ -405,12 +468,14 @@ public class Main extends javax.swing.JFrame
     private javax.swing.JButton btnPastPO;
     private javax.swing.JButton btnPastSO;
     private javax.swing.JButton btnProducts;
+    private javax.swing.JButton btnReminders;
     private javax.swing.JButton btnReports;
     private javax.swing.JDesktopPane desktop;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JSeparator jSeparator10;
     private javax.swing.JSeparator jSeparator11;
+    private javax.swing.JSeparator jSeparator12;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JSeparator jSeparator8;
     private javax.swing.JSeparator jSeparator9;

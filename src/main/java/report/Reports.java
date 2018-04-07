@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Mayfair Stock Control.
+ *
  */
 package main.java.report;
 
@@ -53,9 +52,6 @@ public class Reports extends javax.swing.JInternalFrame
 
     private final JDesktopPane desktop;
     private final Database db = new Database();
-    private String sql;
-    private static final String COMMA = ",";
-    private static final String DIVIDER = " - ";
 
     /**
      * Creates new form ViewEditProducts
@@ -1020,7 +1016,7 @@ public class Reports extends javax.swing.JInternalFrame
 
                         if (discon)
                         {
-                            disconProds.put(prodNum, code + COMMA + salesPrice + COMMA + purchasePrice);
+                            disconProds.put(prodNum, code + "," + salesPrice + "," + purchasePrice);
                         }
                         else
                         {
@@ -1055,7 +1051,7 @@ public class Reports extends javax.swing.JInternalFrame
 
                         cell = row.createCell(cellCount++);
                         cell.setCellValue(prodNum);
-                        for (String info : prod.split(COMMA))
+                        for (String info : prod.split(","))
                         {
                             cell = row.createCell(cellCount++);
                             cell.setCellValue(info);
@@ -1081,7 +1077,7 @@ public class Reports extends javax.swing.JInternalFrame
                         String name = rs.getString("name");
                         custCellIndexes.put(custNum, columnCount);
                         cell = row.createCell(columnCount++);
-                        cell.setCellValue(custNum + DIVIDER + name);
+                        cell.setCellValue(custNum + " - " + name);
                         cell.setCellStyle(rotate);
                         sheet.autoSizeColumn(columnCount - 1);
                     }

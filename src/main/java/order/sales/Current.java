@@ -307,11 +307,11 @@ public class Current extends javax.swing.JInternalFrame
             ResultSet rs;
             if (!fieldOrderNumber.getText().equals(""))
             {
-                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%a %d/%m/%Y'), DATE_FORMAT(sales_order.del_date,'%a %d/%m/%Y'), sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%a %d/%m/%Y') FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC");
+                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC");
             }
             else
             {
-                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%a %d/%m/%Y'), DATE_FORMAT(sales_order.del_date,'%a %d/%m/%Y'), sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%a %d/%m/%Y') FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE customers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC");
+                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE customers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC");
             }
 
             scrollPane.setVisible(true);
@@ -611,7 +611,7 @@ public class Current extends javax.swing.JInternalFrame
             try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
                 ResultSet rs = statement.executeQuery(
-                        "SELECT DATE_FORMAT(sales_order.del_date,'%a %d/%m/%Y') AS del_date, customers.cust_num, customers.reference, customers.del_address "
+                        "SELECT DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a') AS del_date, customers.cust_num, customers.reference, customers.del_address "
                         + "FROM sales_order JOIN customers ON sales_order.cust_num = customers.cust_num "
                         + "WHERE sales_order.ord_num = " + ord_num);
                 rs.next();

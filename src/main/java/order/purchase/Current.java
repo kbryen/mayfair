@@ -59,7 +59,8 @@ public class Current extends javax.swing.JInternalFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         jLabel1 = new javax.swing.JLabel();
         btnViewSummary = new javax.swing.JButton();
@@ -93,15 +94,19 @@ public class Current extends javax.swing.JInternalFrame
 
         btnViewSummary.setBackground(new java.awt.Color(153, 204, 255));
         btnViewSummary.setText("View Summary");
-        btnViewSummary.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnViewSummary.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnViewSummaryActionPerformed(evt);
             }
         });
 
         btnFind.setText("Find");
-        btnFind.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnFind.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnFindActionPerformed(evt);
             }
         });
@@ -109,34 +114,43 @@ public class Current extends javax.swing.JInternalFrame
         scrollPane.setBorder(null);
 
         table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+            new Object [][]
+            {
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null},
                 {null, null, null, null, null, null, null}
             },
-            new String [] {
-                "Number", "Supploer", "Ordered", "Expected Delivery", "Total (£)", "Dispatched", "Dispatched Date"
+            new String []
+            {
+                "Number", "Supplier", "Ordered", "Expected Delivery", "Total (£)", "Dispatched", "Dispatched Date"
             }
-        ) {
-            Class[] types = new Class [] {
+        )
+        {
+            Class[] types = new Class []
+            {
                 java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Float.class, java.lang.Boolean.class, java.lang.String.class
             };
-            boolean[] canEdit = new boolean [] {
+            boolean[] canEdit = new boolean []
+            {
                 false, false, false, false, false, false, false
             };
 
-            public Class getColumnClass(int columnIndex) {
+            public Class getColumnClass(int columnIndex)
+            {
                 return types [columnIndex];
             }
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
+            public boolean isCellEditable(int rowIndex, int columnIndex)
+            {
                 return canEdit [columnIndex];
             }
         });
         table.setColumnSelectionAllowed(true);
-        table.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+        table.addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mouseClicked(java.awt.event.MouseEvent evt)
+            {
                 tableMouseClicked(evt);
             }
         });
@@ -145,8 +159,10 @@ public class Current extends javax.swing.JInternalFrame
 
         jLabel3.setText("Order Number");
 
-        fieldOrderNumber.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        fieldOrderNumber.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 fieldOrderNumberActionPerformed(evt);
             }
         });
@@ -156,49 +172,63 @@ public class Current extends javax.swing.JInternalFrame
         labelName.setText("Supplier Name");
 
         btnCancel.setText("Cancel Order");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnCancel.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCancelActionPerformed(evt);
             }
         });
 
         btnEdit.setText("Edit Order");
-        btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnEdit.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnEditActionPerformed(evt);
             }
         });
 
-        btnMarkDispatched.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnMarkDispatched.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnMarkDispatchedActionPerformed(evt);
             }
         });
 
         btnMarkDelivered.setText("Mark Delivered");
-        btnMarkDelivered.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnMarkDelivered.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnMarkDeliveredActionPerformed(evt);
             }
         });
 
         btnClear.setText("Clear");
-        btnClear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnClear.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnClearActionPerformed(evt);
             }
         });
 
         btnExcelSummary.setText("Create Summary File");
-        btnExcelSummary.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnExcelSummary.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnExcelSummaryActionPerformed(evt);
             }
         });
 
         btnPOStatus.setText("Create PO Avaliability");
-        btnPOStatus.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnPOStatus.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnPOStatusActionPerformed(evt);
             }
         });
@@ -307,11 +337,11 @@ public class Current extends javax.swing.JInternalFrame
             ResultSet rs;
             if (!fieldOrderNumber.getText().equals(""))
             {
-                rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%a %d/%m/%Y'), DATE_FORMAT(purchase_order.del_date,'%a %d/%m/%Y'), purchase_order.price, purchase_order.dispatched, DATE_FORMAT(purchase_order.dispatched_date,'%a %d/%m/%Y') FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE purchase_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ORDER BY purchase_order.del_date, purchase_order.ord_num DESC");
+                rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(purchase_order.del_date,'%d/%m/%Y %a'), purchase_order.price, purchase_order.dispatched, DATE_FORMAT(purchase_order.dispatched_date,'%d/%m/%Y %a') FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE purchase_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ORDER BY purchase_order.del_date, purchase_order.ord_num DESC");
             }
             else
             {
-                rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%a %d/%m/%Y'), DATE_FORMAT(purchase_order.del_date,'%a %d/%m/%Y'), purchase_order.price, purchase_order.dispatched, DATE_FORMAT(purchase_order.dispatched_date,'%a %d/%m/%Y') FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE suppliers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ORDER BY purchase_order.del_date, purchase_order.ord_num DESC");
+                rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(purchase_order.del_date,'%d/%m/%Y %a'), purchase_order.price, purchase_order.dispatched, DATE_FORMAT(purchase_order.dispatched_date,'%d/%m/%Y %a') FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE suppliers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ORDER BY purchase_order.del_date, purchase_order.ord_num DESC");
             }
 
             scrollPane.setVisible(true);

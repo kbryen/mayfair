@@ -219,11 +219,11 @@ public class Past extends javax.swing.JInternalFrame
             ResultSet rs;
             if (!fieldOrderNumber.getText().equals(""))
             {
-                rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%a %d/%m/%Y'), DATE_FORMAT(purchase_order.del_date,'%a %d/%m/%Y'), purchase_order.price FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE purchase_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = true ORDER BY purchase_order.del_date DESC");
+                rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(purchase_order.del_date,'%d/%m/%Y %a'), purchase_order.price FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE purchase_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = true ORDER BY purchase_order.del_date DESC");
             }
             else
             {
-                rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%a %d/%m/%Y'), DATE_FORMAT(purchase_order.del_date,'%a %d/%m/%Y'), purchase_order.price FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE suppliers.name LIKE '%" + fieldName.getText() + "%' and delivered = true ORDER BY purchase_order.del_date DESC");
+                rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(purchase_order.del_date,'%d/%m/%Y %a'), purchase_order.price FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE suppliers.name LIKE '%" + fieldName.getText() + "%' and delivered = true ORDER BY purchase_order.del_date DESC");
             }
 
             scrollPane.setVisible(true);
