@@ -1,4 +1,4 @@
-package main.java.report;
+package main.java.report.xlsx;
 
 import java.awt.Component;
 import java.io.FileInputStream;
@@ -35,6 +35,7 @@ public abstract class XlsxReport
 
     private final XSSFWorkbook workBook;
     private Component loggingComponent;
+    private String reportName = "Report";
 
     private final Map<String, XSSFCellStyle> styles = new HashMap();
     public static final String BOLD = "bold";
@@ -90,12 +91,12 @@ public abstract class XlsxReport
         boldRightStyle.setAlignment(CellStyle.ALIGN_RIGHT);
         boldRightStyle.setFont(bold);
         styles.put(BOLD + RIGHT, boldRightStyle);
-        
+
         // Number
         XSSFCellStyle numberStyle = workBook.createCellStyle();
         numberStyle.setDataFormat(BuiltinFormats.getBuiltinFormat("0"));
         styles.put(NUMBER, numberStyle);
-        
+
         // Bold Number
         XSSFCellStyle boldNumberStyle = workBook.createCellStyle();
         boldNumberStyle.setDataFormat(BuiltinFormats.getBuiltinFormat("0"));
@@ -106,6 +107,16 @@ public abstract class XlsxReport
     public void setLoggingComponent(Component loggingComponent)
     {
         this.loggingComponent = loggingComponent;
+    }
+
+    public void setReportName(String reportName)
+    {
+        this.reportName = reportName;
+    }
+
+    public String getReportName()
+    {
+        return reportName;
     }
 
     public XSSFCellStyle getStyle(String style)
@@ -154,12 +165,12 @@ public abstract class XlsxReport
             workBook.write(fileOut);
             fileOut.flush();
             fileOut.close();
-            outputMessage(loggingComponent, "<html> <b>Dispatch note created successfully.</b> \n<html> <i> " + filename + " </i>", "Dispatch Note Created", INFORMATION_MESSAGE);
+            outputMessage(loggingComponent, "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + filename + " </i>", reportName + " Created", INFORMATION_MESSAGE);
         }
         catch (IOException e)
         {
-            outputMessage(loggingComponent, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-            outputMessage(loggingComponent, "Error", e.getMessage(), ERROR_MESSAGE);
+            outputMessage(loggingComponent, "<html> Error while creating " + reportName + ", please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+            outputMessage(loggingComponent, e.getLocalizedMessage(), "Message for Kian", ERROR_MESSAGE);
         }
     }
 

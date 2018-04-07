@@ -13,7 +13,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
@@ -23,12 +22,9 @@ import static javax.swing.JOptionPane.YES_NO_OPTION;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
 import main.java.MayfairConstants;
-import static main.java.MayfairConstants.DISPATCH_NOTES_DIR;
-import static main.java.MayfairConstants.DISPATCH_NOTE_TEMPLATE;
-import main.java.report.DispatchNoteXls;
+import main.java.report.xls.DispatchNoteXls;
+import main.java.report.xls.XlsReport;
 import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -607,6 +603,7 @@ public class Current extends javax.swing.JInternalFrame
         {
             DispatchNoteXls dispatchNote = new DispatchNoteXls();
             dispatchNote.setLoggingComponent(this);
+            dispatchNote.setReportName("Dispatch Note");
             dispatchNote.setOrd_num(ord_num);
             dispatchNote.setCust_name(cust_name);
 

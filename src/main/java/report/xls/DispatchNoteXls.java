@@ -2,22 +2,22 @@
  * Mayfair Stock Control.
  *
  */
-package main.java.report;
+package main.java.report.xls;
 
 import java.util.Map;
 import java.util.Map.Entry;
 import static main.java.MayfairConstants.DISPATCH_NOTES_DIR;
 import static main.java.MayfairConstants.DISPATCH_NOTE_TEMPLATE;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 
 
 /**
  *
  * @author kian_bryen
  */
-public class DispatchNoteXlsx extends XlsxReport
+public class DispatchNoteXls extends XlsReport
 {
 
     private final String outputDir = DISPATCH_NOTES_DIR;
@@ -27,24 +27,23 @@ public class DispatchNoteXlsx extends XlsxReport
     private String cust_name = "";
     private String del_address = "";
     private Map<String, Integer> products;
-    private int total_quant = 0;
     private int ord_num = 0;
     private String cust_reference = "";
 
-    public DispatchNoteXlsx()
+    public DispatchNoteXls()
     {
-        super(XlsxReport.getXSSFWorkbook(DISPATCH_NOTE_TEMPLATE));
+        super(XlsReport.getHSSFWorkbook(DISPATCH_NOTE_TEMPLATE));
     }
 
     public void populateWorkbook()
     {
-        XSSFSheet sheet = getWorkbook().getSheet(sheetName);
+        HSSFSheet sheet = getWorkbook().getSheet(sheetName);
         int rowCount = 5;
 
         // --- Order Details ---
         // Delivery date
-        XSSFRow row = sheet.getRow(rowCount++);
-        XSSFCell cell = row.createCell(1);
+        HSSFRow row = sheet.getRow(rowCount++);
+        HSSFCell cell = row.createCell(1);
         cell.setCellStyle(getStyle(RIGHT));
         cell.setCellValue(del_date);
 
@@ -78,29 +77,35 @@ public class DispatchNoteXlsx extends XlsxReport
         }
 
         // Products
+        int maxProdsPerPage = 42;
+        int prodsCount = 8;
+        
         rowCount = 13;
-        int maxRowCount = 44;
-
         row = sheet.createRow(rowCount++);
         addProductsHeader(row);
-       
+        
         for (Entry<String, Integer> product : products.entrySet())
         {
-            if (rowCount > maxRowCount)
+            prodsCount++;
+            
+            if (prodsCount == maxProdsPerPage)
             {
-                rowCount = 55;
+                prodsCount = 0;
+                rowCount += 8;
                 row = sheet.createRow(rowCount++);
                 addProductsHeader(row);
+                
+                row = sheet.createRow(rowCount++);
             }
-
-            int quant = product.getValue();
-            total_quant += quant;
-
-            row = sheet.createRow(rowCount++);
+            else
+            {
+                row = sheet.createRow(rowCount++);
+            }
+            
             cell = row.createCell(0);
             cell.setCellValue(product.getKey());
             cell = row.createCell(1);
-            cell.setCellValue(quant);
+            cell.setCellValue(product.getValue());
         }
 
         // Total Units
@@ -110,14 +115,14 @@ public class DispatchNoteXlsx extends XlsxReport
         cell.setCellValue("Total Units");
         cell = row.createCell(1);
         cell.setCellStyle(getStyle(BOLD + RIGHT));
-        cell.setCellValue(total_quant);
+        cell.setCellValue(products.values().stream().mapToInt(Integer::intValue).sum());
 
         autoSizeColumns(sheet, 4);
     }
 
-    private void addProductsHeader(XSSFRow row)
+    private void addProductsHeader(HSSFRow row)
     {
-        XSSFCell cell = row.createCell(0);
+        HSSFCell cell = row.createCell(0);
         cell.setCellStyle(getStyle(BOLD + LEFT));
         cell.setCellValue("Product Code");
 

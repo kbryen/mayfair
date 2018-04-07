@@ -1,4 +1,4 @@
-package main.java.report;
+package main.java.report.xls;
 
 import java.awt.Component;
 import java.io.FileInputStream;
@@ -17,7 +17,6 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.poi.ss.usermodel.BuiltinFormats;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -34,6 +33,7 @@ public abstract class XlsReport
 
     private final HSSFWorkbook workBook;
     private Component loggingComponent;
+    private String reportName = "Report";
 
     private final Map<String, HSSFCellStyle> styles = new HashMap();
     public static final String BOLD = "bold";
@@ -89,12 +89,12 @@ public abstract class XlsReport
         boldRightStyle.setAlignment(CellStyle.ALIGN_RIGHT);
         boldRightStyle.setFont(bold);
         styles.put(BOLD + RIGHT, boldRightStyle);
-        
+
         // Number
         HSSFCellStyle numberStyle = workBook.createCellStyle();
 //        numberStyle.setDataFormat(BuiltinFormats.getBuiltinFormat("0"));
         styles.put(NUMBER, numberStyle);
-        
+
         // Bold Number
         HSSFCellStyle boldNumberStyle = workBook.createCellStyle();
 //        boldNumberStyle.setDataFormat(0);
@@ -107,6 +107,16 @@ public abstract class XlsReport
         this.loggingComponent = loggingComponent;
     }
 
+    public void setReportName(String reportName)
+    {
+        this.reportName = reportName;
+    }
+
+    public String getReportName()
+    {
+        return reportName;
+    }
+    
     public HSSFCellStyle getStyle(String style)
     {
         return styles.get(style);
@@ -153,12 +163,12 @@ public abstract class XlsReport
             workBook.write(fileOut);
             fileOut.flush();
             fileOut.close();
-            outputMessage(loggingComponent, "<html> <b>Dispatch note created successfully.</b> \n<html> <i> " + filename + " </i>", "Dispatch Note Created", INFORMATION_MESSAGE);
+            outputMessage(loggingComponent, "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + filename + " </i>", reportName + " Created", INFORMATION_MESSAGE);
         }
         catch (IOException e)
         {
-            outputMessage(loggingComponent, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-            outputMessage(loggingComponent, e.getLocalizedMessage(), "Error", ERROR_MESSAGE);
+            outputMessage(loggingComponent, "<html> Error while creating " + reportName + ", please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+            outputMessage(loggingComponent, e.getLocalizedMessage(), "Message for Kian", ERROR_MESSAGE);
         }
     }
 

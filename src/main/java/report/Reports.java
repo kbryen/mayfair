@@ -5,6 +5,7 @@
  */
 package main.java.report;
 
+import main.java.report.xls.AvailableStockReportXls;
 import java.io.FileOutputStream;
 import java.math.RoundingMode;
 import java.sql.ResultSet;
@@ -33,7 +34,6 @@ import static main.java.MayfairConstants.PROD_SALES_ORDERS_DIR;
 import static main.java.MayfairConstants.PROD_SALES_TEMPLATE;
 import static main.java.MayfairConstants.SALES_PURCHASE_ORDERS_DIR;
 import static main.java.MayfairConstants.STOCK_REPORTS_DIR;
-import static main.java.MayfairConstants.STOCK_REPORT_TEMPLATE;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -440,148 +440,97 @@ public class Reports extends javax.swing.JInternalFrame
         int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create an available stock report?", "Available Stock Report", JOptionPane.YES_NO_OPTION);
         if (selectedOption == JOptionPane.YES_OPTION)
         {
-            String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-            String fileName = STOCK_REPORTS_DIR + "Stock Report " + date + ".xls";
-            try (FileOutputStream fileOut = new FileOutputStream(fileName))
+            Map<String, Map<String, Integer>> productCounts = new HashMap();
+            List<String> purchaseOrders = new ArrayList();
+            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                HSSFWorkbook workBook = db.getHSSFWorkbook(STOCK_REPORT_TEMPLATE);
-                HSSFSheet sheet = workBook.getSheet("Stock Report");
-
-                HSSFCellStyle numberStyle = workBook.createCellStyle();
-                numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-
-                // Create bold style
-                HSSFCellStyle bold = workBook.createCellStyle();
-                HSSFFont boldFont = workBook.createFont();
-                boldFont.setBoldweight(BOLDWEIGHT_BOLD);
-                bold.setFont(boldFont);
-
-                int finalCellCount = 0;
-                try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+                // Get a list of all undelivered po's
+                ResultSet rs = statement.executeQuery("SELECT ord_num "
+                        + "FROM purchase_order "
+                        + "WHERE delivered = false");
+                while (rs.next())
                 {
-//                    Map<String, Map<String, Integer>> productsMap = new HashMap();
-//                    
-//                    ResultSet rs = statement.executeQuery("SELECT ord_num FROM purchase_order WHERE delivered = false");
-//                    ArrayList<String> orderNumbers = new ArrayList();
-//                    while (rs.next())
-//                    {
-//                        String orderNumber = rs.getString("ord_num");
-//                        orderNumbers.add(orderNumber);
-//                    }
-//                    
-//                    
-//                    
-                    
-                    HSSFRow row;
-                    int rowCount = 0;
-                    HSSFCell cell;
-                    int cellCount = 3;
-
-                    // Date row
-                    row = sheet.getRow(rowCount++);
-                    cell = row.getCell(1);
-                    cell.setCellValue(date);
-
-                    // Headings row
-                    row = sheet.getRow(rowCount++);
-
-                    // Each undelivered purchase order becomes a header
-                    ResultSet rs = statement.executeQuery("SELECT ord_num FROM purchase_order WHERE delivered = false");
-                    ArrayList<String> orderNumbers = new ArrayList();
-                    while (rs.next())
-                    {
-                        String orderNumber = rs.getString("ord_num");
-                        orderNumbers.add(orderNumber);
-
-                        cell = row.createCell(cellCount++);
-                        cell.setCellValue(orderNumber);
-                        cell.setCellStyle(bold);
-                    }
-
-                    cell = row.createCell(cellCount);
-                    cell.setCellValue("Potential");
-                    cell.setCellStyle(bold);
-                    finalCellCount = cellCount;
-
-                    rs = statement.executeQuery("SELECT prod_num, code, in_stock FROM products");
-                    HashMap<Integer, Pair<String, Integer>> products = new HashMap();
-                    while (rs.next())
-                    {
-                        products.put(rs.getInt("prod_num"), new Pair(rs.getString("code"), rs.getInt("in_stock")));
-                    }
-
-                    for (Map.Entry<Integer, Pair<String, Integer>> product : products.entrySet())
-                    {
-                        int prod_num = product.getKey();
-                        String code = product.getValue().getKey();
-                        int in_stock = product.getValue().getValue();
-
-                        // Reset cell count 
-                        cellCount = 0;
-                        row = sheet.createRow(rowCount++);
-
-                        // Cell 1 - prod num
-                        cell = row.createCell(cellCount++);
-                        cell.setCellValue(prod_num);
-                        cell.setCellStyle(numberStyle);
-
-                        // Cell 2 - prod code
-                        cell = row.createCell(cellCount++);
-                        cell.setCellValue(code);
-
-                        // Cell 3 - available
-                        cell = row.createCell(cellCount++);
-                        cell.setCellValue(in_stock);
-                        cell.setCellStyle(numberStyle);
-
-                        // Loop through undelivered purchase orders
-                        int total = in_stock;
-                        for (String orderNumber : orderNumbers)
-                        {
-                            rs = statement.executeQuery("SELECT avaliable FROM purchase_order_details WHERE prod_num = " + prod_num + " AND ord_num = '" + orderNumber + "'");
-
-                            int avaliable = 0;
-                            if (rs.next())
-                            {
-                                avaliable = rs.getInt("avaliable");
-                            }
-
-                            // Cell * - purchase order avaliable
-                            cell = row.createCell(cellCount++);
-                            cell.setCellValue(avaliable);
-                            cell.setCellStyle(numberStyle);
-
-                            total = total + avaliable;
-                        }
-
-                        // Cell last - total
-                        cell = row.createCell(cellCount++);
-                        cell.setCellValue(total);
-                        cell.setCellStyle(numberStyle);
-                    }
-                }
-                catch (SQLException e)
-                {
-                    JOptionPane.showMessageDialog(Reports.this, e);
+                    purchaseOrders.add(rs.getString("ord_num"));
                 }
 
-                // Auto Size Columns
-                for (int i = 0; i < finalCellCount; i++)
+                // Get a list of all products
+                Map<Integer, String> prodNumToCode = new HashMap();
+                rs = statement.executeQuery("SELECT prod_num, code, in_stock "
+                        + "FROM products");
+                while (rs.next())
                 {
-                    sheet.autoSizeColumn(i);
+                    int prod_num = rs.getInt("prod_num");
+                    String code = rs.getString("code");
+                    prodNumToCode.put(prod_num, code);
+
+                    Map<String, Integer> productCount = new HashMap();
+                    productCounts.put(code, productCount);
+                    int in_stock = rs.getInt("in_stock");
+                    productCount.put("In Stock", in_stock);
+
+                    for (String purchaseOrder : purchaseOrders)
+                    {
+                        productCount.put(purchaseOrder, 0);
+                    }
                 }
 
-                workBook.write(fileOut);
-                fileOut.flush();
-                fileOut.close();
+                // Update po avaliability for products
+                rs = statement.executeQuery("SELECT purchase_order_details.ord_num, prod_num, avaliable "
+                        + "FROM purchase_order_details "
+                        + "JOIN purchase_order "
+                        + "ON purchase_order_details.ord_num=purchase_order.ord_num "
+                        + "WHERE delivered = false");
+                while (rs.next())
+                {
+                    String ord_num = rs.getString("purchase_order_details.ord_num");
+                    int prod_num = rs.getInt("prod_num");
+                    int avaliable = rs.getInt("avaliable");
 
-                JOptionPane.showMessageDialog(Reports.this, "<html> <b>Stock report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
+                    String code = prodNumToCode.get(prod_num);
+                    productCounts.get(code).put(ord_num, avaliable);
+                }
+
+                // Calculate totals / out of stocks
+                List<String> outOfStocks = new ArrayList();
+                for (Map.Entry<String, Map<String, Integer>> products : productCounts.entrySet())
+                {
+                    String code = products.getKey();
+                    Map<String, Integer> counts = products.getValue();
+
+                    int total = 0;
+                    for (Integer value : counts.values())
+                    {
+                        total += value;
+                    }
+
+                    if (total != 0)
+                    {
+                        counts.put("Total", total);
+                    }
+                    else
+                    {
+                        outOfStocks.add(code);
+                    }
+                }
+
+                // Remove out of stocks
+                for (String outOfStock : outOfStocks)
+                {
+                    productCounts.remove(outOfStock);
+                }
             }
-            catch (Exception e)
+            catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating stock report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e);
             }
+
+            AvailableStockReportXls stockReport = new AvailableStockReportXls();
+            stockReport.setLoggingComponent(this);
+            stockReport.setReportName("Available Stock Report");
+            stockReport.setProductCounts(productCounts);
+            stockReport.setPurchaseOrders(purchaseOrders);
+            stockReport.populateWorkbook();
+            stockReport.save(stockReport.getFilename());
         }
     }
 

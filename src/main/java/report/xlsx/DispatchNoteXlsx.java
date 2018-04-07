@@ -2,22 +2,22 @@
  * Mayfair Stock Control.
  *
  */
-package main.java.report;
+package main.java.report.xlsx;
 
 import java.util.Map;
 import java.util.Map.Entry;
 import static main.java.MayfairConstants.DISPATCH_NOTES_DIR;
 import static main.java.MayfairConstants.DISPATCH_NOTE_TEMPLATE;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
 
 
 /**
  *
  * @author kian_bryen
  */
-public class DispatchNoteXls extends XlsReport
+public class DispatchNoteXlsx extends XlsxReport
 {
 
     private final String outputDir = DISPATCH_NOTES_DIR;
@@ -31,20 +31,20 @@ public class DispatchNoteXls extends XlsReport
     private int ord_num = 0;
     private String cust_reference = "";
 
-    public DispatchNoteXls()
+    public DispatchNoteXlsx()
     {
-        super(XlsReport.getHSSFWorkbook(DISPATCH_NOTE_TEMPLATE));
+        super(XlsxReport.getXSSFWorkbook(DISPATCH_NOTE_TEMPLATE));
     }
 
     public void populateWorkbook()
     {
-        HSSFSheet sheet = getWorkbook().getSheet(sheetName);
+        XSSFSheet sheet = getWorkbook().getSheet(sheetName);
         int rowCount = 5;
 
         // --- Order Details ---
         // Delivery date
-        HSSFRow row = sheet.getRow(rowCount++);
-        HSSFCell cell = row.createCell(1);
+        XSSFRow row = sheet.getRow(rowCount++);
+        XSSFCell cell = row.createCell(1);
         cell.setCellStyle(getStyle(RIGHT));
         cell.setCellValue(del_date);
 
@@ -115,9 +115,9 @@ public class DispatchNoteXls extends XlsReport
         autoSizeColumns(sheet, 4);
     }
 
-    private void addProductsHeader(HSSFRow row)
+    private void addProductsHeader(XSSFRow row)
     {
-        HSSFCell cell = row.createCell(0);
+        XSSFCell cell = row.createCell(0);
         cell.setCellStyle(getStyle(BOLD + LEFT));
         cell.setCellValue("Product Code");
 
