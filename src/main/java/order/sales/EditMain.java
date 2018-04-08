@@ -83,6 +83,8 @@ public class EditMain extends javax.swing.JInternalFrame
         labelComments = new javax.swing.JLabel();
         calDelDate = new com.toedter.calendar.JDateChooser();
         labelDelDate2 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        labelTotalUnits = new javax.swing.JLabel();
 
         setIconifiable(true);
         setMaximizable(true);
@@ -137,6 +139,8 @@ public class EditMain extends javax.swing.JInternalFrame
 
         jLabel9.setText("Order Total : £");
 
+        labelOrdTotal.setText("3");
+
         btnAdd.setText("Add Product");
         btnAdd.addActionListener(new java.awt.event.ActionListener()
         {
@@ -182,6 +186,10 @@ public class EditMain extends javax.swing.JInternalFrame
         calDelDate.setDateFormatString("yyyy-MM-dd");
 
         labelDelDate2.setText("Set Delivery Date :");
+
+        jLabel10.setText("Total Units:");
+
+        labelTotalUnits.setText("3");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -231,15 +239,18 @@ public class EditMain extends javax.swing.JInternalFrame
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(calDelDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
                                 .addComponent(fieldComments, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(jLabel9)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(labelOrdTotal)
-                                .addGap(10, 10, 10)))))
+                                .addComponent(labelOrdTotal))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(calDelDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jLabel10)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(labelTotalUnits)))
+                        .addGap(10, 10, 10)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -268,7 +279,7 @@ public class EditMain extends javax.swing.JInternalFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel8)
                 .addGap(7, 7, 7)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 132, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 136, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -279,17 +290,22 @@ public class EditMain extends javax.swing.JInternalFrame
                         .addComponent(fieldComments, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addGap(30, 30, 30)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(labelDelDate2)
-                    .addComponent(calDelDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnAdd)
-                    .addComponent(btnDelete)
-                    .addComponent(btnQuant))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnFinish)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(labelDelDate2)
+                            .addComponent(calDelDate, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnAdd)
+                            .addComponent(btnDelete)
+                            .addComponent(btnQuant))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnFinish))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel10)
+                        .addComponent(labelTotalUnits)))
                 .addContainerGap())
         );
 
@@ -304,14 +320,19 @@ public class EditMain extends javax.swing.JInternalFrame
         try (Connection con = db.getConnection())
         {
             Statement queryStatement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = queryStatement.executeQuery("SELECT SUM(price) AS total_price FROM sales_order_details WHERE ord_num = '" + orderNum + "'");
+            ResultSet rs = queryStatement.executeQuery("SELECT SUM(price) AS total_price, SUM(quantity) as total_quantity "
+                    + "FROM sales_order_details WHERE ord_num = '" + orderNum + "'");
             rs.next();
-            double price = Double.parseDouble(rs.getString("total_price"));
+            double price = rs.getDouble("total_price");
+            int quantity = rs.getInt("total_quantity");
 
             Statement updateStatement = con.createStatement();
-            updateStatement.executeUpdate("UPDATE sales_order SET price = " + price + " WHERE ord_num = " + orderNum);
+            updateStatement.executeUpdate("UPDATE sales_order SET price = " + price + ", total_units = " + quantity + " WHERE ord_num = " + orderNum);
 
-            rs = queryStatement.executeQuery("SELECT customers.cust_num, customers.name, sales_order.ord_num, sales_order.del_date, sales_order.price, sales_order.comments FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order.ord_num = " + orderNum);
+            rs = queryStatement.executeQuery("SELECT customers.cust_num, customers.name, sales_order.ord_num, sales_order.del_date, sales_order.comments "
+                    + "FROM sales_order "
+                    + "INNER JOIN customers ON sales_order.cust_num=customers.cust_num "
+                    + "WHERE sales_order.ord_num = " + orderNum);
             rs.next();
 
             labelNumber.setText("Customer Number : ");
@@ -334,7 +355,8 @@ public class EditMain extends javax.swing.JInternalFrame
             }
             labelDelDate.setText(date);
             calDelDate.setDate(delDate);
-            labelOrdTotal.setText(String.format("%.02f", rs.getFloat("price")));
+            labelOrdTotal.setText(String.format("%.02f", price));
+            labelTotalUnits.setText(String.valueOf(quantity));
             fieldComments.setText(rs.getString("comments"));
 
             rs = queryStatement.executeQuery("SELECT products.code, sales_order_details.quantity, products.sales_price, sales_order_details.price FROM sales_order_details INNER JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + orderNum);
@@ -570,7 +592,7 @@ public class EditMain extends javax.swing.JInternalFrame
         {
             Date datetime = new Date();
             datetime = formatter.parse(formatter.format(datetime));
-            
+
             ResultSet rs = statement.executeQuery("SELECT purchase_order.del_date FROM purchase_order JOIN purchase_sales_order ON purchase_order.ord_num = purchase_sales_order.po_num WHERE purchase_sales_order.so_num = " + salesOrderNum);
             while (rs.next())
             {
@@ -581,7 +603,7 @@ public class EditMain extends javax.swing.JInternalFrame
                     datetime = delivery_date;
                 }
             }
-            
+
             return datetime;
         }
         catch (ParseException | SQLException e)
@@ -604,6 +626,7 @@ public class EditMain extends javax.swing.JInternalFrame
     private com.toedter.calendar.JDateChooser calDelDate;
     private javax.swing.JTextField fieldComments;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -620,6 +643,7 @@ public class EditMain extends javax.swing.JInternalFrame
     private javax.swing.JLabel labelNumber2;
     private javax.swing.JLabel labelOrdNum;
     private javax.swing.JLabel labelOrdTotal;
+    private javax.swing.JLabel labelTotalUnits;
     private javax.swing.JTable table;
     // End of variables declaration//GEN-END:variables
 }

@@ -62,13 +62,15 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
         jLabel9 = new javax.swing.JLabel();
         labelOrdDate = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
-        labelComments = new javax.swing.JLabel();
-        scrollPane = new javax.swing.JScrollPane();
-        fieldComments = new javax.swing.JTextArea();
         labelAddress = new javax.swing.JLabel();
         labelAddress2 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
+        labelTotalUnits = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
+        scrollPane = new javax.swing.JScrollPane();
+        fieldComments = new javax.swing.JTextArea();
+        labelComments = new javax.swing.JLabel();
 
         setClosable(true);
         setIconifiable(true);
@@ -149,81 +151,80 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
 
         jLabel10.setText("Order Date : ");
 
-        labelComments.setText("Comments:");
-
-        fieldComments.setColumns(20);
-        fieldComments.setRows(5);
-        scrollPane.setViewportView(fieldComments);
-
         labelAddress.setText("Delivery Address:");
 
         jLabel11.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
         jLabel11.setText("Order Details");
 
+        labelTotalUnits.setText("100");
+
+        jLabel12.setText("Total Units :");
+
         javax.swing.GroupLayout panePrintLayout = new javax.swing.GroupLayout(panePrint);
         panePrint.setLayout(panePrintLayout);
         panePrintLayout.setHorizontalGroup(
             panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panePrintLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panePrintLayout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(labelOrdTotal))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panePrintLayout.createSequentialGroup()
+                        .addComponent(jLabel12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(labelTotalUnits))))
             .addGroup(panePrintLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(labelComments)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
-                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panePrintLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel9)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(labelOrdTotal)
+                .addComponent(jScrollPane1)
                 .addContainerGap())
             .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panePrintLayout.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(panePrintLayout.createSequentialGroup()
-                            .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(panePrintLayout.createSequentialGroup()
-                                    .addComponent(jLabel7)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(labelDelDate))
-                                .addComponent(jLabel8)
-                                .addComponent(labelDetails)
-                                .addGroup(panePrintLayout.createSequentialGroup()
-                                    .addComponent(labelNumber)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(labelNumber2)
-                                    .addGap(18, 18, 18)
-                                    .addComponent(labelName)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(labelName2))
-                                .addGroup(panePrintLayout.createSequentialGroup()
-                                    .addComponent(labelAddress)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(labelAddress2))
-                                .addComponent(jLabel11)
-                                .addGroup(panePrintLayout.createSequentialGroup()
-                                    .addComponent(jLabel6)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(labelOrdNum))
-                                .addGroup(panePrintLayout.createSequentialGroup()
-                                    .addComponent(jLabel10)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(labelOrdDate)))
-                            .addContainerGap(319, Short.MAX_VALUE))
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 402, Short.MAX_VALUE))))
+                            .addComponent(jLabel7)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(labelDelDate))
+                        .addComponent(jLabel8)
+                        .addComponent(labelDetails)
+                        .addGroup(panePrintLayout.createSequentialGroup()
+                            .addComponent(labelNumber)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(labelNumber2)
+                            .addGap(18, 18, 18)
+                            .addComponent(labelName)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(labelName2))
+                        .addGroup(panePrintLayout.createSequentialGroup()
+                            .addComponent(labelAddress)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(labelAddress2))
+                        .addComponent(jLabel11)
+                        .addGroup(panePrintLayout.createSequentialGroup()
+                            .addComponent(jLabel6)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(labelOrdNum))
+                        .addGroup(panePrintLayout.createSequentialGroup()
+                            .addComponent(jLabel10)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(labelOrdDate)))
+                    .addContainerGap(319, Short.MAX_VALUE)))
         );
         panePrintLayout.setVerticalGroup(
             panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panePrintLayout.createSequentialGroup()
-                .addContainerGap(402, Short.MAX_VALUE)
+                .addGap(0, 237, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel9)
                     .addComponent(labelOrdTotal))
-                .addGap(18, 18, 18)
-                .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelComments))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel12)
+                    .addComponent(labelTotalUnits)))
             .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panePrintLayout.createSequentialGroup()
                     .addContainerGap()
@@ -257,10 +258,14 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
                         .addComponent(labelDelDate))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addComponent(jLabel8)
-                    .addGap(7, 7, 7)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 166, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap(89, Short.MAX_VALUE)))
+                    .addContainerGap(262, Short.MAX_VALUE)))
         );
+
+        fieldComments.setColumns(20);
+        fieldComments.setRows(5);
+        scrollPane.setViewportView(fieldComments);
+
+        labelComments.setText("Comments:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -280,8 +285,12 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
                                 .addComponent(btnClose))
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(jLabel1)
-                                .addGap(0, 147, Short.MAX_VALUE))
-                            .addComponent(jSeparator3))))
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(jSeparator3)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(labelComments)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 304, javax.swing.GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -293,9 +302,13 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(panePrint, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(labelComments))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnClose)
                     .addComponent(btnPrint))
@@ -315,7 +328,10 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
         try
         {
             Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = statement.executeQuery("SELECT customers.cust_num, customers.name, sales_order.ord_num, sales_order.del_date, sales_order.ord_date, sales_order.price, sales_order.comments FROM sales_order JOIN customers ON sales_order.cust_num = customers.cust_num WHERE sales_order.ord_num = " + orderNum);
+            ResultSet rs = statement.executeQuery("SELECT customers.cust_num, customers.name, sales_order.ord_num, sales_order.del_date, sales_order.ord_date, sales_order.price, sales_order.total_units, sales_order.comments "
+                    + "FROM sales_order "
+                    + "JOIN customers ON sales_order.cust_num = customers.cust_num "
+                    + "WHERE sales_order.ord_num = " + orderNum);
             rs.next();
 
             // Fill labels
@@ -330,6 +346,7 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
             date = rs.getString("del_date").split(" ");
             labelDelDate.setText(date[0]);
             labelOrdTotal.setText(String.format("%.02f", rs.getFloat("price")));
+            labelTotalUnits.setText(String.valueOf(rs.getInt("total_units")));
 
             if (rs.getString("comments").equals(""))
             {
@@ -395,6 +412,7 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
@@ -414,6 +432,7 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
     private javax.swing.JLabel labelOrdDate;
     private javax.swing.JLabel labelOrdNum;
     private javax.swing.JLabel labelOrdTotal;
+    private javax.swing.JLabel labelTotalUnits;
     private javax.swing.JPanel panePrint;
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.JTable table;

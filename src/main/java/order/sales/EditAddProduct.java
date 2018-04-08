@@ -65,10 +65,12 @@ public class EditAddProduct extends javax.swing.JInternalFrame
         try
         {
             Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = statement.executeQuery("SELECT SUM(price) AS total_price FROM sales_order_details WHERE ord_num = '" + orderNum + "'");
+            ResultSet rs = statement.executeQuery("SELECT SUM(price) AS total_price, SUM(quantity) AS total_units FROM sales_order_details WHERE ord_num = '" + orderNum + "'");
             rs.next();
-            double price = Double.parseDouble(rs.getString("total_price"));
+            double price = rs.getDouble("total_price");
+            int quantity = rs.getInt("total_units");
             labelOrdTotal.setText(String.format("%.02f", price));
+            labelTotalUnits.setText(String.valueOf(quantity));
 
             Statement statement2 = con.createStatement();
             statement2.executeUpdate("UPDATE sales_order SET price = " + price + " WHERE ord_num = " + orderNum);
@@ -138,6 +140,8 @@ public class EditAddProduct extends javax.swing.JInternalFrame
         jLabel4 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         btnAddStock = new javax.swing.JButton();
+        labelTotalUnits = new javax.swing.JLabel();
+        labelOrderTotal1 = new javax.swing.JLabel();
 
         setIconifiable(true);
         setMaximizable(true);
@@ -213,7 +217,8 @@ public class EditAddProduct extends javax.swing.JInternalFrame
             }
         });
         table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.setColumnSelectionAllowed(true);
+        table.setCellSelectionEnabled(false);
+        table.setRowSelectionAllowed(true);
         table.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent evt)
@@ -268,6 +273,8 @@ public class EditAddProduct extends javax.swing.JInternalFrame
 
         labelOrderTotal.setText("Order Total : £");
 
+        labelOrdTotal.setText("3");
+
         labelOrdDetails.setText("Order Details:");
 
         jLabel4.setText("Take from Stock");
@@ -283,6 +290,10 @@ public class EditAddProduct extends javax.swing.JInternalFrame
             }
         });
 
+        labelTotalUnits.setText("3");
+
+        labelOrderTotal1.setText("Total Units :");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -291,34 +302,34 @@ public class EditAddProduct extends javax.swing.JInternalFrame
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(scrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
-                    .addComponent(jSeparator2)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel1)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel5)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(labelProdNum))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel2)
-                                        .addGap(90, 90, 90)
-                                        .addComponent(fieldProdCode, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(18, 18, 18)
-                                .addComponent(btnFind))
-                            .addComponent(labelOrdDetails))
+                                .addComponent(jLabel5)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(labelProdNum))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addGap(90, 90, 90)
+                                .addComponent(fieldProdCode, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(18, 18, 18)
+                        .addComponent(btnFind)
                         .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 556, Short.MAX_VALUE)
+                    .addComponent(scrollPane2)
+                    .addComponent(jSeparator2)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(labelOrdDetails)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 574, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(labelOrderTotal1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(labelTotalUnits))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(labelOrderTotal)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(labelOrdTotal)
-                                .addGap(11, 11, 11))
                             .addComponent(btnFinish, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -338,7 +349,11 @@ public class EditAddProduct extends javax.swing.JInternalFrame
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(fieldStockQuant, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnAddStock)))))))
+                                        .addComponent(btnAddStock))))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(labelOrderTotal)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(labelOrdTotal)))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -358,8 +373,8 @@ public class EditAddProduct extends javax.swing.JInternalFrame
                     .addComponent(fieldProdCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnFind))
                 .addGap(18, 18, 18)
-                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 189, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -382,9 +397,13 @@ public class EditAddProduct extends javax.swing.JInternalFrame
                 .addComponent(scrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelOrderTotal)
-                    .addComponent(labelOrdTotal))
+                    .addComponent(labelOrdTotal)
+                    .addComponent(labelOrderTotal))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelTotalUnits)
+                    .addComponent(labelOrderTotal1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnFinish)
                 .addContainerGap())
         );
@@ -476,12 +495,14 @@ public class EditAddProduct extends javax.swing.JInternalFrame
             try
             {
                 Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = statement.executeQuery("SELECT SUM(price) AS total_price FROM sales_order_details WHERE ord_num = '" + orderNum + "'");
+                ResultSet rs = statement.executeQuery("SELECT SUM(price) AS total_price, SUM(quantity) as total_quantity "
+                        + "FROM sales_order_details WHERE ord_num = '" + orderNum + "'");
                 rs.next();
                 double price = rs.getDouble("total_price");
+                int quantity = rs.getInt("total_quantity");
 
                 Statement statement2 = con.createStatement();
-                sql = "UPDATE sales_order SET price = " + price + " WHERE ord_num = " + orderNum;
+                sql = "UPDATE sales_order SET price = " + price + ", total_units = " + quantity + " WHERE ord_num = " + orderNum;
                 statement2.executeUpdate(sql);
                 db.writeToLog(sql);
 
@@ -678,7 +699,9 @@ public class EditAddProduct extends javax.swing.JInternalFrame
     private javax.swing.JLabel labelOrdDetails;
     private javax.swing.JLabel labelOrdTotal;
     private javax.swing.JLabel labelOrderTotal;
+    private javax.swing.JLabel labelOrderTotal1;
     private javax.swing.JLabel labelProdNum;
+    private javax.swing.JLabel labelTotalUnits;
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.JScrollPane scrollPane2;
     private javax.swing.JTable table;

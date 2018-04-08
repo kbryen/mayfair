@@ -376,18 +376,9 @@ public class Main extends javax.swing.JFrame
 
     private void btnRemindersActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnRemindersActionPerformed
     {//GEN-HEADEREND:event_btnRemindersActionPerformed
-
-        try
-        {
-            Reminders reminders = new Reminders(desktop);
-            desktop.add(reminders);
-            reminders.setMaximum(true);
-            reminders.show();
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        Reminders reminders = new Reminders(desktop);
+        desktop.add(reminders);
+        reminders.show();
     }//GEN-LAST:event_btnRemindersActionPerformed
 
     /**

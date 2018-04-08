@@ -3,13 +3,19 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/order/purchase/OrderNumber.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/report/xls/XlsReport.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/MayfairConstants.java</file>
             <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/order/sales/Current.java</file>
-            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/report/XlsReport.java</file>
-            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/report/DispatchNoteXls.java</file>
-            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/report/XlsxReport.java</file>
-            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/report/Reports.java</file>
-            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/report/AvailableStockReport.java</file>
-            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/report/DispatchNoteXlsx.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/reminders/Reminders.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/reminders/NewReminder.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/order/purchase/Current.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/order/sales/Past.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/report/xls/DispatchNoteXls.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/report/xls/AvailableStockReportXls.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/Main.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/order/purchase/Past.java</file>
+            <file>file:/E:/old%20stuff/mayfair/branches/1.1/src/main/java/product/Products.java</file>
         </group>
     </open-files>
 </project-private>

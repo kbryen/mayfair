@@ -146,7 +146,8 @@ public class Current extends javax.swing.JInternalFrame
                 return canEdit [columnIndex];
             }
         });
-        table.setColumnSelectionAllowed(true);
+        table.setCellSelectionEnabled(false);
+        table.setRowSelectionAllowed(true);
         table.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent evt)

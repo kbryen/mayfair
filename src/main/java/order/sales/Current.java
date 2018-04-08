@@ -21,9 +21,9 @@ import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
+import main.java.Main;
 import main.java.MayfairConstants;
 import main.java.report.xls.DispatchNoteXls;
-import main.java.report.xls.XlsReport;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -64,7 +64,8 @@ public class Current extends javax.swing.JInternalFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         jLabel1 = new javax.swing.JLabel();
         btnViewSummary = new javax.swing.JButton();
@@ -97,15 +98,19 @@ public class Current extends javax.swing.JInternalFrame
 
         btnViewSummary.setBackground(new java.awt.Color(153, 204, 255));
         btnViewSummary.setText("View Summary");
-        btnViewSummary.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnViewSummary.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnViewSummaryActionPerformed(evt);
             }
         });
 
         btnFind.setText("Find");
-        btnFind.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnFind.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnFindActionPerformed(evt);
             }
         });
@@ -113,34 +118,44 @@ public class Current extends javax.swing.JInternalFrame
         scrollPane.setBorder(null);
 
         table.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null}
+            new Object [][]
+            {
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null}
             },
-            new String [] {
-                "Number", "Customer", "Ordered", "Expected Delivery", "Total (£)", "Dispatched", "Dispatched Date"
+            new String []
+            {
+                "Number", "Customer", "Ordered", "Expected Delivery", "Total Units", "Total (£)", "Dispatched", "Dispatched Date"
             }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Float.class, java.lang.Boolean.class, java.lang.String.class
+        )
+        {
+            Class[] types = new Class []
+            {
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Float.class, java.lang.Boolean.class, java.lang.String.class
             };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false
+            boolean[] canEdit = new boolean []
+            {
+                false, false, false, false, false, false, false, false
             };
 
-            public Class getColumnClass(int columnIndex) {
+            public Class getColumnClass(int columnIndex)
+            {
                 return types [columnIndex];
             }
 
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
+            public boolean isCellEditable(int rowIndex, int columnIndex)
+            {
                 return canEdit [columnIndex];
             }
         });
-        table.setColumnSelectionAllowed(true);
-        table.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+        table.setCellSelectionEnabled(false);
+        table.setRowSelectionAllowed(true);
+        table.addMouseListener(new java.awt.event.MouseAdapter()
+        {
+            public void mouseClicked(java.awt.event.MouseEvent evt)
+            {
                 tableMouseClicked(evt);
             }
         });
@@ -149,8 +164,10 @@ public class Current extends javax.swing.JInternalFrame
 
         jLabel3.setText("Order Number");
 
-        fieldOrderNumber.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        fieldOrderNumber.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 fieldOrderNumberActionPerformed(evt);
             }
         });
@@ -160,49 +177,63 @@ public class Current extends javax.swing.JInternalFrame
         labelName.setText("Customer Name");
 
         btnCancel.setText("Cancel Order");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnCancel.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCancelActionPerformed(evt);
             }
         });
 
         btnEdit.setText("Edit Order");
-        btnEdit.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnEdit.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnEditActionPerformed(evt);
             }
         });
 
-        btnMarkDispatched.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnMarkDispatched.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnMarkDispatchedActionPerformed(evt);
             }
         });
 
         btnMarkDelivered.setText("Mark Delivered");
-        btnMarkDelivered.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnMarkDelivered.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnMarkDeliveredActionPerformed(evt);
             }
         });
 
         btnDispatch.setText("Create Dispatch Note");
-        btnDispatch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnDispatch.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnDispatchActionPerformed(evt);
             }
         });
 
         btnClear.setText("Clear");
-        btnClear.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnClear.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnClearActionPerformed(evt);
             }
         });
 
         btnExcelSummary.setText("Create Summary File");
-        btnExcelSummary.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnExcelSummary.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnExcelSummaryActionPerformed(evt);
             }
         });
@@ -304,38 +335,23 @@ public class Current extends javax.swing.JInternalFrame
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
         try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            ResultSet rs;
+            String sql = "SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.total_units, sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') "
+                    + "FROM sales_order "
+                    + "INNER JOIN customers ON sales_order.cust_num=customers.cust_num ";
             if (!fieldOrderNumber.getText().equals(""))
             {
-                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC");
+                sql += "WHERE sales_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC";
             }
             else
             {
-                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE customers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC");
+                sql += "WHERE customers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC";
             }
-
+            
             scrollPane.setVisible(true);
             getContentPane().validate();
             getContentPane().repaint();
-
-            while (table.getRowCount() > 0)
-            {
-                ((DefaultTableModel) table.getModel()).removeRow(0);
-            }
-
-            int columns = rs.getMetaData().getColumnCount();
-
-            while (rs.next())
-            {
-                Object[] row = new Object[columns];
-
-                for (int i = 1; i <= columns; i++)
-                {
-                    row[i - 1] = rs.getObject(i);
-                }
-
-                ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
-            }
+            Main.fillTable(table, statement.executeQuery(sql));
+            
 
             btnViewSummary.setVisible(false);
             btnEdit.setVisible(false);
@@ -363,7 +379,7 @@ public class Current extends javax.swing.JInternalFrame
         btnCancel.setVisible(true);
         btnMarkDispatched.setVisible(true);
         btnExcelSummary.setVisible(true);
-        if ((boolean) table.getValueAt(table.getSelectedRow(), 5))
+        if ((boolean) table.getValueAt(table.getSelectedRow(), 6))
         {
             btnMarkDispatched.setText("Mark Undispatched");
         }

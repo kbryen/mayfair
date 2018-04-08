@@ -67,13 +67,23 @@ public class Reminders extends javax.swing.JInternalFrame
             date = date.plusWeeks(1);
             String toDate = date.format(formatters);
 
-            ResultSet rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') "
+            ResultSet rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.total_units, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') "
                     + "FROM sales_order "
                     + "JOIN customers ON sales_order.cust_num=customers.cust_num "
                     + "WHERE sales_order.del_date >= '" + fromDate + "' AND sales_order.del_date <= '" + toDate + "' AND sales_order.del_date and delivered = false "
                     + "ORDER BY sales_order.del_date, sales_order.ord_num DESC");
 
             Main.fillTable(tableSales, rs);
+
+            rs = statement.executeQuery("SELECT SUM(sales_order.total_units) AS weekly_total_units "
+                    + "FROM sales_order "
+                    + "JOIN customers ON sales_order.cust_num=customers.cust_num "
+                    + "WHERE sales_order.del_date >= '" + fromDate + "' AND sales_order.del_date <= '" + toDate + "' AND sales_order.del_date and delivered = false ");
+            if (rs.next())
+            {
+                labelTotalUnits.setText(rs.getString("weekly_total_units"));
+            }
+
         }
         catch (SQLException e)
         {
@@ -131,6 +141,8 @@ public class Reminders extends javax.swing.JInternalFrame
         tablePurchase = new javax.swing.JTable();
         jSeparator4 = new javax.swing.JSeparator();
         btnNewReminder = new javax.swing.JButton();
+        labelOrderTotal1 = new javax.swing.JLabel();
+        labelTotalUnits = new javax.swing.JLabel();
 
         setClosable(true);
         setIconifiable(true);
@@ -180,7 +192,8 @@ public class Reminders extends javax.swing.JInternalFrame
                 return canEdit [columnIndex];
             }
         });
-        tableReminders.setColumnSelectionAllowed(true);
+        tableReminders.setCellSelectionEnabled(false);
+        tableReminders.setRowSelectionAllowed(true);
         scrollPane.setViewportView(tableReminders);
         tableReminders.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
@@ -192,24 +205,24 @@ public class Reminders extends javax.swing.JInternalFrame
         tableSales.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
             {
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null},
-                {null, null, null, null, null, null}
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null}
             },
             new String []
             {
-                "Number", "Customer", "Ordered", "Expected Delivery", "Dispatched", "Dispatched Date"
+                "Number", "Customer", "Ordered", "Expected Delivery", "Total Units", "Dispatched", "Dispatched Date"
             }
         )
         {
             Class[] types = new Class []
             {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Boolean.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Boolean.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean []
             {
-                false, false, false, false, false, false
+                false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex)
@@ -222,15 +235,9 @@ public class Reminders extends javax.swing.JInternalFrame
                 return canEdit [columnIndex];
             }
         });
+        tableSales.setColumnSelectionAllowed(true);
         scrollPane1.setViewportView(tableSales);
         tableSales.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
-        if (tableSales.getColumnModel().getColumnCount() > 0)
-        {
-            tableSales.getColumnModel().getColumn(0).setHeaderValue("Number");
-            tableSales.getColumnModel().getColumn(3).setHeaderValue("Expected Delivery");
-            tableSales.getColumnModel().getColumn(4).setHeaderValue("Dispatched");
-            tableSales.getColumnModel().getColumn(5).setHeaderValue("Dispatched Date");
-        }
 
         jLabel6.setFont(new java.awt.Font("Lucida Grande", 0, 18)); // NOI18N
         jLabel6.setText("Incoming Purchase Orders");
@@ -289,6 +296,10 @@ public class Reminders extends javax.swing.JInternalFrame
             }
         });
 
+        labelOrderTotal1.setText("Weekly Total Units:");
+
+        labelTotalUnits.setText("0");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -302,6 +313,7 @@ public class Reminders extends javax.swing.JInternalFrame
                     .addComponent(scrollPane1)
                     .addComponent(jSeparator3)
                     .addComponent(scrollPane2)
+                    .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel4)
@@ -309,10 +321,14 @@ public class Reminders extends javax.swing.JInternalFrame
                             .addComponent(jLabel5)
                             .addComponent(jLabel6))
                         .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(btnNewReminder)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(labelOrderTotal1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(labelTotalUnits))
+                            .addComponent(btnNewReminder, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -332,6 +348,10 @@ public class Reminders extends javax.swing.JInternalFrame
                 .addComponent(jLabel5)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(scrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(labelTotalUnits)
+                    .addComponent(labelOrderTotal1))
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -340,7 +360,7 @@ public class Reminders extends javax.swing.JInternalFrame
                 .addComponent(scrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 153, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
                 .addComponent(btnNewReminder)
                 .addContainerGap())
         );
@@ -356,7 +376,6 @@ public class Reminders extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnNewReminderActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton Add;
     private javax.swing.JButton btnNewReminder;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.JLabel jLabel1;
@@ -367,6 +386,8 @@ public class Reminders extends javax.swing.JInternalFrame
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
+    private javax.swing.JLabel labelOrderTotal1;
+    private javax.swing.JLabel labelTotalUnits;
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.JScrollPane scrollPane1;
     private javax.swing.JScrollPane scrollPane2;

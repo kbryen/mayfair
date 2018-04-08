@@ -213,7 +213,8 @@ public class Products extends javax.swing.JInternalFrame
             }
         });
         table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.setColumnSelectionAllowed(true);
+        table.setCellSelectionEnabled(false);
+        table.setRowSelectionAllowed(true);
         table.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent evt)
