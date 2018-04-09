@@ -154,17 +154,9 @@ public class NewReminder extends javax.swing.JInternalFrame
             }
 
             remindersComponent.dispose();
-            try
-            {
-                Reminders reminders = new Reminders(desktop);
-                desktop.add(reminders);
-                reminders.setMaximum(true);
-                reminders.show();
-            }
-            catch (PropertyVetoException e)
-            {
-                JOptionPane.showMessageDialog(NewReminder.this, e.getMessage());
-            }
+            Reminders reminders = new Reminders(desktop);
+            desktop.add(reminders);
+            reminders.show();
             this.dispose();
         }
         else

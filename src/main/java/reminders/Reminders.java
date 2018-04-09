@@ -62,15 +62,13 @@ public class Reminders extends javax.swing.JInternalFrame
         tableSales.setAutoCreateRowSorter(true);
         try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            LocalDate date = LocalDate.now();
-            String fromDate = date.format(formatters);
-            date = date.plusWeeks(1);
+            LocalDate date = LocalDate.now().plusWeeks(1);
             String toDate = date.format(formatters);
 
             ResultSet rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.total_units, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') "
                     + "FROM sales_order "
                     + "JOIN customers ON sales_order.cust_num=customers.cust_num "
-                    + "WHERE sales_order.del_date >= '" + fromDate + "' AND sales_order.del_date <= '" + toDate + "' AND sales_order.del_date and delivered = false "
+                    + "WHERE sales_order.del_date <= '" + toDate + "' AND sales_order.del_date and delivered = false "
                     + "ORDER BY sales_order.del_date, sales_order.ord_num DESC");
 
             Main.fillTable(tableSales, rs);
@@ -78,7 +76,7 @@ public class Reminders extends javax.swing.JInternalFrame
             rs = statement.executeQuery("SELECT SUM(sales_order.total_units) AS weekly_total_units "
                     + "FROM sales_order "
                     + "JOIN customers ON sales_order.cust_num=customers.cust_num "
-                    + "WHERE sales_order.del_date >= '" + fromDate + "' AND sales_order.del_date <= '" + toDate + "' AND sales_order.del_date and delivered = false ");
+                    + "WHERE sales_order.del_date <= '" + toDate + "' AND sales_order.del_date and delivered = false ");
             if (rs.next())
             {
                 labelTotalUnits.setText(rs.getString("weekly_total_units"));
@@ -96,15 +94,13 @@ public class Reminders extends javax.swing.JInternalFrame
         tablePurchase.setAutoCreateRowSorter(true);
         try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            LocalDate date = LocalDate.now();
-            String fromDate = date.format(formatters);
-            date = date.plusMonths(1);
+            LocalDate date = LocalDate.now().plusMonths(1);
             String toDate = date.format(formatters);
 
             ResultSet rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(purchase_order.del_date,'%d/%m/%Y %a'), purchase_order.dispatched, DATE_FORMAT(purchase_order.dispatched_date,'%d/%m/%Y %a') "
                     + "FROM purchase_order "
                     + "JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num "
-                    + "WHERE purchase_order.del_date >= '" + fromDate + "' AND purchase_order.del_date <= '" + toDate + "' AND purchase_order.del_date and delivered = false "
+                    + "WHERE purchase_order.del_date <= '" + toDate + "' AND purchase_order.del_date and delivered = false "
                     + "ORDER BY purchase_order.del_date, purchase_order.ord_num DESC");
 
             Main.fillTable(tablePurchase, rs);
@@ -192,8 +188,6 @@ public class Reminders extends javax.swing.JInternalFrame
                 return canEdit [columnIndex];
             }
         });
-        tableReminders.setCellSelectionEnabled(false);
-        tableReminders.setRowSelectionAllowed(true);
         scrollPane.setViewportView(tableReminders);
         tableReminders.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
@@ -235,7 +229,7 @@ public class Reminders extends javax.swing.JInternalFrame
                 return canEdit [columnIndex];
             }
         });
-        tableSales.setColumnSelectionAllowed(true);
+        tableSales.setRowSelectionAllowed(true);
         scrollPane1.setViewportView(tableSales);
         tableSales.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
@@ -308,7 +302,7 @@ public class Reminders extends javax.swing.JInternalFrame
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jSeparator1)
-                    .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 606, Short.MAX_VALUE)
+                    .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 575, Short.MAX_VALUE)
                     .addComponent(jSeparator2)
                     .addComponent(scrollPane1)
                     .addComponent(jSeparator3)
@@ -360,7 +354,7 @@ public class Reminders extends javax.swing.JInternalFrame
                 .addComponent(scrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 107, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 105, Short.MAX_VALUE)
                 .addComponent(btnNewReminder)
                 .addContainerGap())
         );
