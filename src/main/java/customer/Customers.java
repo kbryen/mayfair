@@ -4,14 +4,26 @@
  */
 package main.java.customer;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
 import main.java.Database;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.CUSTOMERS_TABLE;
+import static main.java.MayfairStatic.CUSTOMER_BILLINGADDRESS;
+import static main.java.MayfairStatic.CUSTOMER_COMMENTS;
+import static main.java.MayfairStatic.CUSTOMER_CONTACT;
+import static main.java.MayfairStatic.CUSTOMER_DELADDRESS;
+import static main.java.MayfairStatic.CUSTOMER_DELIVERY;
+import static main.java.MayfairStatic.CUSTOMER_EMAIL;
+import static main.java.MayfairStatic.CUSTOMER_FAX;
+import static main.java.MayfairStatic.CUSTOMER_NAME;
+import static main.java.MayfairStatic.CUSTOMER_NUM;
+import static main.java.MayfairStatic.CUSTOMER_PROFORMA;
+import static main.java.MayfairStatic.CUSTOMER_REFERENCE;
+import static main.java.MayfairStatic.CUSTOMER_TEL;
 
 /**
  *
@@ -19,6 +31,7 @@ import main.java.Database;
  */
 public class Customers extends javax.swing.JInternalFrame
 {
+
     private final JDesktopPane desktop;
     private final Database db = new Database();
 
@@ -26,9 +39,9 @@ public class Customers extends javax.swing.JInternalFrame
     {
         initComponents();
         desktop = pane;
-        btnFindActionPerformed(null);
         btnEdit.setEnabled(false);
         table.setAutoCreateRowSorter(true);
+        btnFindActionPerformed(null);
     }
 
     /**
@@ -110,7 +123,6 @@ public class Customers extends javax.swing.JInternalFrame
             }
         });
         table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.setCellSelectionEnabled(false);
         table.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent evt)
@@ -221,66 +233,56 @@ public class Customers extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        Connection con = db.getConnection();
-        try
+        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs;
-            if (!fieldNumber.getText().equals(""))
+            String sql = "SELECT " + CUSTOMER_NUM + ", " 
+                    + CUSTOMER_REFERENCE + ", " 
+                    + CUSTOMER_NAME + ", " 
+                    + CUSTOMER_DELADDRESS + ", " 
+                    + CUSTOMER_DELIVERY + ", " 
+                    + CUSTOMER_BILLINGADDRESS + ", " 
+                    + CUSTOMER_CONTACT + ", " 
+                    + CUSTOMER_TEL + ", " 
+                    + CUSTOMER_FAX + ", " 
+                    + CUSTOMER_EMAIL + ", " 
+                    + CUSTOMER_COMMENTS + ", " 
+                    + CUSTOMER_PROFORMA + " "
+                    + "FROM " + CUSTOMERS_TABLE + " ";
+            if (!fieldNumber.getText().isEmpty())
             {
-                rs = statement.executeQuery("SELECT cust_num, reference, name, del_address, delivery, billing_address, contact, tel, fax, email, comments, proforma FROM customers WHERE cust_num = " + fieldNumber.getText() + " ORDER BY reference ASC");
+                sql += "WHERE " + CUSTOMER_NUM + " = " + fieldNumber.getText() + " ";
             }
-            else if (!fieldReference.getText().equals(""))
+            else if (!fieldReference.getText().isEmpty())
             {
-                rs = statement.executeQuery("SELECT cust_num, reference, name, del_address, delivery, billing_address, contact, tel, fax, email, comments, proforma FROM customers WHERE name LIKE '%" + fieldReference.getText() + "%' ORDER BY reference ASC");
+                sql += "WHERE " + CUSTOMER_NAME + " LIKE '%" + fieldReference.getText() + "%' ";
             }
             else
             {
-                rs = statement.executeQuery("SELECT cust_num, reference, name, del_address, delivery, billing_address, contact, tel, fax, email, comments, proforma FROM customers WHERE contact LIKE '%" + fieldName.getText() + "%' ORDER BY reference ASC");
+                sql += "WHERE " + CUSTOMER_CONTACT + " LIKE '%" + fieldName.getText() + "%' ";
             }
+            sql += "ORDER BY " + CUSTOMER_REFERENCE + " ASC";
+
+            MayfairStatic.fillTable(table, statement.executeQuery(sql));
             scrollPane.setVisible(true);
             getContentPane().validate();
             getContentPane().repaint();
-            while (table.getRowCount() > 0)
-            {
-                ((DefaultTableModel) table.getModel()).removeRow(0);
-            }
-            int columns = rs.getMetaData().getColumnCount();
-            while (rs.next())
-            {
-                Object[] row = new Object[columns];
-                for (int i = 1; i <= columns; i++)
-                {
-                    row[i - 1] = rs.getObject(i);
-                }
-                ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
-            }
             btnEdit.setEnabled(false);
         }
         catch (SQLException e)
         {
             JOptionPane.showMessageDialog(Customers.this, e.getMessage());
         }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
-        }
     }//GEN-LAST:event_btnFindActionPerformed
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
-        fieldNumber.setText(String.valueOf((int) table.getValueAt(table.getSelectedRow(), 0)));
-        fieldName.setText((String) table.getValueAt(table.getSelectedRow(), 2));
-        fieldReference.setText((String) table.getValueAt(table.getSelectedRow(), 1));
+        fieldNumber.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 0)));
+        fieldReference.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 1)));
+        fieldName.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 2)));
         btnEdit.setEnabled(true);
     }//GEN-LAST:event_tableMouseClicked
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        AddCustomer editCust = new AddCustomer("Edit", Integer.valueOf(fieldNumber.getText()));
+        CustomerInfo editCust = new CustomerInfo(Integer.valueOf(fieldNumber.getText()));
         desktop.add(editCust);
         editCust.show();
     }//GEN-LAST:event_btnEditActionPerformed
@@ -292,7 +294,7 @@ public class Customers extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        AddCustomer addCust = new AddCustomer("Add", 0);
+        CustomerInfo addCust = new CustomerInfo();
         desktop.add(addCust);
         addCust.show();
     }//GEN-LAST:event_btnAddActionPerformed

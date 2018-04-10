@@ -12,7 +12,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import main.java.Database;
-import static main.java.MayfairConstants.*;
+import static main.java.MayfairStatic.*;
 
 /**
  *
@@ -66,17 +66,17 @@ public class Edit extends javax.swing.JInternalFrame
             ResultSet rs = statement.executeQuery("SELECT code, barcode, leather, style, colour, sales_price, purchase_price, SSAW, in_stock, in_order, comments FROM products WHERE prod_num = " + prodNum);
             rs.next();
             
-            prodCode = rs.getString(PRODUCTS_CODE);
-            barCode = rs.getString(PRODUCTS_BARCODE);
-            leather = rs.getString(PRODUCTS_LEATHER);
-            style = rs.getString(PRODUCTS_STYLE);
-            colour = rs.getString(PRODUCTS_COLOUR);
-            season = rs.getString(PRODUCTS_SEASON);
-            comments = rs.getString(PRODUCTS_COMMENTS);
-            salesPrice = rs.getDouble(PRODUCTS_SALESPRICE);
-            purchasePrice = rs.getDouble(PRODUCTS_PURCHASEPRICE);
-            inStock = rs.getInt(PRODUCTS_INSTOCK);
-            onOrder = rs.getInt(PRODUCTS_ONORDER);
+            prodCode = rs.getString(PRODUCT_CODE);
+            barCode = rs.getString(PRODUCT_BARCODE);
+            leather = rs.getString(PRODUCT_LEATHER);
+            style = rs.getString(PRODUCT_STYLE);
+            colour = rs.getString(PRODUCT_COLOUR);
+            season = rs.getString(PRODUCT_SEASON);
+            comments = rs.getString(PRODUCT_COMMENTS);
+            salesPrice = rs.getDouble(PRODUCT_SALESPRICE);
+            purchasePrice = rs.getDouble(PRODUCT_PURCHASEPRICE);
+            inStock = rs.getInt(PRODUCT_INSTOCK);
+            onOrder = rs.getInt(PRODUCT_ONORDER);
             
             rs = statement.executeQuery("SELECT SUM(sales_order_details.fromStock) AS total FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.dispatched = false AND sales_order.delivered = false");
             rs.next();

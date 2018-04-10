@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import main.java.MayfairStatic;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -186,18 +186,13 @@ public abstract class XlsReport
             workBook.write(fileOut);
             fileOut.flush();
             fileOut.close();
-            outputMessage(loggingComponent, "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + filename + " </i>", reportName + " Created", INFORMATION_MESSAGE);
+            MayfairStatic.outputMessage(loggingComponent, "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + filename + " </i>", reportName + " Created", INFORMATION_MESSAGE);
         }
         catch (IOException e)
         {
-            outputMessage(loggingComponent, "<html> Error while creating " + reportName + ", please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-            outputMessage(loggingComponent, e.getLocalizedMessage(), "Message for Kian", ERROR_MESSAGE);
+            MayfairStatic.outputMessage(loggingComponent, "<html> Error while creating " + reportName + ", please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+            MayfairStatic.outputMessage(loggingComponent, e.getLocalizedMessage(), "Message for Kian", ERROR_MESSAGE);
         }
-    }
-
-    public static void outputMessage(Component component, String title, String message, int type)
-    {
-        JOptionPane.showMessageDialog(component, title, message, type);
     }
 
     public static HSSFWorkbook getHSSFWorkbook(String file)

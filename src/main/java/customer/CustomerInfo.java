@@ -4,47 +4,53 @@
  */
 package main.java.customer;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.ERROR_MESSAGE;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import main.java.Database;
-import main.java.MayfairConstants;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.CUSTOMERS_TABLE;
+import static main.java.MayfairStatic.CUSTOMER_BILLINGADDRESS;
+import static main.java.MayfairStatic.CUSTOMER_COMMENTS;
+import static main.java.MayfairStatic.CUSTOMER_CONTACT;
+import static main.java.MayfairStatic.CUSTOMER_COUNTRY;
+import static main.java.MayfairStatic.CUSTOMER_DELADDRESS;
+import static main.java.MayfairStatic.CUSTOMER_DELIVERY;
+import static main.java.MayfairStatic.CUSTOMER_EMAIL;
+import static main.java.MayfairStatic.CUSTOMER_FAX;
+import static main.java.MayfairStatic.CUSTOMER_NAME;
+import static main.java.MayfairStatic.CUSTOMER_NUM;
+import static main.java.MayfairStatic.CUSTOMER_PROFORMA;
+import static main.java.MayfairStatic.CUSTOMER_REFERENCE;
+import static main.java.MayfairStatic.CUSTOMER_TEL;
 
 /**
  *
  * @author kian_bryen
  */
-public class AddCustomer extends javax.swing.JInternalFrame
+public class CustomerInfo extends javax.swing.JInternalFrame
 {
 
     private final Database db = new Database();
-    private final String editAdd;
-    private final int custNum;
-    private String sql;
+    private final String type;
+    private int custNum = 0;
 
-    public AddCustomer(String type, int num)
+    public CustomerInfo(int cust_num)
     {
+        this.custNum = cust_num;
+        this.type = "Edit";
         initComponents();
-        this.enableButtons(false);
-        this.editAdd = type;
-        this.custNum = num;
+        enableBillingAddress(false);
+        populateLables();
+    }
 
-        switch (editAdd)
-        {
-            case "Add":
-                labelCustomer.setText("Add Customer");
-                this.setTitle("Add New Customer");
-                btnNext.setText("Add");
-                break;
-            case "Edit":
-                labelCustomer.setText("Edit Customer");
-                this.setTitle("Edit Customer");
-                this.FillLabels();
-                btnNext.setText("Save");
-                break;
-        }
+    public CustomerInfo()
+    {
+        this.type = "Add";
+        initComponents();
+        enableBillingAddress(false);
     }
 
     /**
@@ -54,7 +60,8 @@ public class AddCustomer extends javax.swing.JInternalFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         labelCustomer = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
@@ -78,7 +85,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
         jLabel11 = new javax.swing.JLabel();
         fieldTel = new javax.swing.JTextField();
         jSeparator2 = new javax.swing.JSeparator();
-        btnNext = new javax.swing.JButton();
+        btnSave = new javax.swing.JButton();
         jLabel13 = new javax.swing.JLabel();
         fieldBAdd1 = new javax.swing.JTextField();
         fieldBAdd2 = new javax.swing.JTextField();
@@ -95,12 +102,12 @@ public class AddCustomer extends javax.swing.JInternalFrame
         jLabel19 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
         jSeparator4 = new javax.swing.JSeparator();
-        DifferentBillingAddress = new javax.swing.JCheckBox();
+        differentBillingAddress = new javax.swing.JCheckBox();
         btnSwitch = new javax.swing.JButton();
         fieldCountry = new javax.swing.JTextField();
         jLabel12 = new javax.swing.JLabel();
         jLabel20 = new javax.swing.JLabel();
-        Proforma = new javax.swing.JCheckBox();
+        proforma = new javax.swing.JCheckBox();
         jLabel21 = new javax.swing.JLabel();
         fieldComments = new javax.swing.JTextField();
         jLabel22 = new javax.swing.JLabel();
@@ -109,8 +116,10 @@ public class AddCustomer extends javax.swing.JInternalFrame
         setClosable(true);
         setIconifiable(true);
         setResizable(true);
+        setTitle("Customer Information");
 
         labelCustomer.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
+        labelCustomer.setText("Customer");
 
         jLabel2.setText("* Company Name : ");
 
@@ -132,9 +141,12 @@ public class AddCustomer extends javax.swing.JInternalFrame
 
         jLabel11.setText("Telephone Number : ");
 
-        btnNext.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnNextActionPerformed(evt);
+        btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnSaveActionPerformed(evt);
             }
         });
 
@@ -152,16 +164,20 @@ public class AddCustomer extends javax.swing.JInternalFrame
 
         jLabel19.setText("Email Address : ");
 
-        DifferentBillingAddress.setText("Different Billing Address:");
-        DifferentBillingAddress.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                DifferentBillingAddressActionPerformed(evt);
+        differentBillingAddress.setText("Different Billing Address:");
+        differentBillingAddress.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                differentBillingAddressActionPerformed(evt);
             }
         });
 
         btnSwitch.setText("<- Switch ->");
-        btnSwitch.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnSwitch.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnSwitchActionPerformed(evt);
             }
         });
@@ -179,18 +195,20 @@ public class AddCustomer extends javax.swing.JInternalFrame
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addContainerGap()
+                .addComponent(labelCustomer)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(labelCustomer)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(jSeparator3)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(btnNext))
-                    .addComponent(jSeparator4)
-                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(btnSave))
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addContainerGap()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jSeparator1)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGap(0, 0, Short.MAX_VALUE)
@@ -210,25 +228,23 @@ public class AddCustomer extends javax.swing.JInternalFrame
                                                 .addComponent(jLabel20))
                                             .addGap(82, 82, 82)
                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addComponent(Proforma)
+                                                .addComponent(proforma)
                                                 .addComponent(fieldContact, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                         .addGroup(layout.createSequentialGroup()
                                             .addComponent(jLabel5)
                                             .addGap(277, 277, 277)
-                                            .addComponent(DifferentBillingAddress))
+                                            .addComponent(differentBillingAddress))
                                         .addComponent(jLabel12)
                                         .addGroup(layout.createSequentialGroup()
                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                                 .addGroup(layout.createSequentialGroup()
                                                     .addComponent(jLabel6)
                                                     .addGap(97, 97, 97))
-                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                        .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING)
-                                                        .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING))
-                                                    .addGap(26, 26, 26)))
+                                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.LEADING)
+                                                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING)))
                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                 .addGroup(layout.createSequentialGroup()
                                                     .addGap(56, 56, 56)
@@ -283,8 +299,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
                                             .addGroup(layout.createSequentialGroup()
                                                 .addComponent(jLabel18)
                                                 .addGap(95, 95, 95)
-                                                .addComponent(fieldFax, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE))))))))
-                    .addComponent(jSeparator2))
+                                                .addComponent(fieldFax, javax.swing.GroupLayout.PREFERRED_SIZE, 225, javax.swing.GroupLayout.PREFERRED_SIZE)))))))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -299,7 +314,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
                     .addComponent(fieldReference, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel3)
                     .addComponent(jLabel20)
-                    .addComponent(Proforma))
+                    .addComponent(proforma))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -307,31 +322,30 @@ public class AddCustomer extends javax.swing.JInternalFrame
                     .addComponent(fieldContact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel5)
-                            .addComponent(DifferentBillingAddress))
+                            .addComponent(differentBillingAddress))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(fieldAdd1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel6))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(fieldAdd2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel7))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(fieldCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel8))
-                                .addGap(3, 3, 3)
-                                .addComponent(fieldCounty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                            .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(fieldAdd2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel7))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(fieldCity, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel8))
+                        .addGap(3, 3, 3)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(fieldCounty, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel9))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel10)
                             .addComponent(fieldPostCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -363,7 +377,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnSwitch)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jSeparator4, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(fieldTel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -381,125 +395,113 @@ public class AddCustomer extends javax.swing.JInternalFrame
                     .addComponent(fieldInstructions, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel22))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 70, Short.MAX_VALUE)
-                .addComponent(btnNext)
+                .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 2, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 13, Short.MAX_VALUE)
+                .addComponent(btnSave)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void FillLabels()
+    private void populateLables()
     {
-        Connection con = db.getConnection();
-
-        try
+        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = statement.executeQuery("SELECT * FROM customers WHERE cust_num = " + custNum);
-            rs.next();
+            ResultSet rs = statement.executeQuery("SELECT * "
+                    + "FROM " + CUSTOMERS_TABLE + " "
+                    + "WHERE " + CUSTOMER_NUM + " = " + custNum);
+            if (rs.next())
+            {
+                fieldReference.setText(rs.getString(CUSTOMER_REFERENCE));
+                fieldName.setText(rs.getString(CUSTOMER_NAME));
+                fieldContact.setText(rs.getString(CUSTOMER_CONTACT));
+                fieldTel.setText(rs.getString(CUSTOMER_TEL));
+                fieldFax.setText(rs.getString(CUSTOMER_FAX));
+                fieldEmail.setText(rs.getString(CUSTOMER_EMAIL));
+                fieldCountry.setText(rs.getString(CUSTOMER_COUNTRY));
+                fieldComments.setText(rs.getString(CUSTOMER_COMMENTS));
+                fieldInstructions.setText(rs.getString(CUSTOMER_DELIVERY));
+                proforma.setSelected(rs.getBoolean(CUSTOMER_PROFORMA));
 
-            fieldReference.setText(rs.getString("reference"));
-            fieldName.setText(rs.getString("name"));
-            fieldReference.setText(rs.getString("reference"));
-            fieldContact.setText(rs.getString("contact"));
-            fieldTel.setText(rs.getString("tel"));
-            fieldFax.setText(rs.getString("fax"));
-            fieldEmail.setText(rs.getString("email"));
-            fieldCountry.setText(rs.getString("country"));
-            fieldComments.setText(rs.getString("comments"));
-            fieldInstructions.setText(rs.getString("delivery"));
-
-            // Mark customer as a proforma (Delivery between 10-4)
-            if (rs.getBoolean("proforma"))
-            {
-                Proforma.setSelected(true);
-            }
-
-            String[] delAddress = rs.getString("del_address").split(", ");
-            if (delAddress.length == 5)
-            {
-                fieldAdd1.setText(delAddress[0]);
-                fieldAdd2.setText(delAddress[1]);
-                fieldCity.setText(delAddress[2]);
-                fieldCounty.setText(delAddress[3]);
-                fieldPostCode.setText(delAddress[4]);
-            }
-            else if (delAddress.length == 4)
-            {
-                fieldAdd1.setText(delAddress[0]);
-                fieldCity.setText(delAddress[1]);
-                fieldCounty.setText(delAddress[2]);
-                fieldPostCode.setText(delAddress[3]);
-            }
-            else if (delAddress.length == 3)
-            {
-                fieldAdd1.setText(delAddress[0]);
-                fieldCounty.setText(delAddress[1]);
-                fieldPostCode.setText(delAddress[2]);
-            }
-
-            if (!rs.getString("billing_address").equals(""))
-            {
-                DifferentBillingAddress.setSelected(true);
-                fieldBAdd1.setEnabled(true);
-                fieldBAdd2.setEnabled(true);
-                fieldBCity.setEnabled(true);
-                fieldBCounty.setEnabled(true);
-                fieldBPostCode.setEnabled(true);
-                String[] billAddress = rs.getString("billing_address").split(", ");
-                if (billAddress.length == 5)
+                String[] delAddress = rs.getString(CUSTOMER_DELADDRESS).split(", ");
+                switch (delAddress.length)
                 {
-                    fieldBAdd1.setText(billAddress[0]);
-                    fieldBAdd2.setText(billAddress[1]);
-                    fieldBCity.setText(billAddress[2]);
-                    fieldBCounty.setText(billAddress[3]);
-                    fieldBPostCode.setText(billAddress[4]);
+                    case 5:
+                        fieldAdd1.setText(delAddress[0]);
+                        fieldAdd2.setText(delAddress[1]);
+                        fieldCity.setText(delAddress[2]);
+                        fieldCounty.setText(delAddress[3]);
+                        fieldPostCode.setText(delAddress[4]);
+                        break;
+                    case 4:
+                        fieldAdd1.setText(delAddress[0]);
+                        fieldCity.setText(delAddress[1]);
+                        fieldCounty.setText(delAddress[2]);
+                        fieldPostCode.setText(delAddress[3]);
+                        break;
+                    case 3:
+                        fieldAdd1.setText(delAddress[0]);
+                        fieldCounty.setText(delAddress[1]);
+                        fieldPostCode.setText(delAddress[2]);
+                        break;
                 }
-                else if (billAddress.length == 4)
+
+                String billAdd = rs.getString(CUSTOMER_BILLINGADDRESS);
+                if (!billAdd.isEmpty())
                 {
-                    fieldBAdd1.setText(billAddress[0]);
-                    fieldBCity.setText(billAddress[1]);
-                    fieldBCounty.setText(billAddress[2]);
-                    fieldBPostCode.setText(billAddress[3]);
+                    differentBillingAddress.setSelected(true);
+                    fieldBAdd1.setEnabled(true);
+                    fieldBAdd2.setEnabled(true);
+                    fieldBCity.setEnabled(true);
+                    fieldBCounty.setEnabled(true);
+                    fieldBPostCode.setEnabled(true);
+                    String[] billAddress = billAdd.split(", ");
+                    switch (billAddress.length)
+                    {
+                        case 5:
+                            fieldBAdd1.setText(billAddress[0]);
+                            fieldBAdd2.setText(billAddress[1]);
+                            fieldBCity.setText(billAddress[2]);
+                            fieldBCounty.setText(billAddress[3]);
+                            fieldBPostCode.setText(billAddress[4]);
+                            break;
+                        case 4:
+                            fieldBAdd1.setText(billAddress[0]);
+                            fieldBCity.setText(billAddress[1]);
+                            fieldBCounty.setText(billAddress[2]);
+                            fieldBPostCode.setText(billAddress[3]);
+                            break;
+                        case 3:
+                            fieldBAdd1.setText(billAddress[0]);
+                            fieldBCounty.setText(billAddress[1]);
+                            fieldBPostCode.setText(billAddress[2]);
+                            break;
+                        default:
+                            break;
+                    }
                 }
-                else if (billAddress.length == 3)
-                {
-                    fieldBAdd1.setText(billAddress[0]);
-                    fieldBCounty.setText(billAddress[1]);
-                    fieldBPostCode.setText(billAddress[2]);
-                }
+            }
+            else
+            {
+                MayfairStatic.outputMessage(this, "No Customer", "Customer does not exist - " + custNum, ERROR_MESSAGE);
             }
         }
         catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(AddCustomer.this, e.getMessage());
-        }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
+            MayfairStatic.outputMessage(this, e);
         }
     }
 
-    private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
 
-        if (!fieldReference.getText().equals("") && !fieldName.getText().equals("") && !fieldAdd1.getText().equals("") && !fieldCounty.getText().equals("") && !fieldPostCode.getText().equals(""))
+        if (!fieldReference.getText().isEmpty() && !fieldName.getText().isEmpty() && !fieldAdd1.getText().isEmpty() && !fieldCounty.getText().isEmpty() && !fieldPostCode.getText().isEmpty())
         {
-            if ((DifferentBillingAddress.isSelected() && !fieldBAdd1.getText().equals("") && !fieldBCounty.getText().equals("") && !fieldBPostCode.getText().equals("")) || !DifferentBillingAddress.isSelected())
+            if ((differentBillingAddress.isSelected() && !fieldBAdd1.getText().isEmpty() && !fieldBCounty.getText().isEmpty() && !fieldBPostCode.getText().isEmpty()) || !differentBillingAddress.isSelected())
             {
-                Connection con = db.getConnection();
-                try
+                try (Statement statement = db.getConnection().createStatement())
                 {
-                    Statement statement = con.createStatement();
-
                     StringBuilder delAddress = new StringBuilder();
-
                     addToAddress(delAddress, fieldAdd1.getText());
                     addToAddress(delAddress, fieldAdd2.getText());
                     addToAddress(delAddress, fieldCity.getText());
@@ -508,7 +510,7 @@ public class AddCustomer extends javax.swing.JInternalFrame
 
                     StringBuilder billAddress = new StringBuilder();
                     billAddress.append("");
-                    if (DifferentBillingAddress.isSelected())
+                    if (differentBillingAddress.isSelected())
                     {
                         addToAddress(billAddress, fieldBAdd1.getText());
                         addToAddress(billAddress, fieldBAdd2.getText());
@@ -517,79 +519,103 @@ public class AddCustomer extends javax.swing.JInternalFrame
                         billAddress.append(fieldBPostCode.getText());
                     }
 
-                    String instructions;
-                    if (fieldInstructions.getText().equals(""))
-                    {
-                        instructions = "BETWEEN 10AM AND 4PM";
-                    }
-                    else
-                    {
-                        instructions = fieldInstructions.getText();
-                    }
+                    String instructions = fieldInstructions.getText().isEmpty() ? "BETWEEN 10AM AND 4PM" : fieldInstructions.getText();
 
-                    switch (editAdd)
+                    String sql = "";
+                    switch (type)
                     {
                         case "Add":
                             db.writeToLog("ADD CUSTOMER");
-                            sql = "INSERT INTO customers (reference, name, contact, tel, del_address, billing_address, email, fax, country, comments, proforma, delivery) VALUES ('" + fieldReference.getText() + "', '" + fieldName.getText() + "', '" + fieldContact.getText() + "', '" + fieldTel.getText() + "', '" + delAddress.toString() + "', '" + billAddress.toString() + "', '" + fieldEmail.getText() + "', '" + fieldFax.getText() + "', '" + fieldCountry.getText() + "', '" + fieldComments.getText() + "', " + Proforma.isSelected() + ", '" + instructions + "')";
-                            JOptionPane.showMessageDialog(AddCustomer.this, "Customer Added");
+                            sql = "INSERT INTO " + CUSTOMERS_TABLE + " ("
+                                    + CUSTOMER_REFERENCE + ", "
+                                    + CUSTOMER_NAME + ", "
+                                    + CUSTOMER_CONTACT + ", "
+                                    + CUSTOMER_TEL + ", "
+                                    + CUSTOMER_DELADDRESS + ", "
+                                    + CUSTOMER_BILLINGADDRESS + ", "
+                                    + CUSTOMER_EMAIL + ", "
+                                    + CUSTOMER_FAX + ", "
+                                    + CUSTOMER_COUNTRY + ", "
+                                    + CUSTOMER_COMMENTS + ", "
+                                    + CUSTOMER_PROFORMA + ", "
+                                    + CUSTOMER_DELIVERY + ") "
+                                    + "VALUES ('"
+                                    + fieldReference.getText() + "', '"
+                                    + fieldName.getText() + "', '"
+                                    + fieldContact.getText() + "', '"
+                                    + fieldTel.getText() + "', '"
+                                    + delAddress.toString() + "', '"
+                                    + billAddress.toString() + "', '"
+                                    + fieldEmail.getText() + "', '"
+                                    + fieldFax.getText() + "', '"
+                                    + fieldCountry.getText() + "', '"
+                                    + fieldComments.getText() + "', "
+                                    + proforma.isSelected() + ", '"
+                                    + instructions + "')";
+                            MayfairStatic.outputMessage(this, "Success", "Customer Added", INFORMATION_MESSAGE);
                             break;
                         case "Edit":
                             db.writeToLog("EDIT CUSTOMER");
-                            sql = "UPDATE customers SET reference = '" + fieldReference.getText() + "', name = '" + fieldName.getText() + "', contact = '" + fieldContact.getText() + "', tel = '" + fieldTel.getText() + "', del_address = '" + delAddress.toString() + "', billing_address = '" + billAddress.toString() + "', email = '" + fieldEmail.getText() + "', fax = '" + fieldFax.getText() + "', country = '" + fieldCountry.getText() + "', comments = '" + fieldComments.getText() + "', proforma = " + Proforma.isSelected() + ", delivery = '" + instructions + "' WHERE cust_num = " + custNum;
-                            JOptionPane.showMessageDialog(AddCustomer.this, "Customer Updated");
+                            sql = "UPDATE " + CUSTOMERS_TABLE + " "
+                                    + "SET " + CUSTOMER_REFERENCE + " = '" + fieldReference.getText() + "', "
+                                    + CUSTOMER_NAME + " = '" + fieldName.getText() + "', "
+                                    + CUSTOMER_CONTACT + " = '" + fieldContact.getText() + "', "
+                                    + CUSTOMER_TEL + " = '" + fieldTel.getText() + "', "
+                                    + CUSTOMER_DELADDRESS + " = '" + delAddress.toString() + "', "
+                                    + CUSTOMER_BILLINGADDRESS + " = '" + billAddress.toString() + "', "
+                                    + CUSTOMER_EMAIL + " = '" + fieldEmail.getText() + "', "
+                                    + CUSTOMER_FAX + " = '" + fieldFax.getText() + "', "
+                                    + CUSTOMER_COUNTRY + " = '" + fieldCountry.getText() + "', "
+                                    + CUSTOMER_COMMENTS + " = '" + fieldComments.getText() + "', "
+                                    + CUSTOMER_PROFORMA + " = " + proforma.isSelected() + ", "
+                                    + CUSTOMER_DELIVERY + " = '" + instructions + "' "
+                                    + "WHERE " + CUSTOMER_NUM + " = " + custNum;
+                            MayfairStatic.outputMessage(this, "Success", "Customer Updated", INFORMATION_MESSAGE);
                             break;
                     }
 
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
-                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                     this.dispose();
                 }
                 catch (SQLException e)
                 {
-                    JOptionPane.showMessageDialog(AddCustomer.this, e.getMessage());
-                }
-                finally
-                {
-                    try
-                    {
-                        con.close();
-                    }
-                    catch (Exception e)
-                    { /* ignored */ }
+                    MayfairStatic.outputMessage(this, e);
                 }
             }
             else
             {
-                JOptionPane.showMessageDialog(AddCustomer.this, "Please complete all compulsory fields. (*)");
+                MayfairStatic.outputMessage(this, "Incomplete", "Please complete all compulsory fields. (*)", ERROR_MESSAGE);
             }
         }
         else
         {
-            JOptionPane.showMessageDialog(AddCustomer.this, "Please complete all compulsory fields. (*)");
+            MayfairStatic.outputMessage(this, "Incomplete", "Please complete all compulsory fields. (*)", ERROR_MESSAGE);
         }
-    }//GEN-LAST:event_btnNextActionPerformed
+    }//GEN-LAST:event_btnSaveActionPerformed
 
     private void addToAddress(StringBuilder address, String line)
     {
-        if (!line.equals(""))
+        if (!line.isEmpty())
         {
-            line = line.replaceAll(",", "");
-            address.append(line).append(", ");
+            address.append(line.replaceAll(",", "")).append(", ");
         }
     }
 
-    private void DifferentBillingAddressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DifferentBillingAddressActionPerformed
-        if (DifferentBillingAddress.isSelected())
-        {
-            this.enableButtons(true);
-        }
-        else
-        {
-            this.enableButtons(false);
-        }
-    }//GEN-LAST:event_DifferentBillingAddressActionPerformed
+    private void differentBillingAddressActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_differentBillingAddressActionPerformed
+        enableBillingAddress(differentBillingAddress.isSelected());
+    }//GEN-LAST:event_differentBillingAddressActionPerformed
+
+    private void enableBillingAddress(boolean enable)
+    {
+        fieldBAdd1.setEnabled(enable);
+        fieldBAdd2.setEnabled(enable);
+        fieldBCity.setEnabled(enable);
+        fieldBCounty.setEnabled(enable);
+        fieldBPostCode.setEnabled(enable);
+        btnSwitch.setVisible(enable);
+    }
 
     private void btnSwitchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSwitchActionPerformed
         String ad1 = fieldAdd1.getText();
@@ -611,21 +637,10 @@ public class AddCustomer extends javax.swing.JInternalFrame
         fieldBPostCode.setText(postcode);
     }//GEN-LAST:event_btnSwitchActionPerformed
 
-    private void enableButtons(boolean enable)
-    {
-        fieldBAdd1.setEnabled(enable);
-        fieldBAdd2.setEnabled(enable);
-        fieldBCity.setEnabled(enable);
-        fieldBCounty.setEnabled(enable);
-        fieldBPostCode.setEnabled(enable);
-        btnSwitch.setVisible(enable);
-    }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JCheckBox DifferentBillingAddress;
-    private javax.swing.JCheckBox Proforma;
-    private javax.swing.JButton btnNext;
+    private javax.swing.JButton btnSave;
     private javax.swing.JButton btnSwitch;
+    private javax.swing.JCheckBox differentBillingAddress;
     private javax.swing.JTextField fieldAdd1;
     private javax.swing.JTextField fieldAdd2;
     private javax.swing.JTextField fieldBAdd1;
@@ -671,5 +686,6 @@ public class AddCustomer extends javax.swing.JInternalFrame
     private javax.swing.JSeparator jSeparator3;
     private javax.swing.JSeparator jSeparator4;
     private javax.swing.JLabel labelCustomer;
+    private javax.swing.JCheckBox proforma;
     // End of variables declaration//GEN-END:variables
 }

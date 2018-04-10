@@ -15,7 +15,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import main.java.MayfairConstants;
+import main.java.MayfairStatic;
 
 /**
  *
@@ -390,7 +390,7 @@ public class Products extends javax.swing.JInternalFrame
                         sql = "UPDATE products SET discon = true WHERE code = '" + fieldProdCode.getText() + "'";
                         statement.executeUpdate(sql);
                         db.writeToLog(sql);
-                        db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                        db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                         JOptionPane.showMessageDialog(Products.this, "State of product has been updated.");
                     }
                 }
@@ -400,7 +400,7 @@ public class Products extends javax.swing.JInternalFrame
                     sql = "UPDATE products SET discon = false WHERE code = '" + fieldProdCode.getText() + "'";
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
-                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                     JOptionPane.showMessageDialog(Products.this, "Product has been updated.");
                 }
 
@@ -456,7 +456,7 @@ public class Products extends javax.swing.JInternalFrame
                     sql = "DELETE FROM products WHERE code = '" + fieldProdCode.getText() + "'";
                     statement2.executeUpdate(sql);
                     db.writeToLog(sql);
-                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
                     JOptionPane.showMessageDialog(Products.this, "Product Deleted.");
 

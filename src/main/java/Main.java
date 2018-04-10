@@ -5,16 +5,9 @@
 package main.java;
 
 import main.java.product.Products;
-import java.beans.PropertyVetoException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JTable;
-import javax.swing.table.DefaultTableModel;
 import main.java.customer.Customers;
+import main.java.order.sales.Current;
+import main.java.order.sales.CustomerNumber;
 import main.java.reminders.Reminders;
 import main.java.report.Reports;
 
@@ -25,17 +18,57 @@ import main.java.report.Reports;
 public class Main extends javax.swing.JFrame
 {
 
-    public static String formatDate(String datetime)
-    {
-        LocalDateTime localDateTime = LocalDateTime.parse(datetime, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.S"));
-        return localDateTime.format(DateTimeFormatter.ofPattern("E dd MMM yyyy"));
-    }
-
     public Main()
     {
         initComponents();
         setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
-//        btnRemindersActionPerformed(null);
+    }
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[])
+    {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try
+        {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+            {
+                if ("Nimbus".equals(info.getName()))
+                {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        }
+        catch (ClassNotFoundException ex)
+        {
+            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        catch (InstantiationException ex)
+        {
+            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        catch (IllegalAccessException ex)
+        {
+            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        catch (javax.swing.UnsupportedLookAndFeelException ex)
+        {
+            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() ->
+        {
+            new Main().setVisible(true);
+        });
     }
 
     /**
@@ -273,22 +306,15 @@ public class Main extends javax.swing.JFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewSOActionPerformed
-        main.java.order.sales.CustomerNumber salesOrder = new main.java.order.sales.CustomerNumber(desktop);
+        CustomerNumber salesOrder = new CustomerNumber(desktop);
         desktop.add(salesOrder);
         salesOrder.show();
     }//GEN-LAST:event_btnNewSOActionPerformed
 
     private void btnCurrentSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCurrentSOActionPerformed
-        main.java.order.sales.Current salesOrder = new main.java.order.sales.Current(desktop);
+        Current salesOrder = new Current(desktop);
         desktop.add(salesOrder);
-        try
-        {
-            salesOrder.setMaximum(true);
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        MayfairStatic.setMaximum(salesOrder);
         salesOrder.show();
     }//GEN-LAST:event_btnCurrentSOActionPerformed
 
@@ -301,70 +327,35 @@ public class Main extends javax.swing.JFrame
     private void btnCurrentPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCurrentPOActionPerformed
         main.java.order.purchase.Current purchaseOrder = new main.java.order.purchase.Current(desktop);
         desktop.add(purchaseOrder);
-        try
-        {
-            purchaseOrder.setMaximum(true);
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        MayfairStatic.setMaximum(purchaseOrder);
         purchaseOrder.show();
     }//GEN-LAST:event_btnCurrentPOActionPerformed
 
     private void btnProductsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProductsActionPerformed
         Products products = new Products(desktop);
         desktop.add(products);
-        try
-        {
-            products.setMaximum(true);
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        MayfairStatic.setMaximum(products);
         products.show();
     }//GEN-LAST:event_btnProductsActionPerformed
 
     private void btnCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomersActionPerformed
         Customers customers = new Customers(desktop);
         desktop.add(customers);
-        try
-        {
-            customers.setMaximum(true);
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        MayfairStatic.setMaximum(customers);
         customers.show();
     }//GEN-LAST:event_btnCustomersActionPerformed
 
     private void btnPastSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPastSOActionPerformed
         main.java.order.sales.Past salesOrder = new main.java.order.sales.Past(desktop);
         desktop.add(salesOrder);
-        try
-        {
-            salesOrder.setMaximum(true);
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        MayfairStatic.setMaximum(salesOrder);
         salesOrder.show();
     }//GEN-LAST:event_btnPastSOActionPerformed
 
     private void btnPastPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPastPOActionPerformed
         main.java.order.purchase.Past purchaseOrder = new main.java.order.purchase.Past(desktop);
         desktop.add(purchaseOrder);
-        try
-        {
-            purchaseOrder.setMaximum(true);
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        MayfairStatic.setMaximum(purchaseOrder);
         purchaseOrder.show();
     }//GEN-LAST:event_btnPastPOActionPerformed
 
@@ -380,75 +371,6 @@ public class Main extends javax.swing.JFrame
         desktop.add(reminders);
         reminders.show();
     }//GEN-LAST:event_btnRemindersActionPerformed
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[])
-    {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try
-        {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
-            {
-                if ("Nimbus".equals(info.getName()))
-                {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        }
-        catch (ClassNotFoundException ex)
-        {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (InstantiationException ex)
-        {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (IllegalAccessException ex)
-        {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (javax.swing.UnsupportedLookAndFeelException ex)
-        {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() ->
-        {
-            new Main().setVisible(true);
-        });
-    }
-
-    public static void fillTable(JTable table, ResultSet rs) throws SQLException
-    {
-        while (table.getRowCount() > 0)
-        {
-            ((DefaultTableModel) table.getModel()).removeRow(0);
-        }
-
-        int columns = rs.getMetaData().getColumnCount();
-
-        while (rs.next())
-        {
-            Object[] row = new Object[columns];
-
-            for (int i = 1; i <= columns; i++)
-            {
-                row[i - 1] = rs.getObject(i);
-            }
-
-            ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
-        }
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnCurrentPO;
@@ -472,5 +394,4 @@ public class Main extends javax.swing.JFrame
     private javax.swing.JSeparator jSeparator9;
     private javax.swing.JPanel panelSelection;
     // End of variables declaration//GEN-END:variables
-
 }

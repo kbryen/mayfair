@@ -19,10 +19,8 @@ import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
-import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import main.java.Main;
-import main.java.MayfairConstants;
+import main.java.MayfairStatic;
 import main.java.report.xls.DispatchNoteXls;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -350,7 +348,7 @@ public class Current extends javax.swing.JInternalFrame
             scrollPane.setVisible(true);
             getContentPane().validate();
             getContentPane().repaint();
-            Main.fillTable(table, statement.executeQuery(sql));
+            MayfairStatic.fillTable(table, statement.executeQuery(sql));
             
 
             btnViewSummary.setVisible(false);
@@ -474,7 +472,7 @@ public class Current extends javax.swing.JInternalFrame
                 sql = "DELETE FROM sales_order WHERE ord_num = " + ord_num;
                 statement2.executeUpdate(sql);
                 db.writeToLog(sql);
-                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
                 JOptionPane.showMessageDialog(Current.this, "Order cancelled");
                 fieldOrderNumber.setText("");
@@ -534,7 +532,7 @@ public class Current extends javax.swing.JInternalFrame
                     sql = "UPDATE sales_order SET dispatched = true, dispatched_date = CURRENT_TIMESTAMP WHERE ord_num = " + fieldOrderNumber.getText();
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
-                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
                     JOptionPane.showMessageDialog(Current.this, "State of order has been updated.");
                     fieldOrderNumber.setText("");
@@ -547,7 +545,7 @@ public class Current extends javax.swing.JInternalFrame
                     sql = "UPDATE sales_order SET dispatched = false, dispatched_date = null WHERE ord_num = " + fieldOrderNumber.getText();
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
-                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
                     JOptionPane.showMessageDialog(Current.this, "State of order has been updated.");
                     fieldOrderNumber.setText("");
@@ -597,7 +595,7 @@ public class Current extends javax.swing.JInternalFrame
                         db.writeToLog("MARK SALES DELIVERED " + fieldOrderNumber.getText());
                         db.writeToLog(sql);
 
-                        db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                        db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                         fieldOrderNumber.setText("");
                         fieldName.setText("");
                     }

@@ -20,8 +20,8 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import main.java.MayfairConstants;
-import static main.java.MayfairConstants.PURCHASE_ORDERS_DIR;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.PURCHASE_ORDERS_DIR;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellStyle;
 
@@ -479,7 +479,7 @@ public class Current extends javax.swing.JInternalFrame
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
 
-                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                     fieldOrderNumber.setText("");
                     fieldName.setText("");
                     btnFindActionPerformed(null);
@@ -502,7 +502,7 @@ public class Current extends javax.swing.JInternalFrame
                     }
 
                     db.writeToLog("UNABLE TO CANCEL ORDER" + message);
-                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                     JOptionPane.showMessageDialog(Current.this, "Can not cancel Purchase Order " + ord_num + " due to the below Products being on Sales Orders:" + message);
                 }
 
@@ -562,7 +562,7 @@ public class Current extends javax.swing.JInternalFrame
 
                 statement.executeUpdate(sql);
                 db.writeToLog(sql);
-                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
                 JOptionPane.showMessageDialog(Current.this, "State of order has been updated.");
                 fieldOrderNumber.setText("");
@@ -679,7 +679,7 @@ public class Current extends javax.swing.JInternalFrame
                     statement.executeUpdate(sql);
                     db.writeToLog(sql);
 
-                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                     fieldOrderNumber.setText("");
                     fieldName.setText("");
                     btnFindActionPerformed(null);

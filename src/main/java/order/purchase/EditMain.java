@@ -13,7 +13,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import main.java.MayfairConstants;
+import main.java.MayfairStatic;
 
 /**
  *
@@ -374,14 +374,14 @@ public class EditMain extends javax.swing.JInternalFrame
                 updateStatement.executeUpdate(sql);
                 db.writeToLog(sql);
 
-                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                 FillLabels();
                 JOptionPane.showMessageDialog(EditMain.this, "Quantity Updated");
             }
             else
             {
                 db.writeToLog("UNABLE TO UPDATE QUANTITY");
-                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                 JOptionPane.showMessageDialog(EditMain.this, "New Quantity must be at least " + onOrder + " as there are Sales Orders for this product.");
             }
         }
@@ -444,7 +444,7 @@ public class EditMain extends javax.swing.JInternalFrame
                     updateStatment.executeUpdate(sql);
                     db.writeToLog(sql);
 
-                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                     FillLabels();
                     JOptionPane.showMessageDialog(EditMain.this, "Product Deleted");
                 }
@@ -460,7 +460,7 @@ public class EditMain extends javax.swing.JInternalFrame
                     });
 
                     db.writeToLog("UNABLE TO CANCEL ORDER" + message);
-                    db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
                     JOptionPane.showMessageDialog(EditMain.this, "Can not delete product " + prodCode + " due to being on the following Sales Orders:" + message);
                 }
             }
@@ -491,7 +491,7 @@ public class EditMain extends javax.swing.JInternalFrame
             }
             finally
             {
-                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                db.writeToLog(MayfairStatic.LOG_SEPERATOR);
             }
         }
     }//GEN-LAST:event_btnFinishActionPerformed

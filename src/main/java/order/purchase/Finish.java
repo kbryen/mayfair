@@ -11,7 +11,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import main.java.Database;
-import main.java.MayfairConstants;
+import main.java.MayfairStatic;
 
 /**
  *
@@ -160,7 +160,7 @@ public class Finish extends javax.swing.JInternalFrame
                 sql = "UPDATE purchase_order SET del_date = '" + date + "', comments = '" + fieldComments.getText() + "' WHERE ord_num = '" + orderNum + "'";
                 statement.executeUpdate(sql);
                 db.writeToLog(sql);
-                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
                 JOptionPane.showMessageDialog(Finish.this, "Order Placed");
                 

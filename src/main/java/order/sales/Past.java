@@ -16,7 +16,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import main.java.MayfairConstants;
+import main.java.MayfairStatic;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -345,7 +345,7 @@ public class Past extends javax.swing.JInternalFrame
                 sql = "UPDATE sales_order SET delivered = false WHERE ord_num = " + Integer.parseInt(fieldOrderNumber.getText());
                 statement.executeUpdate(sql);
                 db.writeToLog(sql);
-                db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
                 fieldOrderNumber.setText("");
                 fieldName.setText("");

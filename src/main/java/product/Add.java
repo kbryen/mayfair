@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 import main.java.Database;
-import static main.java.MayfairConstants.*;
+import static main.java.MayfairStatic.*;
 
 /**
  *

@@ -21,7 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import main.java.MayfairConstants;
+import main.java.MayfairStatic;
 
 /**
  *
@@ -557,7 +557,7 @@ public class EditMain extends javax.swing.JInternalFrame
                         sql = "UPDATE sales_order SET del_date = '" + date + "', comments = '" + fieldComments.getText() + "' WHERE ord_num = " + orderNum;
                         statement.executeUpdate(sql);
                         db.writeToLog(sql);
-                        db.writeToLog(MayfairConstants.LOG_SEPERATOR);
+                        db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
                         ViewSalesSummary salesOrder = new ViewSalesSummary(orderNum);
                         desktop.add(salesOrder);

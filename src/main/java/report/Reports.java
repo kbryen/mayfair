@@ -24,15 +24,15 @@ import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.JOptionPane.QUESTION_MESSAGE;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import main.java.Database;
-import static main.java.MayfairConstants.ALL_PURCHASE_TEMPLATE;
-import static main.java.MayfairConstants.ALL_SALES_TEMPLATE;
-import static main.java.MayfairConstants.CUSTOMERS_TEMPLATE;
-import static main.java.MayfairConstants.CUSTOMER_REPORTS_DIR;
-import static main.java.MayfairConstants.OUT_OF_STOCK_REPORT_TEMPLATE;
-import static main.java.MayfairConstants.PROD_SALES_ORDERS_DIR;
-import static main.java.MayfairConstants.PROD_SALES_TEMPLATE;
-import static main.java.MayfairConstants.SALES_PURCHASE_ORDERS_DIR;
-import static main.java.MayfairConstants.STOCK_REPORTS_DIR;
+import static main.java.MayfairStatic.ALL_PURCHASE_TEMPLATE;
+import static main.java.MayfairStatic.ALL_SALES_TEMPLATE;
+import static main.java.MayfairStatic.CUSTOMERS_TEMPLATE;
+import static main.java.MayfairStatic.CUSTOMER_REPORTS_DIR;
+import static main.java.MayfairStatic.OUT_OF_STOCK_REPORT_TEMPLATE;
+import static main.java.MayfairStatic.PROD_SALES_ORDERS_DIR;
+import static main.java.MayfairStatic.PROD_SALES_TEMPLATE;
+import static main.java.MayfairStatic.SALES_PURCHASE_ORDERS_DIR;
+import static main.java.MayfairStatic.STOCK_REPORTS_DIR;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFDataFormat;
@@ -41,7 +41,8 @@ import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import static org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD;
-import static main.java.MayfairConstants.WHS_REPORT_TEMPLATE;
+import static main.java.MayfairStatic.WHS_REPORT_TEMPLATE;
+import main.java.report.xls.XlsReport;
 
 /**
  *
@@ -539,7 +540,7 @@ public class Reports extends javax.swing.JInternalFrame
             String fileName = STOCK_REPORTS_DIR + "Warehouse Stock Report " + date + ".xls";
             try (FileOutputStream fileOut = new FileOutputStream(fileName))
             {
-                HSSFWorkbook workBook = db.getHSSFWorkbook(WHS_REPORT_TEMPLATE);
+                HSSFWorkbook workBook = XlsReport.getHSSFWorkbook(WHS_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Warehouse Stock Report");
 
                 HSSFCellStyle numberStyle = workBook.createCellStyle();
@@ -632,7 +633,7 @@ public class Reports extends javax.swing.JInternalFrame
             String fileName = STOCK_REPORTS_DIR + "Out of Stock Report " + date + ".xls";
             try (FileOutputStream fileOut = new FileOutputStream(fileName))
             {
-                HSSFWorkbook workBook = db.getHSSFWorkbook(OUT_OF_STOCK_REPORT_TEMPLATE);
+                HSSFWorkbook workBook = XlsReport.getHSSFWorkbook(OUT_OF_STOCK_REPORT_TEMPLATE);
                 HSSFSheet sheet = workBook.getSheet("Out of Stock Report");
 
                 HSSFCellStyle numberStyle = workBook.createCellStyle();
@@ -703,7 +704,7 @@ public class Reports extends javax.swing.JInternalFrame
                     String fileName = SALES_PURCHASE_ORDERS_DIR + "Purchase Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
                     try (FileOutputStream fileOut = new FileOutputStream(fileName))
                     {
-                        HSSFWorkbook workBook = db.getHSSFWorkbook(ALL_PURCHASE_TEMPLATE);
+                        HSSFWorkbook workBook = XlsReport.getHSSFWorkbook(ALL_PURCHASE_TEMPLATE);
 
                         HSSFCellStyle numberStyle = workBook.createCellStyle();
                         numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
@@ -786,7 +787,7 @@ public class Reports extends javax.swing.JInternalFrame
                     String fileName = SALES_PURCHASE_ORDERS_DIR + "Sales Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
                     try (FileOutputStream fileOut = new FileOutputStream(fileName))
                     {
-                        HSSFWorkbook workBook = db.getHSSFWorkbook(ALL_SALES_TEMPLATE);
+                        HSSFWorkbook workBook = XlsReport.getHSSFWorkbook(ALL_SALES_TEMPLATE);
                         HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
 
                         HSSFCellStyle numberStyle = workBook.createCellStyle();
@@ -869,7 +870,7 @@ public class Reports extends javax.swing.JInternalFrame
                         try (FileOutputStream fileOut = new FileOutputStream(fileName))
                         {
 
-                            HSSFWorkbook workBook = db.getHSSFWorkbook(PROD_SALES_TEMPLATE);
+                            HSSFWorkbook workBook = XlsReport.getHSSFWorkbook(PROD_SALES_TEMPLATE);
                             HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
 
                             HSSFCellStyle numberStyle = workBook.createCellStyle();
@@ -995,7 +996,7 @@ public class Reports extends javax.swing.JInternalFrame
 
                 try (FileOutputStream fileOut = new FileOutputStream(fileName.toString()))
                 {
-                    HSSFWorkbook workBook = db.getHSSFWorkbook(CUSTOMERS_TEMPLATE);
+                    HSSFWorkbook workBook = XlsReport.getHSSFWorkbook(CUSTOMERS_TEMPLATE);
                     HSSFSheet sheet = workBook.getSheet("Customers");
 
                     HSSFRow row;

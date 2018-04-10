@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import main.java.Database;
-import main.java.Main;
+import main.java.MayfairStatic;
 
 /**
  *
@@ -49,7 +49,7 @@ public class Reminders extends javax.swing.JInternalFrame
                     + "WHERE date >= '" + fromDate + "' AND date <= '" + toDate + "' AND completed = false "
                     + "ORDER BY date ASC");
 
-            Main.fillTable(tableReminders, rs);
+            MayfairStatic.fillTable(tableReminders, rs);
         }
         catch (SQLException e)
         {
@@ -71,7 +71,7 @@ public class Reminders extends javax.swing.JInternalFrame
                     + "WHERE sales_order.del_date <= '" + toDate + "' AND sales_order.del_date and delivered = false "
                     + "ORDER BY sales_order.del_date, sales_order.ord_num DESC");
 
-            Main.fillTable(tableSales, rs);
+            MayfairStatic.fillTable(tableSales, rs);
 
             rs = statement.executeQuery("SELECT SUM(sales_order.total_units) AS weekly_total_units "
                     + "FROM sales_order "
@@ -103,7 +103,7 @@ public class Reminders extends javax.swing.JInternalFrame
                     + "WHERE purchase_order.del_date <= '" + toDate + "' AND purchase_order.del_date and delivered = false "
                     + "ORDER BY purchase_order.del_date, purchase_order.ord_num DESC");
 
-            Main.fillTable(tablePurchase, rs);
+            MayfairStatic.fillTable(tablePurchase, rs);
         }
         catch (SQLException e)
         {

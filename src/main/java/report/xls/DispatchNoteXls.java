@@ -6,8 +6,8 @@ package main.java.report.xls;
 
 import java.util.Map;
 import java.util.Map.Entry;
-import static main.java.MayfairConstants.DISPATCH_NOTES_DIR;
-import static main.java.MayfairConstants.DISPATCH_NOTE_TEMPLATE;
+import static main.java.MayfairStatic.DISPATCH_NOTES_DIR;
+import static main.java.MayfairStatic.DISPATCH_NOTE_TEMPLATE;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
