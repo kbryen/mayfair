@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import main.java.customer.Customers;
+import main.java.order.sales.CustomerNumber;
 import main.java.reminders.Reminders;
 import main.java.report.Reports;
 
@@ -273,7 +274,7 @@ public class Main extends javax.swing.JFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewSOActionPerformed
-        main.java.order.sales.CustomerNumber salesOrder = new main.java.order.sales.CustomerNumber(desktop);
+        CustomerNumber salesOrder = new CustomerNumber(desktop);
         desktop.add(salesOrder);
         salesOrder.show();
     }//GEN-LAST:event_btnNewSOActionPerformed

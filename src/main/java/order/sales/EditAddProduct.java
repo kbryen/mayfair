@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
 import main.java.Main;
+import main.java.MayfairConstants;
 
 /**
  *
@@ -645,6 +646,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
 
                         JOptionPane.showMessageDialog(EditAddProduct.this, "Product added");
                         EditAddProduct addProducts = new EditAddProduct(desktop, orderNum);
+                        MayfairConstants.setMaximum(addProducts);
                         desktop.add(addProducts);
                         addProducts.show();
                         this.dispose();

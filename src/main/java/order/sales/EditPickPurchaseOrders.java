@@ -16,6 +16,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
+import main.java.MayfairConstants;
 
 /**
  *
@@ -510,6 +511,7 @@ public class EditPickPurchaseOrders extends javax.swing.JInternalFrame
     {//GEN-HEADEREND:event_btnBackActionPerformed
         EditAddProduct addProducts = new EditAddProduct(desktop, salesOrderNum);
         desktop.add(addProducts);
+        MayfairConstants.setMaximum(addProducts);
         addProducts.show();
         this.dispose();
     }//GEN-LAST:event_btnBackActionPerformed

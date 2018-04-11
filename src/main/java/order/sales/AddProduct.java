@@ -81,7 +81,7 @@ public class AddProduct extends javax.swing.JInternalFrame
         try
         {
             Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = statement.executeQuery("SELECT SUM(price) AS total_price, SUM(quantity) AS total_units FROM sales_order_details WHERE ord_num = '" + orderNum + "'");
+            ResultSet rs = statement.executeQuery("SELECT SUM(price) AS total_price, SUM(quantity) AS total_units FROM sales_order_details WHERE ord_num = " + orderNum);
             rs.next();
             double price = rs.getDouble("total_price");
             int quantity = rs.getInt("total_units");
@@ -89,7 +89,7 @@ public class AddProduct extends javax.swing.JInternalFrame
             labelTotalUnits.setText(String.valueOf(quantity));
 
             Statement statement2 = con.createStatement();
-            statement2.executeUpdate("UPDATE sales_order SET price = " + price + " WHERE ord_num = " + orderNum);
+            statement2.executeUpdate("UPDATE sales_order SET price = " + price + ", total_units = " + quantity + " WHERE ord_num = " + orderNum);
 
             rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity, products.sales_price, sales_order_details.price FROM sales_order_details INNER JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + orderNum);
             while (table2.getRowCount() > 0)
@@ -119,7 +119,8 @@ public class AddProduct extends javax.swing.JInternalFrame
                 con.close();
             }
             catch (Exception e)
-            { /* ignored */ }
+            {
+                /* ignored */ }
         }
     }
 
@@ -507,7 +508,8 @@ public class AddProduct extends javax.swing.JInternalFrame
                     con.close();
                 }
                 catch (Exception e)
-                { /* ignored */ }
+                {
+                    /* ignored */ }
             }
         }
         catch (NumberFormatException | HeadlessException e)
@@ -552,27 +554,25 @@ public class AddProduct extends javax.swing.JInternalFrame
                     con.close();
                 }
                 catch (Exception e)
-                { /* ignored */ }
+                {
+                    /* ignored */ }
             }
         }
     }//GEN-LAST:event_btnFinishActionPerformed
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        try
-        {
-            this.setMaximum(true);
-
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(Main.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
         Connection con = db.getConnection();
         try
         {
+            String code = fieldProdCode.getText();
+            sql = "SELECT prod_num, code, sales_price, in_stock, in_order, total, SSAW FROM products ";
+            if (code != null || !code.isEmpty())
+            {
+                sql += "WHERE code LIKE '%" + code + "%' ";
+            }
+            sql += "ORDER BY prod_num ASC";            
             Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = statement.executeQuery("SELECT prod_num, code, sales_price, in_stock, in_order, total, SSAW FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' ORDER BY prod_num ASC");
+            ResultSet rs = statement.executeQuery(sql);
 
             scrollPane.setVisible(true);
             getContentPane().validate();
@@ -603,7 +603,8 @@ public class AddProduct extends javax.swing.JInternalFrame
                 con.close();
             }
             catch (Exception e)
-            { /* ignored */ }
+            {
+                /* ignored */ }
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
@@ -648,7 +649,8 @@ public class AddProduct extends javax.swing.JInternalFrame
                         con.close();
                     }
                     catch (Exception e)
-                    { /* ignored */ }
+                    {
+                        /* ignored */ }
                 }
             }
         }
@@ -681,7 +683,8 @@ public class AddProduct extends javax.swing.JInternalFrame
                         con.close();
                     }
                     catch (Exception e)
-                    { /* ignored */ }
+                    {
+                        /* ignored */ }
                 }
             }
         }
@@ -745,6 +748,7 @@ public class AddProduct extends javax.swing.JInternalFrame
                         JOptionPane.showMessageDialog(AddProduct.this, "Product added");
                         AddProduct addProducts = new AddProduct(desktop, orderNum, numOfProducts + 1);
                         desktop.add(addProducts);
+                        MayfairConstants.setMaximum(addProducts);
                         addProducts.show();
                         this.dispose();
                     }
@@ -770,7 +774,8 @@ public class AddProduct extends javax.swing.JInternalFrame
                     con.close();
                 }
                 catch (Exception e)
-                { /* ignored */ }
+                {
+                    /* ignored */ }
             }
         }
         catch (NumberFormatException | HeadlessException e)

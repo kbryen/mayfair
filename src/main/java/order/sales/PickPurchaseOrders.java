@@ -16,6 +16,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
+import main.java.MayfairConstants;
 
 /**
  *
@@ -521,6 +522,7 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
             
             AddProduct addProducts = new AddProduct(desktop, salesOrderNum, total + 1);
             desktop.add(addProducts);
+            MayfairConstants.setMaximum(addProducts);
             addProducts.show();
             this.dispose();
         }

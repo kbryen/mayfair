@@ -384,6 +384,7 @@ public class EditMain extends javax.swing.JInternalFrame
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         EditAddProduct addProd = new EditAddProduct(desktop, orderNum);
         desktop.add(addProd);
+        MayfairConstants.setMaximum(addProd);
         addProd.show();
         this.dispose();
     }//GEN-LAST:event_btnAddActionPerformed

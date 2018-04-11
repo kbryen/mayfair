@@ -13,6 +13,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import main.java.Database;
+import main.java.MayfairConstants;
 
 /**
  *
@@ -223,7 +224,7 @@ public class CustomerNumber extends javax.swing.JInternalFrame
             {
                 Statement statement = con.createStatement();
                 db.writeToLog("CREATE NEW SALES ORDER");
-                sql = "INSERT INTO sales_order (cust_num) VALUES (" + fieldCustomerNumber.getText() + ")";
+                sql = "INSERT INTO sales_order (cust_num, total_units) VALUES (" + fieldCustomerNumber.getText() + ", 0)";
                 statement.executeUpdate(sql);
                 db.writeToLog(sql);
 
@@ -234,6 +235,7 @@ public class CustomerNumber extends javax.swing.JInternalFrame
 
                 AddProduct salesOrder = new AddProduct(desktop, orderNum, 1);
                 desktop.add(salesOrder);
+                MayfairConstants.setMaximum(salesOrder);
                 salesOrder.show();
                 this.dispose();
             }
