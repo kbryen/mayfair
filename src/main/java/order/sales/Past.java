@@ -49,6 +49,7 @@ public class Past extends javax.swing.JInternalFrame
         btnExcelSummary.setVisible(false);
         btnFindActionPerformed(null);
         table.setAutoCreateRowSorter(true);
+        MayfairConstants.addDateSorter(table, 2);
     }
 
     /**

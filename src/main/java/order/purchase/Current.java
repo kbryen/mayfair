@@ -50,6 +50,7 @@ public class Current extends javax.swing.JInternalFrame
         btnPOStatus.setVisible(false);
         btnFindActionPerformed(null);
         table.setAutoCreateRowSorter(true);
+        MayfairConstants.addDateSorter(table, new int[]{2,3,6});
     }
 
     /**

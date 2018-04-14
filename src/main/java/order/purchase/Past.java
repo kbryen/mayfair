@@ -12,6 +12,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
+import main.java.MayfairConstants;
 
 /**
  *
@@ -35,6 +36,7 @@ public class Past extends javax.swing.JInternalFrame
         labelOR.setVisible(false);
         btnFindActionPerformed(null);
         table.setAutoCreateRowSorter(true);
+        MayfairConstants.addDateSorter(table, 2);
     }
 
     /**

@@ -10,7 +10,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.util.Pair;
@@ -19,7 +22,8 @@ import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.JTable;
+import javax.swing.table.TableRowSorter;
 import main.java.Database;
 import main.java.Main;
 import main.java.MayfairConstants;
@@ -55,6 +59,7 @@ public class Current extends javax.swing.JInternalFrame
         btnExcelSummary.setVisible(false);
         btnFindActionPerformed(null);
         table.setAutoCreateRowSorter(true);
+        MayfairConstants.addDateSorter(table, new int[]{2,3,7});
     }
 
     /**
@@ -335,23 +340,23 @@ public class Current extends javax.swing.JInternalFrame
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
         try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            String sql = "SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.total_units, sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') "
+            sql = "SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.total_units, sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') "
                     + "FROM sales_order "
                     + "INNER JOIN customers ON sales_order.cust_num=customers.cust_num ";
             if (!fieldOrderNumber.getText().equals(""))
             {
-                sql += "WHERE sales_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC";
+                sql += "WHERE sales_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ";
             }
             else
             {
-                sql += "WHERE customers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC";
+                sql += "WHERE customers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ";
             }
-            
+            sql += "ORDER BY sales_order.del_date";
+
             scrollPane.setVisible(true);
             getContentPane().validate();
             getContentPane().repaint();
             Main.fillTable(table, statement.executeQuery(sql));
-            
 
             btnViewSummary.setVisible(false);
             btnEdit.setVisible(false);
@@ -660,7 +665,7 @@ public class Current extends javax.swing.JInternalFrame
                 JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
                 JOptionPane.showMessageDialog(Current.this, e.getStackTrace());
             }
-            
+
             dispatchNote.populateWorkbook();
             dispatchNote.save(dispatchNote.getFilename());
         }

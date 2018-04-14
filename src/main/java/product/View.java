@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
+import main.java.MayfairConstants;
 import static main.java.MayfairConstants.*;
 
 /**
@@ -44,6 +45,7 @@ public class View extends javax.swing.JInternalFrame
         requestDB();
         updateLabels();
         table.setAutoCreateRowSorter(true);
+        MayfairConstants.addDateSorter(table, 2);
     }
 
     private void requestDB()

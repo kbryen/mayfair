@@ -431,9 +431,11 @@ public class Main extends javax.swing.JFrame
 
     public static void fillTable(JTable table, ResultSet rs) throws SQLException
     {
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        
         while (table.getRowCount() > 0)
         {
-            ((DefaultTableModel) table.getModel()).removeRow(0);
+            model.removeRow(0);
         }
 
         int columns = rs.getMetaData().getColumnCount();
@@ -447,7 +449,7 @@ public class Main extends javax.swing.JFrame
                 row[i - 1] = rs.getObject(i);
             }
 
-            ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
+            model.insertRow(rs.getRow() - 1, row);
         }
     }
 

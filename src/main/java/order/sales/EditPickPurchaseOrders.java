@@ -50,6 +50,7 @@ public class EditPickPurchaseOrders extends javax.swing.JInternalFrame
         FillTable();
         btnBack.setVisible(true);
         table.setAutoCreateRowSorter(true);
+        MayfairConstants.addDateSorter(table, 1);
     }
 
     private void showLabels(boolean show)

@@ -13,6 +13,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import main.java.Database;
 import main.java.Main;
+import main.java.MayfairConstants;
 
 /**
  *
@@ -37,6 +38,7 @@ public class Reminders extends javax.swing.JInternalFrame
     private void fillReminders()
     {
         tableReminders.setAutoCreateRowSorter(true);
+        MayfairConstants.addDateSorter(tableReminders, 1);
         try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             LocalDate date = LocalDate.now();
@@ -60,6 +62,7 @@ public class Reminders extends javax.swing.JInternalFrame
     private void fillSalesOrders()
     {
         tableSales.setAutoCreateRowSorter(true);
+        MayfairConstants.addDateSorter(tableSales, new int[]{2,3,6});
         try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             LocalDate date = LocalDate.now().plusWeeks(1);
@@ -92,6 +95,7 @@ public class Reminders extends javax.swing.JInternalFrame
     private void fillPurchaseOrders()
     {
         tablePurchase.setAutoCreateRowSorter(true);
+        MayfairConstants.addDateSorter(tablePurchase, new int[]{2,3,5});
         try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             LocalDate date = LocalDate.now().plusMonths(1);
