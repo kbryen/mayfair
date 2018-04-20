@@ -55,25 +55,21 @@
                               <Component id="btnClear" min="-2" max="-2" attributes="0"/>
                           </Group>
                       </Group>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                      <EmptySpace min="0" pref="42" max="32767" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="btnMarkDispatched" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnMark" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnMarkDelivered" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="btnSummaryReport" alignment="1" min="-2" pref="160" max="-2" attributes="0"/>
                           <Group type="102" alignment="1" attributes="0">
                               <Component id="btnCancel" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnEdit" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="1" attributes="0">
-                              <Component id="btnExcelSummary" min="-2" pref="160" max="-2" attributes="0"/>
-                              <EmptySpace max="-2" attributes="0"/>
-                              <Component id="btnPOStatus" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="btnViewSummary" alignment="1" min="-2" max="-2" attributes="0"/>
                       </Group>
@@ -101,12 +97,12 @@
                   <Component id="btnClear" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="scrollPane" pref="306" max="32767" attributes="0"/>
+              <Component id="scrollPane" pref="263" max="32767" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="btnMarkDispatched" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnMark" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnMarkDelivered" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -117,10 +113,7 @@
                   <Component id="btnCancel" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="btnExcelSummary" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnPOStatus" alignment="3" min="-2" max="-2" attributes="0"/>
-              </Group>
+              <Component id="btnSummaryReport" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -171,17 +164,17 @@
         <Component class="javax.swing.JTable" name="table">
           <Properties>
             <Property name="model" type="javax.swing.table.TableModel" editor="org.netbeans.modules.form.editors2.TableModelEditor">
-              <Table columnCount="7" rowCount="4">
+              <Table columnCount="8" rowCount="4">
                 <Column editable="false" title="Number" type="java.lang.Integer"/>
                 <Column editable="false" title="Supplier" type="java.lang.String"/>
                 <Column editable="false" title="Ordered" type="java.lang.String"/>
                 <Column editable="false" title="Expected Delivery" type="java.lang.String"/>
+                <Column editable="false" title="Total Units" type="java.lang.Integer"/>
                 <Column editable="false" title="Total (&#xa3;)" type="java.lang.Float"/>
                 <Column editable="false" title="Dispatched" type="java.lang.Boolean"/>
                 <Column editable="false" title="Dispatched Date" type="java.lang.String"/>
               </Table>
             </Property>
-            <Property name="cellSelectionEnabled" type="boolean" value="false"/>
             <Property name="columnModel" type="javax.swing.table.TableColumnModel" editor="org.netbeans.modules.form.editors2.TableColumnModelEditor">
               <TableColumnModel selectionModel="2">
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
@@ -204,6 +197,11 @@
                   <Editor/>
                   <Renderer/>
                 </Column>
+                <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="false">
+                  <Title/>
+                  <Editor/>
+                  <Renderer/>
+                </Column>
                 <Column maxWidth="-1" minWidth="-1" prefWidth="-1" resizable="true">
                   <Title/>
                   <Editor/>
@@ -221,7 +219,7 @@
                 </Column>
               </TableColumnModel>
             </Property>
-            <Property name="rowSelectionAllowed" type="boolean" value="true"/>
+            <Property name="columnSelectionAllowed" type="boolean" value="true"/>
             <Property name="tableHeader" type="javax.swing.table.JTableHeader" editor="org.netbeans.modules.form.editors2.JTableHeaderEditor">
               <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
             </Property>
@@ -240,9 +238,6 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="fieldOrderNumber">
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fieldOrderNumberActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
       <Properties>
@@ -272,9 +267,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEditActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="btnMarkDispatched">
+    <Component class="javax.swing.JButton" name="btnMark">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Mark "/>
+      </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMarkDispatchedActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMarkActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnMarkDelivered">
@@ -293,20 +291,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="btnExcelSummary">
+    <Component class="javax.swing.JButton" name="btnSummaryReport">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Create Summary File"/>
+        <Property name="text" type="java.lang.String" value="Create Summary Report"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnExcelSummaryActionPerformed"/>
-      </Events>
-    </Component>
-    <Component class="javax.swing.JButton" name="btnPOStatus">
-      <Properties>
-        <Property name="text" type="java.lang.String" value="Create PO Avaliability"/>
-      </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPOStatusActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSummaryReportActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

@@ -32,14 +32,14 @@ import org.apache.poi.ss.usermodel.CellStyle;
  *
  * @author kian_bryen
  */
-public class Current extends javax.swing.JInternalFrame
+public class CurrentSalesOrders extends javax.swing.JInternalFrame
 {
 
     private final Database db = new Database();
     private final JDesktopPane desktop;
     private String sql;
 
-    public Current(JDesktopPane desktop)
+    public CurrentSalesOrders(JDesktopPane desktop)
     {
         initComponents();
         this.desktop = desktop;
@@ -148,8 +148,6 @@ public class Current extends javax.swing.JInternalFrame
                 return canEdit [columnIndex];
             }
         });
-        table.setCellSelectionEnabled(false);
-        table.setRowSelectionAllowed(true);
         table.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent evt)
@@ -361,7 +359,7 @@ public class Current extends javax.swing.JInternalFrame
         }
         catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(Current.this, e.getMessage());
+            JOptionPane.showMessageDialog(CurrentSalesOrders.this, e.getMessage());
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
@@ -474,7 +472,7 @@ public class Current extends javax.swing.JInternalFrame
                 db.writeToLog(sql);
                 db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
-                JOptionPane.showMessageDialog(Current.this, "Order cancelled");
+                JOptionPane.showMessageDialog(CurrentSalesOrders.this, "Order cancelled");
                 fieldOrderNumber.setText("");
                 fieldName.setText("");
                 btnFindActionPerformed(null);
@@ -482,7 +480,7 @@ public class Current extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(Current.this, e.getMessage());
+                JOptionPane.showMessageDialog(CurrentSalesOrders.this, e.getMessage());
             }
         }
     }//GEN-LAST:event_btnCancelActionPerformed
@@ -534,7 +532,7 @@ public class Current extends javax.swing.JInternalFrame
                     db.writeToLog(sql);
                     db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
-                    JOptionPane.showMessageDialog(Current.this, "State of order has been updated.");
+                    JOptionPane.showMessageDialog(CurrentSalesOrders.this, "State of order has been updated.");
                     fieldOrderNumber.setText("");
                     fieldName.setText("");
 //                    }
@@ -547,7 +545,7 @@ public class Current extends javax.swing.JInternalFrame
                     db.writeToLog(sql);
                     db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
-                    JOptionPane.showMessageDialog(Current.this, "State of order has been updated.");
+                    JOptionPane.showMessageDialog(CurrentSalesOrders.this, "State of order has been updated.");
                     fieldOrderNumber.setText("");
                     fieldName.setText("");
                 }
@@ -555,7 +553,7 @@ public class Current extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(Current.this, e.getMessage());
+                JOptionPane.showMessageDialog(CurrentSalesOrders.this, e.getMessage());
             }
         }
     }//GEN-LAST:event_btnMarkDispatchedActionPerformed
@@ -585,7 +583,7 @@ public class Current extends javax.swing.JInternalFrame
 
                     if (onPO)
                     {
-                        JOptionPane.showMessageDialog(Current.this, "Cannot mark as delivered as Order takes from the following undelivered Purchase Order(s):\n" + message.toString());
+                        JOptionPane.showMessageDialog(CurrentSalesOrders.this, "Cannot mark as delivered as Order takes from the following undelivered Purchase Order(s):\n" + message.toString());
                     }
                     else
                     {
@@ -603,7 +601,7 @@ public class Current extends javax.swing.JInternalFrame
                 }
                 catch (SQLException e)
                 {
-                    JOptionPane.showMessageDialog(Current.this, e.getMessage());
+                    JOptionPane.showMessageDialog(CurrentSalesOrders.this, e.getMessage());
                 }
             }
         }
@@ -636,8 +634,8 @@ public class Current extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Current.this, e);
+                JOptionPane.showMessageDialog(CurrentSalesOrders.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(CurrentSalesOrders.this, e);
             }
 
             // Select Products
@@ -655,8 +653,8 @@ public class Current extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Current.this, e.getStackTrace());
+                JOptionPane.showMessageDialog(CurrentSalesOrders.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(CurrentSalesOrders.this, e.getStackTrace());
             }
             
             dispatchNote.populateWorkbook();
@@ -774,13 +772,13 @@ public class Current extends javax.swing.JInternalFrame
                     wb.write(fileOut);
                     fileOut.flush();
 
-                    JOptionPane.showMessageDialog(Current.this, "<html> <b>Excel summary created successfully.</b> \n<html> <i> " + fileName + " </i>", "Excel Summary Created", INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(CurrentSalesOrders.this, "<html> <b>Excel summary created successfully.</b> \n<html> <i> " + fileName + " </i>", "Excel Summary Created", INFORMATION_MESSAGE);
                 }
             }
             catch (SQLException | IOException e)
             {
-                JOptionPane.showMessageDialog(Current.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Current.this, e);
+                JOptionPane.showMessageDialog(CurrentSalesOrders.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(CurrentSalesOrders.this, e);
             }
         }
     }//GEN-LAST:event_btnExcelSummaryActionPerformed

@@ -8,8 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
-import main.java.Database;
 import main.java.MayfairStatic;
 import static main.java.MayfairStatic.CUSTOMERS_TABLE;
 import static main.java.MayfairStatic.CUSTOMER_BILLINGADDRESS;
@@ -31,17 +29,20 @@ import static main.java.MayfairStatic.CUSTOMER_TEL;
  */
 public class Customers extends javax.swing.JInternalFrame
 {
-
     private final JDesktopPane desktop;
-    private final Database db = new Database();
 
-    public Customers(JDesktopPane pane)
+    public Customers(JDesktopPane desktop)
+    {
+        setUpGUI();
+        this.desktop = desktop;
+        btnFindActionPerformed(null);
+    }
+
+    private void setUpGUI()
     {
         initComponents();
-        desktop = pane;
         btnEdit.setEnabled(false);
         table.setAutoCreateRowSorter(true);
-        btnFindActionPerformed(null);
     }
 
     /**
@@ -233,19 +234,19 @@ public class Customers extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            String sql = "SELECT " + CUSTOMER_NUM + ", " 
-                    + CUSTOMER_REFERENCE + ", " 
-                    + CUSTOMER_NAME + ", " 
-                    + CUSTOMER_DELADDRESS + ", " 
-                    + CUSTOMER_DELIVERY + ", " 
-                    + CUSTOMER_BILLINGADDRESS + ", " 
-                    + CUSTOMER_CONTACT + ", " 
-                    + CUSTOMER_TEL + ", " 
-                    + CUSTOMER_FAX + ", " 
-                    + CUSTOMER_EMAIL + ", " 
-                    + CUSTOMER_COMMENTS + ", " 
+            String sql = "SELECT " + CUSTOMER_NUM + ", "
+                    + CUSTOMER_REFERENCE + ", "
+                    + CUSTOMER_NAME + ", "
+                    + CUSTOMER_DELADDRESS + ", "
+                    + CUSTOMER_DELIVERY + ", "
+                    + CUSTOMER_BILLINGADDRESS + ", "
+                    + CUSTOMER_CONTACT + ", "
+                    + CUSTOMER_TEL + ", "
+                    + CUSTOMER_FAX + ", "
+                    + CUSTOMER_EMAIL + ", "
+                    + CUSTOMER_COMMENTS + ", "
                     + CUSTOMER_PROFORMA + " "
                     + "FROM " + CUSTOMERS_TABLE + " ";
             if (!fieldNumber.getText().isEmpty())
@@ -268,9 +269,9 @@ public class Customers extends javax.swing.JInternalFrame
             getContentPane().repaint();
             btnEdit.setEnabled(false);
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(Customers.this, e.getMessage());
+            MayfairStatic.outputMessage(this, ex);
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
@@ -282,9 +283,16 @@ public class Customers extends javax.swing.JInternalFrame
     }//GEN-LAST:event_tableMouseClicked
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        CustomerInfo editCust = new CustomerInfo(Integer.valueOf(fieldNumber.getText()));
-        desktop.add(editCust);
-        editCust.show();
+        try
+        {
+            CustomerInfo jFrame = new CustomerInfo(Integer.valueOf(fieldNumber.getText()));
+            desktop.add(jFrame);
+            jFrame.show();
+        }
+        catch (NumberFormatException ex)
+        {
+            MayfairStatic.outputMessage(this, ex);
+        }
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
@@ -294,9 +302,9 @@ public class Customers extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        CustomerInfo addCust = new CustomerInfo();
-        desktop.add(addCust);
-        addCust.show();
+        CustomerInfo jFrame = new CustomerInfo();
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnAddActionPerformed
 
 

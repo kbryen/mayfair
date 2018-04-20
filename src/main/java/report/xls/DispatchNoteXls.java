@@ -158,6 +158,6 @@ public class DispatchNoteXls extends XlsReport
 
     public String getFilename()
     {
-        return outputDir + ord_num + " - " + cust_reference + " " + del_date.replace('/', '-') + ".xls";
+        return outputDir + ord_num + " - " + cust_reference + " " + del_date.replace('/', '-') + EXTENSION;
     }
 }

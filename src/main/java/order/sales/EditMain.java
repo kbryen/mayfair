@@ -13,8 +13,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
@@ -384,6 +382,7 @@ public class EditMain extends javax.swing.JInternalFrame
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         EditAddProduct addProd = new EditAddProduct(desktop, orderNum);
         desktop.add(addProd);
+        MayfairStatic.setMaximum(addProd);
         addProd.show();
         this.dispose();
     }//GEN-LAST:event_btnAddActionPerformed

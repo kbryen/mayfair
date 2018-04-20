@@ -22,7 +22,7 @@ import main.java.Main;
  *
  * @author kian_bryen
  */
-public class EditAddProduct extends javax.swing.JInternalFrame
+public class EditPurchaseOrderStep2 extends javax.swing.JInternalFrame
 {
 
     private final Database db = new Database();
@@ -30,7 +30,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
     private final String orderNum;
     private final JDesktopPane desktop;
 
-    public EditAddProduct(String num, JDesktopPane pane)
+    public EditPurchaseOrderStep2(String num, JDesktopPane pane)
     {
         initComponents();
         this.orderNum = num;
@@ -118,8 +118,6 @@ public class EditAddProduct extends javax.swing.JInternalFrame
             }
         });
         table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.setCellSelectionEnabled(false);
-        table.setRowSelectionAllowed(true);
         table.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent evt)
@@ -236,7 +234,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
         }
         catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(EditAddProduct.this, e.getMessage());
+            JOptionPane.showMessageDialog(EditPurchaseOrderStep2.this, e.getMessage());
         }
         finally
         {
@@ -293,20 +291,20 @@ public class EditAddProduct extends javax.swing.JInternalFrame
                     statement2.executeUpdate(sql);
                     db.writeToLog(sql);
 
-                    JOptionPane.showMessageDialog(EditAddProduct.this, "Product added");
-                    EditMain editMain = new EditMain(orderNum, desktop);
+                    JOptionPane.showMessageDialog(EditPurchaseOrderStep2.this, "Product added");
+                    EditPurchaseOrderStep1 editMain = new EditPurchaseOrderStep1(orderNum, desktop);
                     desktop.add(editMain);
                     editMain.show();
                     this.dispose();
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(EditAddProduct.this, "Quantity must be greater than 0");
+                    JOptionPane.showMessageDialog(EditPurchaseOrderStep2.this, "Quantity must be greater than 0");
                 }
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(EditAddProduct.this, e.getMessage());
+                JOptionPane.showMessageDialog(EditPurchaseOrderStep2.this, e.getMessage());
             }
             finally
             {
@@ -320,7 +318,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
         }
         catch (NumberFormatException | HeadlessException e)
         {
-            JOptionPane.showMessageDialog(EditAddProduct.this, "Please enter a valid quantity");
+            JOptionPane.showMessageDialog(EditPurchaseOrderStep2.this, "Please enter a valid quantity");
         }
     }//GEN-LAST:event_btnAddActionPerformed
 

@@ -16,6 +16,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
+import main.java.MayfairStatic;
 
 /**
  *
@@ -453,6 +454,7 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
                                 JOptionPane.showMessageDialog(PickPurchaseOrders.this, "Product added");
                                 AddProduct addProducts = new AddProduct(desktop, salesOrderNum, numOfProducts + 1);
                                 desktop.add(addProducts);
+                                MayfairStatic.setMaximum(addProducts);
                                 addProducts.show();
                                 this.dispose();
                             }
@@ -521,6 +523,7 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
             
             AddProduct addProducts = new AddProduct(desktop, salesOrderNum, total + 1);
             desktop.add(addProducts);
+            MayfairStatic.setMaximum(addProducts);
             addProducts.show();
             this.dispose();
         }

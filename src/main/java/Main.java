@@ -4,10 +4,16 @@
  */
 package main.java;
 
+import static java.awt.Frame.MAXIMIZED_BOTH;
+import javax.swing.JFrame;
 import main.java.product.Products;
 import main.java.customer.Customers;
-import main.java.order.sales.Current;
+import main.java.order.purchase.CurrentPurchaseOrders;
+import main.java.order.purchase.NewPurchaseOrderStep1;
+import main.java.order.purchase.PastPurchaseOrders;
+import main.java.order.sales.CurrentSalesOrders;
 import main.java.order.sales.CustomerNumber;
+import main.java.order.sales.PastSalesOrders;
 import main.java.reminders.Reminders;
 import main.java.report.Reports;
 
@@ -15,13 +21,12 @@ import main.java.report.Reports;
  *
  * @author kian_bryen
  */
-public class Main extends javax.swing.JFrame
+public class Main extends JFrame
 {
 
     public Main()
     {
         initComponents();
-        setExtendedState(javax.swing.JFrame.MAXIMIZED_BOTH);
     }
 
     /**
@@ -67,7 +72,9 @@ public class Main extends javax.swing.JFrame
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() ->
         {
-            new Main().setVisible(true);
+            Main main  = new Main();
+            main.setVisible(true);
+            main.setExtendedState(MAXIMIZED_BOTH);
         });
     }
 
@@ -306,70 +313,70 @@ public class Main extends javax.swing.JFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewSOActionPerformed
-        CustomerNumber salesOrder = new CustomerNumber(desktop);
-        desktop.add(salesOrder);
-        salesOrder.show();
+        CustomerNumber jFrame = new CustomerNumber(desktop);
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnNewSOActionPerformed
 
     private void btnCurrentSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCurrentSOActionPerformed
-        Current salesOrder = new Current(desktop);
-        desktop.add(salesOrder);
-        MayfairStatic.setMaximum(salesOrder);
-        salesOrder.show();
+        CurrentSalesOrders jFrame = new CurrentSalesOrders(desktop);
+        desktop.add(jFrame);
+        MayfairStatic.setMaximum(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnCurrentSOActionPerformed
 
     private void btnNewPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewPOActionPerformed
-        main.java.order.purchase.OrderNumber newPO = new main.java.order.purchase.OrderNumber(desktop);
-        desktop.add(newPO);
-        newPO.show();
+        NewPurchaseOrderStep1 jFrame = new NewPurchaseOrderStep1(desktop);
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnNewPOActionPerformed
 
     private void btnCurrentPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCurrentPOActionPerformed
-        main.java.order.purchase.Current purchaseOrder = new main.java.order.purchase.Current(desktop);
-        desktop.add(purchaseOrder);
-        MayfairStatic.setMaximum(purchaseOrder);
-        purchaseOrder.show();
+        CurrentPurchaseOrders jFrame = new CurrentPurchaseOrders(desktop);
+        desktop.add(jFrame);
+        MayfairStatic.setMaximum(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnCurrentPOActionPerformed
 
     private void btnProductsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnProductsActionPerformed
-        Products products = new Products(desktop);
-        desktop.add(products);
-        MayfairStatic.setMaximum(products);
-        products.show();
+        Products jFrame = new Products(desktop);
+        desktop.add(jFrame);
+        MayfairStatic.setMaximum(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnProductsActionPerformed
 
     private void btnCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomersActionPerformed
-        Customers customers = new Customers(desktop);
-        desktop.add(customers);
-        MayfairStatic.setMaximum(customers);
-        customers.show();
+        Customers jFrame = new Customers(desktop);
+        desktop.add(jFrame);
+        MayfairStatic.setMaximum(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnCustomersActionPerformed
 
     private void btnPastSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPastSOActionPerformed
-        main.java.order.sales.Past salesOrder = new main.java.order.sales.Past(desktop);
-        desktop.add(salesOrder);
-        MayfairStatic.setMaximum(salesOrder);
-        salesOrder.show();
+        PastSalesOrders jFrame = new PastSalesOrders(desktop);
+        desktop.add(jFrame);
+        MayfairStatic.setMaximum(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnPastSOActionPerformed
 
     private void btnPastPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPastPOActionPerformed
-        main.java.order.purchase.Past purchaseOrder = new main.java.order.purchase.Past(desktop);
-        desktop.add(purchaseOrder);
-        MayfairStatic.setMaximum(purchaseOrder);
-        purchaseOrder.show();
+        PastPurchaseOrders jFrame = new PastPurchaseOrders(desktop);
+        desktop.add(jFrame);
+        MayfairStatic.setMaximum(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnPastPOActionPerformed
 
     private void btnReportsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReportsActionPerformed
-        Reports reports = new Reports(desktop);
-        desktop.add(reports);
-        reports.show();
+        Reports jFrame = new Reports(desktop);
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnReportsActionPerformed
 
     private void btnRemindersActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnRemindersActionPerformed
     {//GEN-HEADEREND:event_btnRemindersActionPerformed
-        Reminders reminders = new Reminders(desktop);
-        desktop.add(reminders);
-        reminders.show();
+        Reminders jFrame = new Reminders(desktop);
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnRemindersActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

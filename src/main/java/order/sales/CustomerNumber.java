@@ -13,6 +13,7 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import main.java.Database;
+import main.java.MayfairStatic;
 
 /**
  *
@@ -204,7 +205,7 @@ public class CustomerNumber extends javax.swing.JInternalFrame
             {
                 customers.add(rs.getString("cust_num") + " - " + rs.getString("name"));
             }
-            
+
             comboFindCustomers.setVisible(true);
             comboFindCustomers.setModel(new javax.swing.DefaultComboBoxModel(customers.toArray()));
             btnNext.setEnabled(true);
@@ -216,24 +217,26 @@ public class CustomerNumber extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnFindActionPerformed
 
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
-        if (!fieldCustomerNumber.getText().equals(""))
+        if (!fieldCustomerNumber.getText().isEmpty())
         {
+            String cust_num = fieldCustomerNumber.getText();
             Connection con = db.getConnection();
             try
             {
                 Statement statement = con.createStatement();
                 db.writeToLog("CREATE NEW SALES ORDER");
-                sql = "INSERT INTO sales_order (cust_num) VALUES (" + fieldCustomerNumber.getText() + ")";
+                sql = "INSERT INTO sales_order (cust_num, total_units) VALUES (" + cust_num + ", 0)";
                 statement.executeUpdate(sql);
                 db.writeToLog(sql);
 
                 Statement statement2 = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = statement2.executeQuery("SELECT ord_num FROM sales_order where cust_num = "+ fieldCustomerNumber.getText() +" ORDER BY ord_num DESC LIMIT 1");
-                rs.next();
+                ResultSet rs = statement2.executeQuery("SELECT ord_num FROM sales_order where cust_num = " + cust_num + " ORDER BY ord_num DESC LIMIT 1");
+
                 int orderNum = rs.getInt("ord_num");
 
                 AddProduct salesOrder = new AddProduct(desktop, orderNum, 1);
                 desktop.add(salesOrder);
+                MayfairStatic.setMaximum(salesOrder);
                 salesOrder.show();
                 this.dispose();
             }
@@ -248,7 +251,8 @@ public class CustomerNumber extends javax.swing.JInternalFrame
                     con.close();
                 }
                 catch (Exception e)
-                { /* ignored */ }
+                {
+                    /* ignored */ }
             }
         }
         else
@@ -265,16 +269,16 @@ public class CustomerNumber extends javax.swing.JInternalFrame
         String[] selected = ((String) comboFindCustomers.getSelectedItem()).split(" - ", 2);
         fieldCustomerNumber.setText(selected[0]);
         fieldCustomerName.setText(selected[1]);
-        
+
         try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             ResultSet rs = statement.executeQuery("SELECT proforma FROM customers WHERE cust_num = " + fieldCustomerNumber.getText());
             rs.next();
             boolean proforma = rs.getBoolean("proforma");
-            
-            if(proforma)
+
+            if (proforma)
             {
-                JOptionPane.showMessageDialog(CustomerNumber.this, "<html><b>WARNING:</b> " + fieldCustomerName.getText() + " is a pro forma.</html>\nDo not send stock before the pro forma invoice is sent.","Pro Forma Alert",WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(CustomerNumber.this, "<html><b>WARNING:</b> " + fieldCustomerName.getText() + " is a pro forma.</html>\nDo not send stock before the pro forma invoice is sent.", "Pro Forma Alert", WARNING_MESSAGE);
             }
         }
         catch (SQLException e)

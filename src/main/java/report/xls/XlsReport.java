@@ -32,9 +32,10 @@ public abstract class XlsReport
 {
 
     private final HSSFWorkbook workBook;
+    public static final String EXTENSION = ".xls";
     private Component loggingComponent;
     private String reportName = "Report";
-
+    
     private final Map<String, HSSFCellStyle> styles = new HashMap();
     public static final String BOLD = "bold";
     public static final String ITALIC = "italic";
@@ -186,12 +187,12 @@ public abstract class XlsReport
             workBook.write(fileOut);
             fileOut.flush();
             fileOut.close();
-            MayfairStatic.outputMessage(loggingComponent, "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + filename + " </i>", reportName + " Created", INFORMATION_MESSAGE);
+            MayfairStatic.outputMessage(loggingComponent, reportName + " Created", "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + filename + " </i>", INFORMATION_MESSAGE);
         }
         catch (IOException e)
         {
-            MayfairStatic.outputMessage(loggingComponent, "<html> Error while creating " + reportName + ", please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-            MayfairStatic.outputMessage(loggingComponent, e.getLocalizedMessage(), "Message for Kian", ERROR_MESSAGE);
+            MayfairStatic.outputMessage(loggingComponent, "Error", "<html> Error while creating " + reportName + ", please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", ERROR_MESSAGE);
+            MayfairStatic.outputMessage(loggingComponent, "Message for Kian", e.getLocalizedMessage(), ERROR_MESSAGE);
         }
     }
 

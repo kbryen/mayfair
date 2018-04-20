@@ -9,7 +9,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
-import main.java.Database;
 import main.java.MayfairStatic;
 import static main.java.MayfairStatic.CUSTOMERS_TABLE;
 import static main.java.MayfairStatic.CUSTOMER_BILLINGADDRESS;
@@ -32,23 +31,25 @@ import static main.java.MayfairStatic.CUSTOMER_TEL;
  */
 public class CustomerInfo extends javax.swing.JInternalFrame
 {
-
-    private final Database db = new Database();
     private final String type;
     private int custNum = 0;
 
     public CustomerInfo(int cust_num)
     {
+        setUpGUI();
         this.custNum = cust_num;
         this.type = "Edit";
-        initComponents();
-        enableBillingAddress(false);
         populateLables();
     }
 
     public CustomerInfo()
     {
+        setUpGUI();
         this.type = "Add";
+    }
+
+    private void setUpGUI()
+    {
         initComponents();
         enableBillingAddress(false);
     }
@@ -406,7 +407,7 @@ public class CustomerInfo extends javax.swing.JInternalFrame
 
     private void populateLables()
     {
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             ResultSet rs = statement.executeQuery("SELECT * "
                     + "FROM " + CUSTOMERS_TABLE + " "
@@ -499,7 +500,7 @@ public class CustomerInfo extends javax.swing.JInternalFrame
         {
             if ((differentBillingAddress.isSelected() && !fieldBAdd1.getText().isEmpty() && !fieldBCounty.getText().isEmpty() && !fieldBPostCode.getText().isEmpty()) || !differentBillingAddress.isSelected())
             {
-                try (Statement statement = db.getConnection().createStatement())
+                try (Statement statement = MayfairStatic.getConnection().createStatement())
                 {
                     StringBuilder delAddress = new StringBuilder();
                     addToAddress(delAddress, fieldAdd1.getText());
@@ -525,7 +526,7 @@ public class CustomerInfo extends javax.swing.JInternalFrame
                     switch (type)
                     {
                         case "Add":
-                            db.writeToLog("ADD CUSTOMER");
+                            MayfairStatic.writeToLog("ADD CUSTOMER");
                             sql = "INSERT INTO " + CUSTOMERS_TABLE + " ("
                                     + CUSTOMER_REFERENCE + ", "
                                     + CUSTOMER_NAME + ", "
@@ -555,7 +556,7 @@ public class CustomerInfo extends javax.swing.JInternalFrame
                             MayfairStatic.outputMessage(this, "Success", "Customer Added", INFORMATION_MESSAGE);
                             break;
                         case "Edit":
-                            db.writeToLog("EDIT CUSTOMER");
+                            MayfairStatic.writeToLog("EDIT CUSTOMER");
                             sql = "UPDATE " + CUSTOMERS_TABLE + " "
                                     + "SET " + CUSTOMER_REFERENCE + " = '" + fieldReference.getText() + "', "
                                     + CUSTOMER_NAME + " = '" + fieldName.getText() + "', "
@@ -575,8 +576,8 @@ public class CustomerInfo extends javax.swing.JInternalFrame
                     }
 
                     statement.executeUpdate(sql);
-                    db.writeToLog(sql);
-                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
+                    MayfairStatic.writeToLog(sql);
+                    MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
                     this.dispose();
                 }
                 catch (SQLException e)

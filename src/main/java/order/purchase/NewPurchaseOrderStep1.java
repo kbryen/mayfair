@@ -4,33 +4,28 @@
  */
 package main.java.order.purchase;
 
-import java.awt.HeadlessException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
-import main.java.Database;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.PO_ORDNUM;
+import static main.java.MayfairStatic.PO_SUPPNUM;
+import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
 
 /**
  *
  * @author kian_bryen
  */
-public class OrderNumber extends javax.swing.JInternalFrame
+public class NewPurchaseOrderStep1 extends javax.swing.JInternalFrame
 {
 
     private final JDesktopPane desktop;
-    private final Database db = new Database();
-    private String sql;
 
-    /**
-     * Creates new form NewPurchaseOrder
-     *
-     * @param pane Desktop Pane
-     */
-    public OrderNumber(JDesktopPane pane)
+    public NewPurchaseOrderStep1(JDesktopPane desktop)
     {
         initComponents();
-        desktop = pane;
+        this.desktop = desktop;
     }
 
     /**
@@ -55,17 +50,9 @@ public class OrderNumber extends javax.swing.JInternalFrame
         setTitle("New Purchase Order");
 
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
-        jLabel1.setText("New Order");
+        jLabel1.setText("New Purchase Order");
 
         jLabel3.setText("Enter Order Number");
-
-        fieldOrderNumber.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                fieldOrderNumberActionPerformed(evt);
-            }
-        });
 
         btnNext.setText("Next");
         btnNext.addActionListener(new java.awt.event.ActionListener()
@@ -87,7 +74,7 @@ public class OrderNumber extends javax.swing.JInternalFrame
                     .addComponent(jSeparator2, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
-                        .addGap(0, 62, Short.MAX_VALUE))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -118,37 +105,32 @@ public class OrderNumber extends javax.swing.JInternalFrame
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void fieldOrderNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldOrderNumberActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fieldOrderNumberActionPerformed
-
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
-        try
+        String ord_num = fieldOrderNumber.getText();
+        try (Statement statement = MayfairStatic.getConnection().createStatement())
         {
-            String orderNum = fieldOrderNumber.getText();
-            try (Statement statement = db.getConnection().createStatement())
-            {
-                db.writeToLog("CREATE NEW PURCHASE ORDER");
-                sql = "INSERT INTO purchase_order (ord_num, supp_num) VALUES ('" + orderNum + "', 1)";
-                statement.executeUpdate(sql);
-                db.writeToLog(sql);
+            MayfairStatic.writeToLog("CREATE NEW PURCHASE ORDER");
+            String sql = "INSERT INTO " + PURCHASE_ORDER_TABLE + " "
+                    + "(" + PO_ORDNUM + ", " + PO_SUPPNUM + ") "
+                    + "VALUES ('" + ord_num + "', 1)";
+            statement.executeUpdate(sql);
+            MayfairStatic.writeToLog(sql);
 
-                Products addProducts = new Products(desktop, orderNum, 1);
-                desktop.add(addProducts);
-                addProducts.show();
-                this.dispose();
-            }
-            catch (SQLException e)
-            {
-                if (e.getMessage().contains("Duplicate"))
-                {
-                    JOptionPane.showMessageDialog(OrderNumber.this, "Order number already in use");
-                }
-            }
+            NewPurchaseOrderStep2 jFrame = new NewPurchaseOrderStep2(desktop, ord_num, 1);
+            desktop.add(jFrame);
+            jFrame.show();
+            this.dispose();
         }
-        catch (NumberFormatException | HeadlessException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(OrderNumber.this, "Please enter a valid order number");
+            if (ex.getMessage().contains("Duplicate"))
+            {
+                MayfairStatic.outputMessage(this, "Duplicate Order Number", "Order number already in use.", WARNING_MESSAGE);
+            }
+            else
+            {
+                MayfairStatic.outputMessage(this, ex);
+            }
         }
     }//GEN-LAST:event_btnNextActionPerformed
 

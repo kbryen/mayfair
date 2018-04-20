@@ -5,7 +5,6 @@
 package main.java.order.sales;
 
 import java.awt.HeadlessException;
-import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,14 +12,11 @@ import java.sql.Statement;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import main.java.Main;
 import main.java.MayfairStatic;
 
 /**
@@ -89,7 +85,7 @@ public class AddProduct extends javax.swing.JInternalFrame
             labelTotalUnits.setText(String.valueOf(quantity));
 
             Statement statement2 = con.createStatement();
-            statement2.executeUpdate("UPDATE sales_order SET price = " + price + " WHERE ord_num = " + orderNum);
+            statement2.executeUpdate("UPDATE sales_order SET price = " + price + ", total_units = " + quantity + " WHERE ord_num = " + orderNum);
 
             rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity, products.sales_price, sales_order_details.price FROM sales_order_details INNER JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + orderNum);
             while (table2.getRowCount() > 0)
@@ -558,16 +554,6 @@ public class AddProduct extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnFinishActionPerformed
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        try
-        {
-            this.setMaximum(true);
-
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(Main.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
         Connection con = db.getConnection();
         try
         {

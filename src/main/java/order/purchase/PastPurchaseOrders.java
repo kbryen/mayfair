@@ -4,37 +4,47 @@
  */
 package main.java.order.purchase;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
-import main.java.Database;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.PO_DELDATE;
+import static main.java.MayfairStatic.PO_DELIVERED;
+import static main.java.MayfairStatic.PO_ORDDATE;
+import static main.java.MayfairStatic.PO_ORDNUM;
+import static main.java.MayfairStatic.PO_PRICE;
+import static main.java.MayfairStatic.PO_SUPPNUM;
+import static main.java.MayfairStatic.PO_TOTALUNITS;
+import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
+import static main.java.MayfairStatic.SUPPLIERS_TABLE;
+import static main.java.MayfairStatic.SUPPLIER_NAME;
+import static main.java.MayfairStatic.SUPPLIER_SUPPNUM;
 
 /**
  *
  * @author kian_bryen
  */
-public class Past extends javax.swing.JInternalFrame
+public class PastPurchaseOrders extends javax.swing.JInternalFrame
 {
 
     private final JDesktopPane desktop;
-    private final Database db = new Database();
-    private String sql;
 
-    public Past(JDesktopPane desktop)
+    public PastPurchaseOrders(JDesktopPane desktop)
+    {
+        setUpGUI();
+        this.desktop = desktop;
+        btnFindActionPerformed(null);
+    }
+
+    private void setUpGUI()
     {
         initComponents();
-        this.desktop = desktop;
-        scrollPane.setVisible(false);
-        btnViewSummary.setEnabled(false);
-        labelName.setVisible(false);
-        fieldName.setVisible(false);
-        labelOR.setVisible(false);
-        btnFindActionPerformed(null);
         table.setAutoCreateRowSorter(true);
+        MayfairStatic.addDateSorter(table, new int[]
+        {
+            2, 3
+        });
     }
 
     /**
@@ -57,7 +67,7 @@ public class Past extends javax.swing.JInternalFrame
         scrollPane = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
         jSeparator1 = new javax.swing.JSeparator();
-        jLabel3 = new javax.swing.JLabel();
+        labelNumber = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         btnClear = new javax.swing.JButton();
 
@@ -93,37 +103,29 @@ public class Past extends javax.swing.JInternalFrame
             }
         });
 
-        fieldOrderNumber.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                fieldOrderNumberActionPerformed(evt);
-            }
-        });
-
         scrollPane.setBorder(null);
 
         table.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
             {
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null},
-                {null, null, null, null, null}
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null},
+                {null, null, null, null, null, null}
             },
             new String []
             {
-                "Number", "Supplier", "Order Date", "Delivered", "Total (£)"
+                "Number", "Supplier", "Order Date", "Delivered", "Total Units", "Total (£)"
             }
         )
         {
             Class[] types = new Class []
             {
-                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Float.class
+                java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.Integer.class, java.lang.Float.class
             };
             boolean[] canEdit = new boolean []
             {
-                false, false, false, false, false
+                false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex)
@@ -136,8 +138,7 @@ public class Past extends javax.swing.JInternalFrame
                 return canEdit [columnIndex];
             }
         });
-        table.setCellSelectionEnabled(false);
-        table.setRowSelectionAllowed(true);
+        table.setColumnSelectionAllowed(true);
         table.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent evt)
@@ -148,7 +149,7 @@ public class Past extends javax.swing.JInternalFrame
         scrollPane.setViewportView(table);
         table.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 
-        jLabel3.setText("Order Number");
+        labelNumber.setText("Order Number");
 
         btnClear.setText("Clear");
         btnClear.addActionListener(new java.awt.event.ActionListener()
@@ -178,7 +179,7 @@ public class Past extends javax.swing.JInternalFrame
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                     .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(jLabel3)
+                                        .addComponent(labelNumber)
                                         .addGap(18, 18, 18)
                                         .addComponent(fieldOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 198, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -203,7 +204,7 @@ public class Past extends javax.swing.JInternalFrame
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
+                    .addComponent(labelNumber)
                     .addComponent(fieldOrderNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(labelOR)
                     .addComponent(labelName)
@@ -223,69 +224,45 @@ public class Past extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnViewSummaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewSummaryActionPerformed
-
-        ViewPurchaseSummary purchaseOrder = new ViewPurchaseSummary(fieldOrderNumber.getText());
-        desktop.add(purchaseOrder);
-        purchaseOrder.show();
-
+        ViewPurchaseOrderSummary jFrame = new ViewPurchaseOrderSummary(fieldOrderNumber.getText());
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnViewSummaryActionPerformed
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        Connection con = db.getConnection();
-        try
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs;
-            if (!fieldOrderNumber.getText().equals(""))
+            String sql = "SELECT " + PO_ORDNUM + ", "
+                    + SUPPLIER_NAME + ", "
+                    + MayfairStatic.sqlDateFormat(PO_ORDDATE) + ", "
+                    + MayfairStatic.sqlDateFormat(PO_DELDATE) + ", "
+                    + PO_TOTALUNITS + ", "
+                    + PO_PRICE + " "
+                    + "FROM " + PURCHASE_ORDER_TABLE + " "
+                    + "JOIN " + SUPPLIERS_TABLE + " "
+                    + "ON " + PO_SUPPNUM + "=" + SUPPLIER_SUPPNUM + " "
+                    + "WHERE " + PO_DELIVERED + " = true ";
+            if (fieldOrderNumber.getText().isEmpty())
             {
-                rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(purchase_order.del_date,'%d/%m/%Y %a'), purchase_order.price FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE purchase_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = true ORDER BY purchase_order.del_date DESC");
+                sql += "AND " + SUPPLIER_NAME + " LIKE '%" + fieldName.getText() + "%' ";
             }
             else
             {
-                rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(purchase_order.del_date,'%d/%m/%Y %a'), purchase_order.price FROM purchase_order INNER JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num WHERE suppliers.name LIKE '%" + fieldName.getText() + "%' and delivered = true ORDER BY purchase_order.del_date DESC");
+                sql += "AND " + PO_ORDNUM + " LIKE '%" + fieldOrderNumber.getText() + "%' ";
             }
-
-            scrollPane.setVisible(true);
-            getContentPane().validate();
-            getContentPane().repaint();
-            while (table.getRowCount() > 0)
-            {
-                ((DefaultTableModel) table.getModel()).removeRow(0);
-            }
-            int columns = rs.getMetaData().getColumnCount();
-            while (rs.next())
-            {
-                Object[] row = new Object[columns];
-                for (int i = 1; i <= columns; i++)
-                {
-                    row[i - 1] = rs.getObject(i);
-                }
-                ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
-            }
-
+            sql += "ORDER BY " + PO_DELDATE + " DESC";
+            MayfairStatic.fillTable(table, statement.executeQuery(sql));
+            btnViewSummary.setEnabled(false);
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(Past.this, e.getMessage());
-        }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
+            MayfairStatic.outputMessage(this, ex);
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
-    private void fieldOrderNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldOrderNumberActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fieldOrderNumberActionPerformed
-
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
-        fieldOrderNumber.setText((String) table.getValueAt(table.getSelectedRow(), 0));
-        fieldName.setText((String) table.getValueAt(table.getSelectedRow(), 1));
+        fieldOrderNumber.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 0)));
+        fieldName.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 1)));
         btnViewSummary.setEnabled(true);
     }//GEN-LAST:event_tableMouseClicked
 
@@ -294,7 +271,6 @@ public class Past extends javax.swing.JInternalFrame
         fieldOrderNumber.setText("");
     }//GEN-LAST:event_btnClearActionPerformed
 
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnFind;
@@ -302,10 +278,10 @@ public class Past extends javax.swing.JInternalFrame
     private javax.swing.JTextField fieldName;
     private javax.swing.JTextField fieldOrderNumber;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel labelName;
+    private javax.swing.JLabel labelNumber;
     private javax.swing.JLabel labelOR;
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.JTable table;

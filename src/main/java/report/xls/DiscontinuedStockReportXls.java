@@ -20,16 +20,15 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
  *
  * @author kian_bryen
  */
-public class AvailableStockReportXls extends XlsReport
+public class DiscontinuedStockReportXls extends XlsReport
 {
 
     private final String outputDir = STOCK_REPORTS_DIR;
     private final String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
 
-    private Map<String, Map<String, Integer>> productCounts = new HashMap();
-    private List<String> purchaseOrders = new ArrayList();
+    private Map<String, Integer> products = new HashMap();
 
-    public AvailableStockReportXls()
+    public DiscontinuedStockReportXls()
     {
         super(new HSSFWorkbook());
     }
@@ -56,19 +55,8 @@ public class AvailableStockReportXls extends XlsReport
         cell.setCellValue("In Stock");
         cell.setCellStyle(getStyle(BOLD));
 
-        for (String purchaseOrder : purchaseOrders)
-        {
-            cell = row.createCell(cellCount++);
-            cell.setCellValue(purchaseOrder);
-            cell.setCellStyle(getStyle(BOLD));
-        }
-
-        cell = row.createCell(cellCount);
-        cell.setCellValue("Total Units");
-        cell.setCellStyle(getStyle(BOLD));
-
         // Products
-        for (Map.Entry<String, Map<String, Integer>> product : productCounts.entrySet())
+        for (Map.Entry<String, Integer> product : products.entrySet())
         {
             row = sheet.createRow(rowCount++);
             
@@ -77,16 +65,7 @@ public class AvailableStockReportXls extends XlsReport
             cell.setCellValue(product.getKey());
             
             cell = row.createCell(cellCount++);
-            cell.setCellValue(product.getValue().get("In Stock"));
-            
-            for (String purchaseOrder : purchaseOrders)
-            {
-                cell = row.createCell(cellCount++);
-                cell.setCellValue(product.getValue().get(purchaseOrder));
-            }
-            
-            cell = row.createCell(cellCount++);
-            cell.setCellValue(product.getValue().get("Total"));
+            cell.setCellValue(product.getValue());
         }
         
         autoSizeColumns(sheet, cellCount);
@@ -97,13 +76,9 @@ public class AvailableStockReportXls extends XlsReport
         return outputDir + getReportName() + " " + date + EXTENSION;
     }
 
-    public void setProductCounts(Map<String, Map<String, Integer>> productCounts)
+    public void setProducts(Map<String, Integer> products)
     {
-        this.productCounts = productCounts;
+        this.products = products;
     }
 
-    public void setPurchaseOrders(List<String> purchaseOrders)
-    {
-        this.purchaseOrders = purchaseOrders;
-    }
 }

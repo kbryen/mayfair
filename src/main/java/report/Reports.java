@@ -42,6 +42,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import static org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD;
 import static main.java.MayfairStatic.WHS_REPORT_TEMPLATE;
+import main.java.report.xls.DiscontinuedStockReportXls;
 import main.java.report.xls.XlsReport;
 
 /**
@@ -86,7 +87,8 @@ public class Reports extends javax.swing.JInternalFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         jLabel1 = new javax.swing.JLabel();
@@ -127,6 +129,7 @@ public class Reports extends javax.swing.JInternalFrame
         comboCustomers = new javax.swing.JComboBox();
         labelReference = new javax.swing.JTextField();
         jLabel11 = new javax.swing.JLabel();
+        btnDiscontinuedStockReport = new javax.swing.JRadioButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -142,36 +145,46 @@ public class Reports extends javax.swing.JInternalFrame
         jLabel4.setText("Products");
 
         btnAvailableStockReport.setText("Available Stock");
-        btnAvailableStockReport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnAvailableStockReport.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnAvailableStockReportActionPerformed(evt);
             }
         });
 
         btnOutOfStockReport.setText("Out of Stock");
-        btnOutOfStockReport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnOutOfStockReport.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnOutOfStockReportActionPerformed(evt);
             }
         });
 
         btnSOMadeProd.setText("Sales orders made");
-        btnSOMadeProd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnSOMadeProd.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnSOMadeProdActionPerformed(evt);
             }
         });
 
         btnPOMadeDate.setText("Purchase orders made");
-        btnPOMadeDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnPOMadeDate.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnPOMadeDateActionPerformed(evt);
             }
         });
 
         btnSOMadeDate.setText("Sales orders made");
-        btnSOMadeDate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnSOMadeDate.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnSOMadeDateActionPerformed(evt);
             }
         });
@@ -183,8 +196,10 @@ public class Reports extends javax.swing.JInternalFrame
         jLabel7.setText("End Date");
 
         btnFindProd.setText("Find");
-        btnFindProd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnFindProd.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnFindProdActionPerformed(evt);
             }
         });
@@ -193,8 +208,10 @@ public class Reports extends javax.swing.JInternalFrame
         jLabel8.setText("Product Search");
 
         comboProducts.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        comboProducts.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        comboProducts.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 comboProductsActionPerformed(evt);
             }
         });
@@ -203,22 +220,28 @@ public class Reports extends javax.swing.JInternalFrame
         jLabel5.setText("Customers");
 
         btnAllCustomers.setText("All customers");
-        btnAllCustomers.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnAllCustomers.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnAllCustomersActionPerformed(evt);
             }
         });
 
         btnCreate.setText("Create");
-        btnCreate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnCreate.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCreateActionPerformed(evt);
             }
         });
 
         btnWarehouseStockReport.setText("Warehouse Stock");
-        btnWarehouseStockReport.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnWarehouseStockReport.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnWarehouseStockReportActionPerformed(evt);
             }
         });
@@ -231,35 +254,52 @@ public class Reports extends javax.swing.JInternalFrame
 
         checkAll.setFont(new java.awt.Font("Lucida Grande", 2, 12)); // NOI18N
         checkAll.setText("All Dates");
-        checkAll.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        checkAll.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 checkAllActionPerformed(evt);
             }
         });
 
         btnCustomers.setText("Specific customers");
-        btnCustomers.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnCustomers.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCustomersActionPerformed(evt);
             }
         });
 
         btnFindCust.setText("Find");
-        btnFindCust.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnFindCust.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnFindCustActionPerformed(evt);
             }
         });
 
         comboCustomers.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
-        comboCustomers.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        comboCustomers.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 comboCustomersActionPerformed(evt);
             }
         });
 
         jLabel11.setFont(new java.awt.Font("Lucida Grande", 2, 10)); // NOI18N
         jLabel11.setText("Customer Reference Search");
+
+        btnDiscontinuedStockReport.setText("Discontinued Stock");
+        btnDiscontinuedStockReport.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnDiscontinuedStockReportActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -306,7 +346,10 @@ public class Reports extends javax.swing.JInternalFrame
                             .addComponent(jSeparator3, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(btnWarehouseStockReport)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(btnWarehouseStockReport)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(btnDiscontinuedStockReport))
                                     .addComponent(btnOutOfStockReport)
                                     .addGroup(layout.createSequentialGroup()
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -341,7 +384,7 @@ public class Reports extends javax.swing.JInternalFrame
                                     .addComponent(jLabel4)
                                     .addComponent(btnAvailableStockReport)
                                     .addComponent(jLabel1))
-                                .addGap(0, 0, Short.MAX_VALUE))
+                                .addGap(0, 162, Short.MAX_VALUE))
                             .addComponent(jSeparator7, javax.swing.GroupLayout.Alignment.TRAILING))
                         .addContainerGap())))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -363,7 +406,9 @@ public class Reports extends javax.swing.JInternalFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnAvailableStockReport)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnWarehouseStockReport)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnWarehouseStockReport)
+                    .addComponent(btnDiscontinuedStockReport))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnOutOfStockReport)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -417,20 +462,50 @@ public class Reports extends javax.swing.JInternalFrame
                             .addComponent(jLabel10))
                         .addGap(4, 4, 4)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(checkAll)
-                                .addGap(3, 3, 3))
+                            .addComponent(checkAll)
                             .addComponent(dateSR, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(dateER, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 20, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 130, Short.MAX_VALUE)
                 .addComponent(btnCreate)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void createDiscontinuedStockReport()
+    {
+        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a discontinued stock report?", "Discontinued Stock Report", JOptionPane.YES_NO_OPTION);
+        if (selectedOption == JOptionPane.YES_OPTION)
+        {
+            Map<String, Integer> products = new HashMap();
+            try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+            {
+                // Get a list of all discontinued products
+                ResultSet rs = statement.executeQuery("SELECT code, in_stock "
+                        + "FROM products WHERE discon = true");
+                while (rs.next())
+                {
+                    String code = rs.getString("code");
+                    int in_stock = rs.getInt("in_stock");
+                    products.put(code, in_stock);
+                }
+            }
+            catch (SQLException e)
+            {
+                JOptionPane.showMessageDialog(Reports.this, e);
+            }
+
+            DiscontinuedStockReportXls stockReport = new DiscontinuedStockReportXls();
+            stockReport.setLoggingComponent(this);
+            stockReport.setReportName("Discontinued Stock Report");
+            stockReport.setProducts(products);
+            stockReport.populateWorkbook();
+            stockReport.save(stockReport.getFilename());
+        }
+    }
 
     private void createAvailableStockReport()
     {
@@ -1138,6 +1213,10 @@ public class Reports extends javax.swing.JInternalFrame
         {
             createOutOfStockReport();
         }
+        if (btnDiscontinuedStockReport.isSelected())
+        {
+            createDiscontinuedStockReport();
+        }
         if (btnPOMadeDate.isSelected())
         {
             if (dateSPO.getDate() == null || dateEPO.getDate() == null)
@@ -1205,6 +1284,7 @@ public class Reports extends javax.swing.JInternalFrame
     private void btnAvailableStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvailableStockReportActionPerformed
         btnAvailableStockReport.setSelected(true);
         btnWarehouseStockReport.setSelected(false);
+        btnDiscontinuedStockReport.setSelected(false);
         btnOutOfStockReport.setSelected(false);
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(false);
@@ -1236,6 +1316,7 @@ public class Reports extends javax.swing.JInternalFrame
     private void btnWarehouseStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWarehouseStockReportActionPerformed
         btnAvailableStockReport.setSelected(false);
         btnWarehouseStockReport.setSelected(true);
+        btnDiscontinuedStockReport.setSelected(false);
         btnOutOfStockReport.setSelected(false);
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(false);
@@ -1267,6 +1348,7 @@ public class Reports extends javax.swing.JInternalFrame
     private void btnOutOfStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOutOfStockReportActionPerformed
         btnAvailableStockReport.setSelected(false);
         btnWarehouseStockReport.setSelected(false);
+        btnDiscontinuedStockReport.setSelected(false);
         btnOutOfStockReport.setSelected(true);
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(false);
@@ -1298,6 +1380,7 @@ public class Reports extends javax.swing.JInternalFrame
     private void btnPOMadeDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPOMadeDateActionPerformed
         btnAvailableStockReport.setSelected(false);
         btnWarehouseStockReport.setSelected(false);
+        btnDiscontinuedStockReport.setSelected(false);
         btnOutOfStockReport.setSelected(false);
         btnPOMadeDate.setSelected(true);
         btnSOMadeDate.setSelected(false);
@@ -1329,6 +1412,7 @@ public class Reports extends javax.swing.JInternalFrame
     private void btnSOMadeDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSOMadeDateActionPerformed
         btnAvailableStockReport.setSelected(false);
         btnWarehouseStockReport.setSelected(false);
+        btnDiscontinuedStockReport.setSelected(false);
         btnOutOfStockReport.setSelected(false);
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(true);
@@ -1360,6 +1444,7 @@ public class Reports extends javax.swing.JInternalFrame
     private void btnSOMadeProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSOMadeProdActionPerformed
         btnAvailableStockReport.setSelected(false);
         btnWarehouseStockReport.setSelected(false);
+        btnDiscontinuedStockReport.setSelected(false);
         btnOutOfStockReport.setSelected(false);
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(false);
@@ -1415,6 +1500,7 @@ public class Reports extends javax.swing.JInternalFrame
     private void btnAllCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAllCustomersActionPerformed
         btnAvailableStockReport.setSelected(false);
         btnWarehouseStockReport.setSelected(false);
+        btnDiscontinuedStockReport.setSelected(false);
         btnOutOfStockReport.setSelected(false);
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(false);
@@ -1462,6 +1548,7 @@ public class Reports extends javax.swing.JInternalFrame
     private void btnCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomersActionPerformed
         btnAvailableStockReport.setSelected(false);
         btnWarehouseStockReport.setSelected(false);
+        btnDiscontinuedStockReport.setSelected(false);
         btnOutOfStockReport.setSelected(false);
         btnPOMadeDate.setSelected(false);
         btnSOMadeDate.setSelected(false);
@@ -1516,12 +1603,46 @@ public class Reports extends javax.swing.JInternalFrame
         labelReference.setText((String) comboCustomers.getSelectedItem());
     }//GEN-LAST:event_comboCustomersActionPerformed
 
+    private void btnDiscontinuedStockReportActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnDiscontinuedStockReportActionPerformed
+    {//GEN-HEADEREND:event_btnDiscontinuedStockReportActionPerformed
+        btnAvailableStockReport.setSelected(false);
+        btnWarehouseStockReport.setSelected(false);
+        btnDiscontinuedStockReport.setSelected(true);
+        btnOutOfStockReport.setSelected(false);
+        btnPOMadeDate.setSelected(false);
+        btnSOMadeDate.setSelected(false);
+        btnSOMadeProd.setSelected(false);
+        btnAllCustomers.setSelected(false);
+        btnCustomers.setSelected(false);
+
+        dateSPO.setEnabled(false);
+        dateEPO.setEnabled(false);
+
+        dateSSO.setEnabled(false);
+        dateESO.setEnabled(false);
+
+        labelProduct.setEnabled(false);
+        btnFindProd.setEnabled(false);
+        comboProducts.setEnabled(false);
+
+        dateSR.setEnabled(false);
+        dateER.setEnabled(false);
+        checkAll.setEnabled(false);
+
+        labelReference.setEnabled(false);
+        btnFindCust.setEnabled(false);
+        comboCustomers.setEnabled(false);
+
+        btnCreate.setEnabled(true);
+    }//GEN-LAST:event_btnDiscontinuedStockReportActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JRadioButton btnAllCustomers;
     private javax.swing.JRadioButton btnAvailableStockReport;
     private javax.swing.JButton btnCreate;
     private javax.swing.JRadioButton btnCustomers;
+    private javax.swing.JRadioButton btnDiscontinuedStockReport;
     private javax.swing.JButton btnFindCust;
     private javax.swing.JButton btnFindProd;
     private javax.swing.JRadioButton btnOutOfStockReport;

@@ -27,14 +27,14 @@ import org.apache.poi.ss.usermodel.CellStyle;
  *
  * @author kian_bryen
  */
-public class Past extends javax.swing.JInternalFrame
+public class PastSalesOrders extends javax.swing.JInternalFrame
 {
 
     private final JDesktopPane desktop;
     private final Database db = new Database();
     private String sql;
 
-    public Past(JDesktopPane pane)
+    public PastSalesOrders(JDesktopPane pane)
     {
         initComponents();
         this.setTitle("Past Sales Orders");
@@ -152,8 +152,6 @@ public class Past extends javax.swing.JInternalFrame
                 return canEdit [columnIndex];
             }
         });
-        table.setCellSelectionEnabled(false);
-        table.setRowSelectionAllowed(true);
         table.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent evt)
@@ -308,7 +306,7 @@ public class Past extends javax.swing.JInternalFrame
         }
         catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(Past.this, e.getMessage());
+            JOptionPane.showMessageDialog(PastSalesOrders.this, e.getMessage());
         }
         finally
         {
@@ -353,7 +351,7 @@ public class Past extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(Past.this, e.getMessage());
+                JOptionPane.showMessageDialog(PastSalesOrders.this, e.getMessage());
             }
             finally
             {
@@ -480,12 +478,12 @@ public class Past extends javax.swing.JInternalFrame
                 fileOut.flush();
                 fileOut.close();
 
-                JOptionPane.showMessageDialog(Past.this, "Excel Order Summary Created.\n'SALES ORDER - " + ord_num + ".xls'");
+                JOptionPane.showMessageDialog(PastSalesOrders.this, "Excel Order Summary Created.\n'SALES ORDER - " + ord_num + ".xls'");
             }
 
             catch (SQLException | IOException ex)
             {
-                Logger.getLogger(Current.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(CurrentSalesOrders.class.getName()).log(Level.SEVERE, null, ex);
             }
             finally
             {

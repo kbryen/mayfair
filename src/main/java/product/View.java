@@ -63,7 +63,7 @@ public class View extends javax.swing.JInternalFrame
             salesPrice = rs.getDouble(PRODUCT_SALESPRICE);
             purchasePrice = rs.getDouble(PRODUCT_PURCHASEPRICE);
             inStock = rs.getInt(PRODUCT_INSTOCK);
-            onOrder = rs.getInt(PRODUCT_ONORDER);
+            onOrder = rs.getInt(PRODUCT_INORDER);
             
             rs = statement.executeQuery("SELECT SUM(sales_order_details.fromStock) AS total FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.dispatched = false AND sales_order.delivered = false");
             rs.next();

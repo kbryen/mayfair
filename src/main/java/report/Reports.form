@@ -84,7 +84,11 @@
                           <Component id="jSeparator3" alignment="1" max="32767" attributes="0"/>
                           <Group type="102" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="btnWarehouseStockReport" min="-2" max="-2" attributes="0"/>
+                                  <Group type="102" attributes="0">
+                                      <Component id="btnWarehouseStockReport" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
+                                      <Component id="btnDiscontinuedStockReport" min="-2" max="-2" attributes="0"/>
+                                  </Group>
                                   <Component id="btnOutOfStockReport" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
@@ -130,7 +134,7 @@
                                   <Component id="btnAvailableStockReport" min="-2" max="-2" attributes="0"/>
                                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
                               </Group>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                              <EmptySpace min="0" pref="162" max="32767" attributes="0"/>
                           </Group>
                           <Component id="jSeparator7" alignment="1" max="32767" attributes="0"/>
                       </Group>
@@ -159,7 +163,10 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="btnAvailableStockReport" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="btnWarehouseStockReport" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="btnWarehouseStockReport" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnDiscontinuedStockReport" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="btnOutOfStockReport" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -228,7 +235,7 @@
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="jSeparator7" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="20" max="32767" attributes="0"/>
+              <EmptySpace pref="130" max="32767" attributes="0"/>
               <Component id="btnCreate" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -466,6 +473,14 @@
         </Property>
         <Property name="text" type="java.lang.String" value="Customer Reference Search"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JRadioButton" name="btnDiscontinuedStockReport">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Discontinued Stock"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnDiscontinuedStockReportActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>
