@@ -2,7 +2,7 @@
  * Mayfair Stock Control.
  *
  */
-package main.java.report.xls;
+package main.java.report.reports;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -34,6 +34,7 @@ public class AvailableStockReportXls extends XlsReport
         super(new HSSFWorkbook());
     }
 
+    @Override
     public void populateWorkbook()
     {
         HSSFSheet sheet = getWorkbook().createSheet(getReportName());
@@ -92,6 +93,7 @@ public class AvailableStockReportXls extends XlsReport
         autoSizeColumns(sheet, cellCount);
     }
 
+    @Override
     public String getFilename()
     {
         return outputDir + getReportName() + " " + date + EXTENSION;

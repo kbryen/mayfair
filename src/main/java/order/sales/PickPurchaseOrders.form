@@ -40,27 +40,27 @@
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="comboPOS" min="-2" max="-2" attributes="0"/>
                           </Group>
-                          <Component id="label5" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="label4" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
-                              <Component id="label6" min="-2" max="-2" attributes="0"/>
+                              <Component id="label5" min="-2" max="-2" attributes="0"/>
                               <EmptySpace min="-2" pref="38" max="-2" attributes="0"/>
-                              <Component id="fieldQuant" min="-2" pref="81" max="-2" attributes="0"/>
+                              <Component id="fieldQuantity" min="-2" pref="81" max="-2" attributes="0"/>
                               <EmptySpace type="separate" max="-2" attributes="0"/>
                               <Component id="btnAdd" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Component id="labelOrders" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="label3" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="label4" alignment="0" min="-2" max="-2" attributes="0"/>
                                   <Component id="label2" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="label3" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="label1" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                               <EmptySpace min="-2" pref="28" max="-2" attributes="0"/>
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="labelOrdNum" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelDate" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labelDelDate" min="-2" max="-2" attributes="0"/>
                                   <Component id="labelAvaliable" min="-2" max="-2" attributes="0"/>
-                                  <Component id="labelQuant" alignment="0" min="-2" max="-2" attributes="0"/>
+                                  <Component id="labelQuantity" alignment="0" min="-2" max="-2" attributes="0"/>
                               </Group>
                           </Group>
                       </Group>
@@ -91,28 +91,28 @@
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="label2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="label1" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="labelOrdNum" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace min="-2" pref="8" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="label3" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="labelDate" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="label2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="labelDelDate" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="label4" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="label3" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="labelAvaliable" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="label5" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="labelQuant" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="label4" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="labelQuantity" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="fieldQuant" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="label6" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="fieldQuantity" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="label5" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnAdd" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="separate" max="-2" attributes="0"/>
@@ -177,12 +177,12 @@
         <Property name="text" type="java.lang.String" value="Pick a purchase order from the drop down list: "/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="label3">
+    <Component class="javax.swing.JLabel" name="label2">
       <Properties>
         <Property name="text" type="java.lang.String" value="Delivery Date:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="labelDate">
+    <Component class="javax.swing.JLabel" name="labelDelDate">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Tahoma" size="11" style="1"/>
@@ -190,7 +190,7 @@
         <Property name="text" type="java.lang.String" value="DATE"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="label4">
+    <Component class="javax.swing.JLabel" name="label3">
       <Properties>
         <Property name="text" type="java.lang.String" value="Avaliable on Order:"/>
       </Properties>
@@ -203,19 +203,19 @@
         <Property name="text" type="java.lang.String" value="AVALIABLE"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JTextField" name="fieldQuant">
+    <Component class="javax.swing.JTextField" name="fieldQuantity">
     </Component>
-    <Component class="javax.swing.JLabel" name="label6">
+    <Component class="javax.swing.JLabel" name="label5">
       <Properties>
         <Property name="text" type="java.lang.String" value="Take from Order:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="label5">
+    <Component class="javax.swing.JLabel" name="label4">
       <Properties>
         <Property name="text" type="java.lang.String" value="Quantity left to fulfill:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="labelQuant">
+    <Component class="javax.swing.JLabel" name="labelQuantity">
       <Properties>
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Tahoma" size="11" style="1"/>
@@ -262,9 +262,6 @@
               <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
             </Property>
           </Properties>
-          <Events>
-            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="tableMouseClicked"/>
-          </Events>
         </Component>
       </SubComponents>
     </Container>
@@ -276,7 +273,7 @@
         <Property name="text" type="java.lang.String" value="Orders Taken From:"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="label2">
+    <Component class="javax.swing.JLabel" name="label1">
       <Properties>
         <Property name="text" type="java.lang.String" value="Order Number:"/>
       </Properties>

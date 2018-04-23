@@ -2,7 +2,7 @@
  * Mayfair Stock Control.
  *
  */
-package main.java.report.xls;
+package main.java.report.reports;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +32,7 @@ public class PurchaseOrderSummaryReportXls extends XlsReport
         super(new HSSFWorkbook());
     }
 
+    @Override
     public void populateWorkbook()
     {
         HSSFSheet sheet = getWorkbook().createSheet(getReportName());
@@ -61,16 +62,22 @@ public class PurchaseOrderSummaryReportXls extends XlsReport
         cell.setCellValue("Quantity");
         cell.setCellStyle(getStyle(BOLD));
         cell = row.createCell(2);
-        cell.setCellValue("Avaliable");
+        cell.setCellValue("Sold");
         cell.setCellStyle(getStyle(BOLD));
         cell = row.createCell(3);
+        cell.setCellValue("Avaliable");
+        cell.setCellStyle(getStyle(BOLD));
+        cell = row.createCell(4);
+        cell.setCellValue("Unit Price");
+        cell.setCellStyle(getStyle(BOLD));
+        cell = row.createCell(5);
         cell.setCellValue("Price");
         cell.setCellStyle(getStyle(BOLD));
 
         for (String[] product : products)
         {
             row = sheet.createRow(rowCount++);
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 6; i++)
             {
                 cell = row.createCell(i);
                 cell.setCellValue(product[i]);
@@ -93,9 +100,10 @@ public class PurchaseOrderSummaryReportXls extends XlsReport
         cell.setCellValue(total_units);
         cell.setCellStyle(getStyle(BOLD));
 
-        autoSizeColumns(sheet, 4);
+        autoSizeColumns(sheet, 6);
     }
 
+    @Override
     public String getFilename()
     {
         return outputDir + getReportName() + " - " + ord_num + EXTENSION;

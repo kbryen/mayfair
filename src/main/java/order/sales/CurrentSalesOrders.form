@@ -39,12 +39,12 @@
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="btnMarkDispatched" min="-2" max="-2" attributes="0"/>
+                              <Component id="btnMark" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnMarkDelivered" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="1" attributes="0">
-                              <Component id="btnExcelSummary" min="-2" pref="160" max="-2" attributes="0"/>
+                              <Component id="btnSummaryReport" min="-2" pref="160" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="btnDispatch" min="-2" max="-2" attributes="0"/>
                           </Group>
@@ -105,7 +105,7 @@
               <Component id="jSeparator2" min="-2" pref="10" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="btnMarkDispatched" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnMark" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="btnMarkDelivered" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -118,7 +118,7 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="btnDispatch" alignment="3" min="-2" max="-2" attributes="0"/>
-                  <Component id="btnExcelSummary" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="btnSummaryReport" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -243,9 +243,6 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="fieldOrderNumber">
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="fieldOrderNumberActionPerformed"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel4">
       <Properties>
@@ -275,9 +272,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnEditActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="btnMarkDispatched">
+    <Component class="javax.swing.JButton" name="btnMark">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Mark"/>
+      </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMarkDispatchedActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnMarkActionPerformed"/>
       </Events>
     </Component>
     <Component class="javax.swing.JButton" name="btnMarkDelivered">
@@ -304,12 +304,12 @@
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnClearActionPerformed"/>
       </Events>
     </Component>
-    <Component class="javax.swing.JButton" name="btnExcelSummary">
+    <Component class="javax.swing.JButton" name="btnSummaryReport">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Create Summary File"/>
+        <Property name="text" type="java.lang.String" value="Create Summary Report"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnExcelSummaryActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSummaryReportActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

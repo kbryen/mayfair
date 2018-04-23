@@ -25,7 +25,7 @@ import main.java.MayfairStatic;
  *
  * @author kian_bryen
  */
-public class EditMain extends javax.swing.JInternalFrame
+public class EditSalesOrderStep1 extends javax.swing.JInternalFrame
 {
 
     private final Database db = new Database();
@@ -34,7 +34,7 @@ public class EditMain extends javax.swing.JInternalFrame
     private final JDesktopPane desktop;
     private final DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 
-    public EditMain(int orderNum, JDesktopPane desktop)
+    public EditSalesOrderStep1(int orderNum, JDesktopPane desktop)
     {
         initComponents();
         this.orderNum = orderNum;
@@ -375,12 +375,12 @@ public class EditMain extends javax.swing.JInternalFrame
         }
         catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
+            JOptionPane.showMessageDialog(EditSalesOrderStep1.this, e.getMessage());
         }
     }
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
-        EditAddProduct addProd = new EditAddProduct(desktop, orderNum);
+        EditSalesOrderStep2 addProd = new EditSalesOrderStep2(desktop, orderNum);
         desktop.add(addProd);
         MayfairStatic.setMaximum(addProd);
         addProd.show();
@@ -460,7 +460,7 @@ public class EditMain extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
+                JOptionPane.showMessageDialog(EditSalesOrderStep1.this, e.getMessage());
             }
         }
     }//GEN-LAST:event_btnQuantActionPerformed
@@ -530,13 +530,13 @@ public class EditMain extends javax.swing.JInternalFrame
                 sql = "DELETE FROM sales_order_details WHERE prod_num = " + prod_num + " AND ord_num = " + orderNum;
                 updateStatement.executeUpdate(sql);
                 db.writeToLog(sql);
-                JOptionPane.showMessageDialog(EditMain.this, "Product Deleted");
+
 
                 FillLabels();
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
+                JOptionPane.showMessageDialog(EditSalesOrderStep1.this, e.getMessage());
             }
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
@@ -558,7 +558,7 @@ public class EditMain extends javax.swing.JInternalFrame
                         db.writeToLog(sql);
                         db.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
-                        ViewSalesSummary salesOrder = new ViewSalesSummary(orderNum);
+                        ViewSalesOrderSummary salesOrder = new ViewSalesOrderSummary(orderNum);
                         desktop.add(salesOrder);
                         salesOrder.show();
 
@@ -566,22 +566,22 @@ public class EditMain extends javax.swing.JInternalFrame
                     }
                     catch (SQLException e)
                     {
-                        JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
+                        JOptionPane.showMessageDialog(EditSalesOrderStep1.this, e.getMessage());
                     }
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(EditMain.this, "Delivery Date needs to be after " + minDate);
+                    JOptionPane.showMessageDialog(EditSalesOrderStep1.this, "Delivery Date needs to be after " + minDate);
                 }
             }
             catch (ParseException e)
             {
-                JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
+                JOptionPane.showMessageDialog(EditSalesOrderStep1.this, e.getMessage());
             }
         }
         else
         {
-            JOptionPane.showMessageDialog(EditMain.this, "Please select a Delivery Date");
+            JOptionPane.showMessageDialog(EditSalesOrderStep1.this, "Please select a Delivery Date");
         }
     }//GEN-LAST:event_btnFinishActionPerformed
 
@@ -607,7 +607,7 @@ public class EditMain extends javax.swing.JInternalFrame
         }
         catch (ParseException | SQLException e)
         {
-            JOptionPane.showMessageDialog(EditMain.this, e.getMessage());
+            JOptionPane.showMessageDialog(EditSalesOrderStep1.this, e.getMessage());
             return new Date();
         }
     }

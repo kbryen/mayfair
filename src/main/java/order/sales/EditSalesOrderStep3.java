@@ -22,7 +22,7 @@ import main.java.MayfairStatic;
  *
  * @author kian_bryen
  */
-public class EditPickPurchaseOrders extends javax.swing.JInternalFrame
+public class EditSalesOrderStep3 extends javax.swing.JInternalFrame
 {
 
     private final JDesktopPane desktop;
@@ -35,7 +35,7 @@ public class EditPickPurchaseOrders extends javax.swing.JInternalFrame
 
     private final Map<String, Pair<Integer, Date>> possiblePurchaseOrders;
 
-    public EditPickPurchaseOrders(JDesktopPane desktop, Map<String, Pair<Integer, Date>> possiblePurchaseOrders, int leftToFulfill, int prodNum, int salesOrderNum)
+    public EditSalesOrderStep3(JDesktopPane desktop, Map<String, Pair<Integer, Date>> possiblePurchaseOrders, int leftToFulfill, int prodNum, int salesOrderNum)
     {
         initComponents();
         this.desktop = desktop;
@@ -107,7 +107,7 @@ public class EditPickPurchaseOrders extends javax.swing.JInternalFrame
         }
         catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(EditPickPurchaseOrders.this, e.getMessage());
+            JOptionPane.showMessageDialog(EditSalesOrderStep3.this, e.getMessage());
         }
         finally
         {
@@ -441,16 +441,16 @@ public class EditPickPurchaseOrders extends javax.swing.JInternalFrame
 
                             if ((leftToFulfill - quantity) != 0)
                             {
-                                JOptionPane.showMessageDialog(EditPickPurchaseOrders.this, quantity + " Added");
-                                EditPickPurchaseOrders pickOrders = new EditPickPurchaseOrders(desktop, possiblePurchaseOrders, leftToFulfill - quantity, prodNum, salesOrderNum);
+                                JOptionPane.showMessageDialog(EditSalesOrderStep3.this, quantity + " Added");
+                                EditSalesOrderStep3 pickOrders = new EditSalesOrderStep3(desktop, possiblePurchaseOrders, leftToFulfill - quantity, prodNum, salesOrderNum);
                                 desktop.add(pickOrders);
                                 pickOrders.show();
                                 this.dispose();
                             }
                             else
                             {
-                                JOptionPane.showMessageDialog(EditPickPurchaseOrders.this, "Product added");
-                                EditAddProduct addProducts = new EditAddProduct(desktop, salesOrderNum);
+                                JOptionPane.showMessageDialog(EditSalesOrderStep3.this, "Product added");
+                                EditSalesOrderStep2 addProducts = new EditSalesOrderStep2(desktop, salesOrderNum);
                                 desktop.add(addProducts);
                                 MayfairStatic.setMaximum(addProducts);
                                 addProducts.show();
@@ -459,24 +459,24 @@ public class EditPickPurchaseOrders extends javax.swing.JInternalFrame
                         }
                         else
                         {
-                            JOptionPane.showMessageDialog(EditPickPurchaseOrders.this, "Quantity is greater than Number left to fulfill");
+                            JOptionPane.showMessageDialog(EditSalesOrderStep3.this, "Quantity is greater than Number left to fulfill");
                         }
                     }
                     else
                     {
-                        JOptionPane.showMessageDialog(EditPickPurchaseOrders.this, "Quantity is greater than Number avaliable");
+                        JOptionPane.showMessageDialog(EditSalesOrderStep3.this, "Quantity is greater than Number avaliable");
                     }
 
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(EditPickPurchaseOrders.this, "Quantity must be greater than 0");
+                    JOptionPane.showMessageDialog(EditSalesOrderStep3.this, "Quantity must be greater than 0");
                 }
 
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(EditPickPurchaseOrders.this, e.getMessage());
+                JOptionPane.showMessageDialog(EditSalesOrderStep3.this, e.getMessage());
             }
             finally
             {
@@ -490,7 +490,7 @@ public class EditPickPurchaseOrders extends javax.swing.JInternalFrame
         }
         catch (NumberFormatException | HeadlessException e)
         {
-            JOptionPane.showMessageDialog(EditPickPurchaseOrders.this, "Please enter a valid quantity");
+            JOptionPane.showMessageDialog(EditSalesOrderStep3.this, "Please enter a valid quantity");
         }
     }//GEN-LAST:event_btnAddActionPerformed
 
@@ -510,7 +510,7 @@ public class EditPickPurchaseOrders extends javax.swing.JInternalFrame
 
     private void btnBackActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnBackActionPerformed
     {//GEN-HEADEREND:event_btnBackActionPerformed
-        EditAddProduct addProducts = new EditAddProduct(desktop, salesOrderNum);
+        EditSalesOrderStep2 addProducts = new EditSalesOrderStep2(desktop, salesOrderNum);
         desktop.add(addProducts);
         MayfairStatic.setMaximum(addProducts);
         addProducts.show();

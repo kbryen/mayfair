@@ -25,6 +25,7 @@ import static main.java.MayfairStatic.PO_DELDATE;
 import static main.java.MayfairStatic.PO_ORDNUM;
 import static main.java.MayfairStatic.PO_PRICE;
 import static main.java.MayfairStatic.PO_SUPPNUM;
+import static main.java.MayfairStatic.PO_TOTALUNITS;
 import static main.java.MayfairStatic.PRODUCTS_TABLE;
 import static main.java.MayfairStatic.PRODUCT_CODE;
 import static main.java.MayfairStatic.PRODUCT_INORDER;
@@ -71,6 +72,31 @@ public class EditPurchaseOrderStep1 extends javax.swing.JInternalFrame
     {
         btnQuant.setVisible(enable);
         btnDelete.setEnabled(enable);
+    }
+
+    private void updatePurchaseOrderDetails() throws SQLException
+    {
+        try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        {
+            ResultSet rs = selectStatement.executeQuery("SELECT SUM(" + POD_PRICE + ") AS total_price, "
+                    + "SUM(" + POD_QUANTITY + ") as total_quantity "
+                    + "FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                    + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'");
+            rs.next();
+
+            int total_units = rs.getInt("total_units");
+            double total_price = rs.getDouble("total_price");
+            labelUnits.setText("Total Units: " + total_units);
+            labelPrice.setText("Order Total: £" + String.format("%.02f", total_price));
+
+            try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
+            {
+                updateStatement.executeUpdate("UPDATE " + PURCHASE_ORDER_TABLE + " "
+                        + "SET " + PO_PRICE + " = " + total_price + ", "
+                        + PO_TOTALUNITS + " = " + total_units + " "
+                        + "WHERE " + PO_ORDNUM + " = '" + ord_num + "'");
+            }
+        }
     }
 
     /**
@@ -337,8 +363,7 @@ public class EditPurchaseOrderStep1 extends javax.swing.JInternalFrame
     {
         try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            MayfairStatic.updatePurchaseOrderDetails(ord_num, labelUnits, labelPrice, this);
-
+            updatePurchaseOrderDetails();
             ResultSet rs = selectStatement.executeQuery("SELECT " + PO_ORDNUM + ", "
                     + PO_DELDATE + " AS del_datetime, "
                     + MayfairStatic.sqlDateFormat(PO_DELDATE) + ", "
@@ -381,6 +406,7 @@ public class EditPurchaseOrderStep1 extends javax.swing.JInternalFrame
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         EditPurchaseOrderStep2 jFrame = new EditPurchaseOrderStep2(ord_num, desktop);
         desktop.add(jFrame);
+        MayfairStatic.setMaximum(jFrame);
         jFrame.show();
         this.dispose();
     }//GEN-LAST:event_btnAddActionPerformed
@@ -426,12 +452,19 @@ public class EditPurchaseOrderStep1 extends javax.swing.JInternalFrame
                         MayfairStatic.writeToLog("UPDATE QUANTITY " + code + " ON  PO " + ord_num);
 
                         // UPDATE PURCHASE ORDER DETAILS
-                        String sql = ("UPDATE purchase_order_details SET quantity = " + newQuantity + ", avaliable = " + avaliable + ", price = " + price + " WHERE ord_num = '" + ord_num + "'  AND prod_num = " + prod_num);
+                        String sql = ("UPDATE " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                                + "SET " + POD_QUANTITY + " = " + newQuantity + ", "
+                                + POD_AVALIABLE + " = " + avaliable + ", "
+                                + POD_PRICE + " = " + price + " "
+                                + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'  "
+                                + "AND " + POD_PRODNUM + " = " + prod_num);
                         updateStatement.executeUpdate(sql);
                         MayfairStatic.writeToLog(sql);
 
                         // UPDATE PRODUCTS
-                        sql = ("UPDATE products SET in_order = " + in_order + " WHERE prod_num = " + prod_num);
+                        sql = ("UPDATE " + PRODUCTS_TABLE + " "
+                                + "SET " + PRODUCT_INORDER + " = " + in_order + " "
+                                + "WHERE " + PRODUCT_PRODNUM + " = " + prod_num);
                         updateStatement.executeUpdate(sql);
                         MayfairStatic.writeToLog(sql);
 

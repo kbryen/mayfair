@@ -2,7 +2,7 @@
  * Mayfair Stock Control.
  *
  */
-package main.java.report.xls;
+package main.java.report.reports;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,9 +31,10 @@ public class DispatchNoteXls extends XlsReport
 
     public DispatchNoteXls()
     {
-        super(XlsReport.getHSSFWorkbook(DISPATCH_NOTE_TEMPLATE));
+        super(XlsReport.createHSSFWorkbook(DISPATCH_NOTE_TEMPLATE));
     }
 
+    @Override
     public void populateWorkbook()
     {
         HSSFSheet sheet = getWorkbook().getSheet(sheetName);
@@ -156,6 +157,7 @@ public class DispatchNoteXls extends XlsReport
         this.cust_reference = cust_reference;
     }
 
+    @Override
     public String getFilename()
     {
         return outputDir + ord_num + " - " + cust_reference + " " + del_date.replace('/', '-') + EXTENSION;

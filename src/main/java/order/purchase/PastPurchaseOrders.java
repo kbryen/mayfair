@@ -20,6 +20,7 @@ import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
 import static main.java.MayfairStatic.SUPPLIERS_TABLE;
 import static main.java.MayfairStatic.SUPPLIER_NAME;
 import static main.java.MayfairStatic.SUPPLIER_SUPPNUM;
+import main.java.report.ReportGenerator;
 
 /**
  *
@@ -70,6 +71,7 @@ public class PastPurchaseOrders extends javax.swing.JInternalFrame
         labelNumber = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         btnClear = new javax.swing.JButton();
+        btnSummaryReport = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -160,6 +162,16 @@ public class PastPurchaseOrders extends javax.swing.JInternalFrame
             }
         });
 
+        btnSummaryReport.setBackground(new java.awt.Color(153, 204, 255));
+        btnSummaryReport.setText("Create Summary Report");
+        btnSummaryReport.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
+                btnSummaryReportActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -170,6 +182,8 @@ public class PastPurchaseOrders extends javax.swing.JInternalFrame
                     .addComponent(jSeparator2)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(btnSummaryReport)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnViewSummary))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -212,11 +226,13 @@ public class PastPurchaseOrders extends javax.swing.JInternalFrame
                     .addComponent(btnFind)
                     .addComponent(btnClear))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 419, Short.MAX_VALUE)
+                .addComponent(scrollPane, javax.swing.GroupLayout.DEFAULT_SIZE, 531, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnViewSummary)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnViewSummary)
+                    .addComponent(btnSummaryReport))
                 .addContainerGap())
         );
 
@@ -271,9 +287,16 @@ public class PastPurchaseOrders extends javax.swing.JInternalFrame
         fieldOrderNumber.setText("");
     }//GEN-LAST:event_btnClearActionPerformed
 
+    private void btnSummaryReportActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnSummaryReportActionPerformed
+    {//GEN-HEADEREND:event_btnSummaryReportActionPerformed
+        String ord_num = String.valueOf(table.getValueAt(table.getSelectedRow(), 0));
+        ReportGenerator.createPurchaseOrderSummaryReport(this, ord_num);
+    }//GEN-LAST:event_btnSummaryReportActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnFind;
+    private javax.swing.JButton btnSummaryReport;
     private javax.swing.JButton btnViewSummary;
     private javax.swing.JTextField fieldName;
     private javax.swing.JTextField fieldOrderNumber;

@@ -7,9 +7,7 @@ package main.java.order.purchase;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
@@ -20,7 +18,6 @@ import static javax.swing.JOptionPane.YES_OPTION;
 import main.java.MayfairStatic;
 import static main.java.MayfairStatic.POD_AVALIABLE;
 import static main.java.MayfairStatic.POD_ORDNUM;
-import static main.java.MayfairStatic.POD_PRICE;
 import static main.java.MayfairStatic.POD_PRODNUM;
 import static main.java.MayfairStatic.POD_QUANTITY;
 import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
@@ -52,7 +49,7 @@ import static main.java.MayfairStatic.SOD_FROMORDER;
 import static main.java.MayfairStatic.SOD_FROMSTOCK;
 import static main.java.MayfairStatic.SOD_ORDNUM;
 import static main.java.MayfairStatic.SOD_PRODNUM;
-import main.java.report.xls.PurchaseOrderSummaryReportXls;
+import main.java.report.ReportGenerator;
 
 /**
  *
@@ -671,16 +668,14 @@ public class CurrentPurchaseOrders extends javax.swing.JInternalFrame
                     MayfairStatic.writeToLog(sql);
 
                     MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
-
                     MayfairStatic.outputMessage(this, "Order Delivered", ord_num + " marked as delivered.", INFORMATION_MESSAGE);
+                    btnClearActionPerformed(null);
+                    btnFindActionPerformed(null);
                 }
                 catch (SQLException ex)
                 {
                     MayfairStatic.outputMessage(this, ex);
                 }
-
-                btnClearActionPerformed(null);
-                btnFindActionPerformed(null);
             }
         }
     }//GEN-LAST:event_btnMarkDeliveredActionPerformed
@@ -692,53 +687,7 @@ public class CurrentPurchaseOrders extends javax.swing.JInternalFrame
 
     private void btnSummaryReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSummaryReportActionPerformed
         String ord_num = String.valueOf(table.getValueAt(table.getSelectedRow(), 0));
-        if (MayfairStatic.outputConfirm(this, "Summary Report", "Are you sure you want to create a Summary Report for " + ord_num + "?") == JOptionPane.YES_OPTION)
-        {
-            try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                PurchaseOrderSummaryReportXls summaryReport = new PurchaseOrderSummaryReportXls();
-                summaryReport.setLoggingComponent(this);
-                summaryReport.setReportName("Purchase Order Summary");
-                summaryReport.setOrd_num(ord_num);
-
-                ResultSet rs = statement.executeQuery("SELECT " + PO_DELDATE + ", " + PO_PRICE + ", " + PO_TOTALUNITS + " "
-                        + "FROM " + PURCHASE_ORDER_TABLE + " "
-                        + "WHERE " + PO_ORDNUM + " = '" + ord_num + "'");
-                rs.next();
-                summaryReport.setOrd_num(MayfairStatic.sqlDateFormat(rs.getString(PO_DELDATE), "%d/%m/%Y"));
-                summaryReport.setTotal_price(rs.getDouble(PO_PRICE));
-                summaryReport.setTotal_units(rs.getInt(PO_TOTALUNITS));
-
-                List<String[]> products = new ArrayList();
-                rs = statement.executeQuery("SELECT " + PRODUCT_CODE + ", "
-                        + POD_QUANTITY + ", "
-                        + POD_AVALIABLE + ", "
-                        + "(" + POD_QUANTITY + " - " + POD_AVALIABLE + ") AS SOLD "
-                        + POD_PRICE + " "
-                        + "FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
-                        + "JOIN " + PRODUCTS_TABLE + " "
-                        + "ON " + POD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
-                        + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'");
-                while (rs.next())
-                {
-                    String[] entry = new String[4];
-                    entry[0] = rs.getString(PRODUCT_CODE);
-                    entry[1] = rs.getString(POD_QUANTITY);
-                    entry[2] = rs.getString("SOLD");
-                    entry[3] = rs.getString(POD_AVALIABLE);
-                    entry[4] = rs.getString(POD_PRICE);
-                    products.add(entry);
-                }
-                summaryReport.setProducts(products);
-
-                summaryReport.populateWorkbook();
-                summaryReport.save(summaryReport.getFilename());
-            }
-            catch (SQLException ex)
-            {
-                MayfairStatic.outputMessage(this, ex);
-            }
-        }
+        ReportGenerator.createPurchaseOrderSummaryReport(this, ord_num);
     }//GEN-LAST:event_btnSummaryReportActionPerformed
 
 

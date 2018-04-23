@@ -1,4 +1,4 @@
-package main.java.report.xls;
+package main.java.report.reports;
 
 import java.awt.Component;
 import java.io.FileInputStream;
@@ -10,30 +10,23 @@ import java.util.Map;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import main.java.MayfairStatic;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-import org.apache.poi.ss.util.CellUtil;
 
 /**
  *
  * @author Kian
  */
-public abstract class XlsReport
+public abstract class XlsReport implements Report
 {
 
     private final HSSFWorkbook workBook;
     public static final String EXTENSION = ".xls";
-    private Component loggingComponent;
     private String reportName = "Report";
     
     private final Map<String, HSSFCellStyle> styles = new HashMap();
@@ -126,61 +119,32 @@ public abstract class XlsReport
         styles.put(BOLD + LEFT + BORDER + BOTTOM, boldLeftBorderBottomStyle);
     }
 
-    public void setLoggingComponent(Component loggingComponent)
-    {
-        this.loggingComponent = loggingComponent;
-    }
-
+    @Override
     public void setReportName(String reportName)
     {
         this.reportName = reportName;
     }
 
+    @Override
     public String getReportName()
     {
         return reportName;
     }
 
+    @Override
     public HSSFCellStyle getStyle(String style)
     {
         return styles.get(style);
     }
 
+    @Override
     public HSSFWorkbook getWorkbook()
     {
         return workBook;
     }
 
-    public void centreCell(HSSFCell cell)
-    {
-        CellUtil.setAlignment(cell, getWorkbook(), CellStyle.ALIGN_CENTER);
-    }
-
-    public void autoSizeColumns(Sheet sheet, int size)
-    {
-        for (int i = 0; i < size; i++)
-        {
-            sheet.autoSizeColumn(i);
-        }
-    }
-
-    public void createColourChart()
-    {
-        HSSFSheet sheet = getWorkbook().createSheet("Colour Chart");
-        HSSFRow row = sheet.createRow(0);
-        int i = 0;
-        for (IndexedColors value : IndexedColors.values())
-        {
-            HSSFCell cell = row.createCell(i++);
-            HSSFCellStyle style = getWorkbook().createCellStyle();
-            style.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-            style.setFillForegroundColor(value.index);
-            cell.setCellValue(value.name());
-            cell.setCellStyle(style);
-        }
-    }
-
-    public void save(String filename)
+    @Override
+    public void save(String filename, Component loggingComponent)
     {
         try (FileOutputStream fileOut = new FileOutputStream(filename))
         {
@@ -189,14 +153,13 @@ public abstract class XlsReport
             fileOut.close();
             MayfairStatic.outputMessage(loggingComponent, reportName + " Created", "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + filename + " </i>", INFORMATION_MESSAGE);
         }
-        catch (IOException e)
+        catch (IOException ex)
         {
-            MayfairStatic.outputMessage(loggingComponent, "Error", "<html> Error while creating " + reportName + ", please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", ERROR_MESSAGE);
-            MayfairStatic.outputMessage(loggingComponent, "Message for Kian", e.getLocalizedMessage(), ERROR_MESSAGE);
+            MayfairStatic.outputMessage(loggingComponent, ex);
         }
     }
 
-    public static HSSFWorkbook getHSSFWorkbook(String file)
+    public static HSSFWorkbook createHSSFWorkbook(String file)
     {
         if (file != null)
         {

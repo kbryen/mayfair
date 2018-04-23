@@ -20,14 +20,14 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import main.java.Database;
-import main.java.Main;
+import main.java.App;
 import main.java.MayfairStatic;
 
 /**
  *
  * @author kian_bryen
  */
-public class EditAddProduct extends javax.swing.JInternalFrame
+public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
 {
 
     private final JDesktopPane desktop;
@@ -35,7 +35,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
     private String sql;
     private final int orderNum;
 
-    public EditAddProduct(JDesktopPane desktop, int orderNum)
+    public EditSalesOrderStep2(JDesktopPane desktop, int orderNum)
     {
 
         initComponents();
@@ -95,7 +95,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
         }
         catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(EditAddProduct.this, e.getMessage());
+            JOptionPane.showMessageDialog(EditSalesOrderStep2.this, e.getMessage());
         }
         finally
         {
@@ -218,8 +218,6 @@ public class EditAddProduct extends javax.swing.JInternalFrame
             }
         });
         table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.setCellSelectionEnabled(false);
-        table.setRowSelectionAllowed(true);
         table.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent evt)
@@ -303,26 +301,9 @@ public class EditAddProduct extends javax.swing.JInternalFrame
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel1)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel5)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(labelProdNum))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jLabel2)
-                                .addGap(90, 90, 90)
-                                .addComponent(fieldProdCode, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(18, 18, 18)
-                        .addComponent(btnFind)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 556, Short.MAX_VALUE)
+                    .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(scrollPane2)
                     .addComponent(jSeparator2)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(labelOrdDetails)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 574, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(labelOrderTotal1)
@@ -354,7 +335,24 @@ public class EditAddProduct extends javax.swing.JInternalFrame
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(labelOrderTotal)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(labelOrdTotal)))))
+                                .addComponent(labelOrdTotal))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel5)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(labelProdNum))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addGap(90, 90, 90)
+                                        .addComponent(fieldProdCode, javax.swing.GroupLayout.PREFERRED_SIZE, 105, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(18, 18, 18)
+                                .addComponent(btnFind))
+                            .addComponent(labelOrdDetails))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -452,25 +450,25 @@ public class EditAddProduct extends javax.swing.JInternalFrame
                             possiblePurchaseOrders.put(poNum, new Pair(avaliable, date));
                         }
 
-                        EditPickPurchaseOrders pickOrders = new EditPickPurchaseOrders(desktop, possiblePurchaseOrders, fromOrder, prod_num, orderNum);
+                        EditSalesOrderStep3 pickOrders = new EditSalesOrderStep3(desktop, possiblePurchaseOrders, fromOrder, prod_num, orderNum);
                         desktop.add(pickOrders);
                         pickOrders.show();
                         this.dispose();
                     }
                     else
                     {
-                        JOptionPane.showMessageDialog(EditAddProduct.this, "Not enough avaliable on Purchase Order.");
+                        JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Not enough avaliable on Purchase Order.");
                     }
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(EditAddProduct.this, "Quantity must be greater than 0");
+                    JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Quantity must be greater than 0");
                 }
 
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(EditAddProduct.this, e.getMessage());
+                JOptionPane.showMessageDialog(EditSalesOrderStep2.this, e.getMessage());
             }
             finally
             {
@@ -484,7 +482,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
         }
         catch (NumberFormatException | HeadlessException e)
         {
-            JOptionPane.showMessageDialog(EditAddProduct.this, "Please enter a valid quantity");
+            JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Please enter a valid quantity");
         }
     }//GEN-LAST:event_btnAddPOActionPerformed
 
@@ -507,7 +505,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
                 statement2.executeUpdate(sql);
                 db.writeToLog(sql);
 
-                EditMain editMain = new EditMain(orderNum, desktop);
+                EditSalesOrderStep1 editMain = new EditSalesOrderStep1(orderNum, desktop);
                 desktop.add(editMain);
                 MayfairStatic.setMaximum(editMain);
                 editMain.show();
@@ -516,7 +514,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(EditAddProduct.this, e.getMessage());
+                JOptionPane.showMessageDialog(EditSalesOrderStep2.this, e.getMessage());
             }
             finally
             {
@@ -538,7 +536,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
         }
         catch (PropertyVetoException ex)
         {
-            Logger.getLogger(Main.class
+            Logger.getLogger(App.class
                     .getName()).log(Level.SEVERE, null, ex);
         }
         Connection con = db.getConnection();
@@ -567,7 +565,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
         }
         catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(EditAddProduct.this, e.getMessage());
+            JOptionPane.showMessageDialog(EditSalesOrderStep2.this, e.getMessage());
         }
         finally
         {
@@ -645,8 +643,8 @@ public class EditAddProduct extends javax.swing.JInternalFrame
                         statement2.executeUpdate(sql);
                         db.writeToLog(sql);
 
-                        JOptionPane.showMessageDialog(EditAddProduct.this, "Product added");
-                        EditAddProduct addProducts = new EditAddProduct(desktop, orderNum);
+                        JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Product added");
+                        EditSalesOrderStep2 addProducts = new EditSalesOrderStep2(desktop, orderNum);
                         desktop.add(addProducts);
                         MayfairStatic.setMaximum(addProducts);
                         addProducts.show();
@@ -654,18 +652,18 @@ public class EditAddProduct extends javax.swing.JInternalFrame
                     }
                     else
                     {
-                        JOptionPane.showMessageDialog(EditAddProduct.this, "Not enough avaliable in Stock.");
+                        JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Not enough avaliable in Stock.");
                     }
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(EditAddProduct.this, "Quantity must be greater than 0");
+                    JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Quantity must be greater than 0");
                 }
 
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(EditAddProduct.this, e.getMessage());
+                JOptionPane.showMessageDialog(EditSalesOrderStep2.this, e.getMessage());
             }
             finally
             {
@@ -679,7 +677,7 @@ public class EditAddProduct extends javax.swing.JInternalFrame
         }
         catch (NumberFormatException | HeadlessException e)
         {
-            JOptionPane.showMessageDialog(EditAddProduct.this, "Please enter a valid quantity");
+            JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Please enter a valid quantity");
         }
     }//GEN-LAST:event_btnAddStockActionPerformed
 

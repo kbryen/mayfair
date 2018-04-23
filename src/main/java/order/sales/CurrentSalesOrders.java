@@ -4,29 +4,49 @@
  */
 package main.java.order.sales;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
-import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
-import static javax.swing.JOptionPane.YES_NO_OPTION;
-import main.java.Database;
 import main.java.MayfairStatic;
-import main.java.report.xls.DispatchNoteXls;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.CellStyle;
+import static main.java.MayfairStatic.CUSTOMERS_TABLE;
+import static main.java.MayfairStatic.CUSTOMER_CUSTNUM;
+import static main.java.MayfairStatic.CUSTOMER_NAME;
+import static main.java.MayfairStatic.POD_AVALIABLE;
+import static main.java.MayfairStatic.POD_ORDNUM;
+import static main.java.MayfairStatic.POD_PRODNUM;
+import static main.java.MayfairStatic.PRODUCTS_TABLE;
+import static main.java.MayfairStatic.PRODUCT_CODE;
+import static main.java.MayfairStatic.PRODUCT_INORDER;
+import static main.java.MayfairStatic.PRODUCT_INSTOCK;
+import static main.java.MayfairStatic.PRODUCT_PRODNUM;
+import static main.java.MayfairStatic.PS_PONUM;
+import static main.java.MayfairStatic.PS_PRODNUM;
+import static main.java.MayfairStatic.PS_QUANTITY;
+import static main.java.MayfairStatic.PS_SONUM;
+import static main.java.MayfairStatic.PURCHASE_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.PURCHASE_SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SALES_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SOD_FROMORDER;
+import static main.java.MayfairStatic.SOD_FROMSTOCK;
+import static main.java.MayfairStatic.SOD_ORDNUM;
+import static main.java.MayfairStatic.SOD_PRODNUM;
+import static main.java.MayfairStatic.SO_CUSTNUM;
+import static main.java.MayfairStatic.SO_DELDATE;
+import static main.java.MayfairStatic.SO_DELIVERED;
+import static main.java.MayfairStatic.SO_DISPATCHDATE;
+import static main.java.MayfairStatic.SO_DISPATCHED;
+import static main.java.MayfairStatic.SO_ORDDATE;
+import static main.java.MayfairStatic.SO_ORDNUM;
+import static main.java.MayfairStatic.SO_PRICE;
+import static main.java.MayfairStatic.SO_TOTALUNITS;
+import main.java.report.ReportGenerator;
 
 /**
  *
@@ -35,24 +55,35 @@ import org.apache.poi.ss.usermodel.CellStyle;
 public class CurrentSalesOrders extends javax.swing.JInternalFrame
 {
 
-    private final Database db = new Database();
     private final JDesktopPane desktop;
-    private String sql;
 
     public CurrentSalesOrders(JDesktopPane desktop)
     {
-        initComponents();
+        setUpGUI();
         this.desktop = desktop;
-        scrollPane.setVisible(false);
-        btnViewSummary.setVisible(false);
-        btnEdit.setVisible(false);
-        btnCancel.setVisible(false);
-        btnMarkDispatched.setVisible(false);
-        btnMarkDelivered.setVisible(false);
-        btnDispatch.setVisible(false);
-        btnExcelSummary.setVisible(false);
         btnFindActionPerformed(null);
+    }
+
+    private void setUpGUI()
+    {
+        initComponents();
+        enableButtons(false);
         table.setAutoCreateRowSorter(true);
+        MayfairStatic.addDateSorter(table, new int[]
+        {
+            2, 3, 7
+        });
+    }
+
+    private void enableButtons(boolean enable)
+    {
+        btnViewSummary.setVisible(enable);
+        btnEdit.setVisible(enable);
+        btnCancel.setVisible(enable);
+        btnMark.setVisible(enable);
+        btnMarkDelivered.setVisible(enable);
+        btnDispatch.setVisible(enable);
+        btnSummaryReport.setVisible(enable);
     }
 
     /**
@@ -79,11 +110,11 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
         fieldName = new javax.swing.JTextField();
         btnCancel = new javax.swing.JButton();
         btnEdit = new javax.swing.JButton();
-        btnMarkDispatched = new javax.swing.JButton();
+        btnMark = new javax.swing.JButton();
         btnMarkDelivered = new javax.swing.JButton();
         btnDispatch = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
-        btnExcelSummary = new javax.swing.JButton();
+        btnSummaryReport = new javax.swing.JButton();
 
         setClosable(true);
         setIconifiable(true);
@@ -160,14 +191,6 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
 
         jLabel3.setText("Order Number");
 
-        fieldOrderNumber.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                fieldOrderNumberActionPerformed(evt);
-            }
-        });
-
         jLabel4.setText("OR");
 
         labelName.setText("Customer Name");
@@ -190,11 +213,12 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
             }
         });
 
-        btnMarkDispatched.addActionListener(new java.awt.event.ActionListener()
+        btnMark.setText("Mark");
+        btnMark.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
             {
-                btnMarkDispatchedActionPerformed(evt);
+                btnMarkActionPerformed(evt);
             }
         });
 
@@ -225,12 +249,12 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
             }
         });
 
-        btnExcelSummary.setText("Create Summary File");
-        btnExcelSummary.addActionListener(new java.awt.event.ActionListener()
+        btnSummaryReport.setText("Create Summary Report");
+        btnSummaryReport.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
             {
-                btnExcelSummaryActionPerformed(evt);
+                btnSummaryReportActionPerformed(evt);
             }
         });
 
@@ -250,11 +274,11 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(btnMarkDispatched)
+                                .addComponent(btnMark)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnMarkDelivered))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(btnExcelSummary, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(btnSummaryReport, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(btnDispatch))
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -304,7 +328,7 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnMarkDispatched)
+                    .addComponent(btnMark)
                     .addComponent(btnMarkDelivered))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(btnViewSummary)
@@ -315,7 +339,7 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnDispatch)
-                    .addComponent(btnExcelSummary))
+                    .addComponent(btnSummaryReport))
                 .addContainerGap())
         );
 
@@ -323,286 +347,242 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnViewSummaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewSummaryActionPerformed
-        ViewSalesSummary salesOrder = new ViewSalesSummary(Integer.parseInt(fieldOrderNumber.getText()));
-        desktop.add(salesOrder);
-        salesOrder.show();
+        ViewSalesOrderSummary jFrame = new ViewSalesOrderSummary(Integer.parseInt(fieldOrderNumber.getText()));
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnViewSummaryActionPerformed
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            String sql = "SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.total_units, sales_order.price, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') "
-                    + "FROM sales_order "
-                    + "INNER JOIN customers ON sales_order.cust_num=customers.cust_num ";
-            if (!fieldOrderNumber.getText().equals(""))
+            String sql = "SELECT " + SO_ORDNUM + ", "
+                    + CUSTOMER_NAME + ", "
+                    + MayfairStatic.sqlDateFormat(SO_ORDDATE) + ", "
+                    + MayfairStatic.sqlDateFormat(SO_DELDATE) + ", "
+                    + SO_TOTALUNITS + ", "
+                    + SO_PRICE + ", "
+                    + SO_DISPATCHED + ", "
+                    + MayfairStatic.sqlDateFormat(SO_DISPATCHDATE) + " "
+                    + "FROM " + SALES_ORDER_TABLE + " "
+                    + "JOIN " + CUSTOMERS_TABLE + " "
+                    + "ON " + SO_CUSTNUM + "=" + CUSTOMER_CUSTNUM + " "
+                    + "WHERE " + SO_DELIVERED + " = false ";
+            if (fieldOrderNumber.getText().isEmpty())
             {
-                sql += "WHERE sales_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC";
+                sql += "AND " + CUSTOMER_NAME + " LIKE '%" + fieldName.getText() + "%' ";
             }
             else
             {
-                sql += "WHERE customers.name LIKE '%" + fieldName.getText() + "%' and delivered = false ORDER BY sales_order.del_date, sales_order.ord_num DESC";
+                sql += "AND " + SO_ORDNUM + " LIKE '%" + fieldOrderNumber.getText() + "%' ";
             }
-            
-            scrollPane.setVisible(true);
-            getContentPane().validate();
-            getContentPane().repaint();
-            MayfairStatic.fillTable(table, statement.executeQuery(sql));
-            
+            sql += "ORDER BY " + SO_DELDATE + ", " + SO_ORDNUM + " DESC";
 
-            btnViewSummary.setVisible(false);
-            btnEdit.setVisible(false);
-            btnCancel.setVisible(false);
-            btnMarkDispatched.setVisible(false);
-            btnMarkDelivered.setVisible(false);
-            btnDispatch.setVisible(false);
-            btnExcelSummary.setVisible(false);
+            MayfairStatic.fillTable(table, statement.executeQuery(sql));
+            enableButtons(false);
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(CurrentSalesOrders.this, e.getMessage());
+            MayfairStatic.outputMessage(this, ex);
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
-    private void fieldOrderNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldOrderNumberActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fieldOrderNumberActionPerformed
-
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
         fieldOrderNumber.setText(String.valueOf((int) table.getValueAt(table.getSelectedRow(), 0)));
-        fieldName.setText((String) table.getValueAt(table.getSelectedRow(), 1));
-        btnViewSummary.setVisible(true);
-        btnEdit.setVisible(true);
-        btnCancel.setVisible(true);
-        btnMarkDispatched.setVisible(true);
-        btnExcelSummary.setVisible(true);
+        fieldName.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 1)));
         if ((boolean) table.getValueAt(table.getSelectedRow(), 6))
         {
-            btnMarkDispatched.setText("Mark Undispatched");
+            btnMark.setText("Mark Undispatched");
         }
         else
         {
-            btnMarkDispatched.setText("Mark Dispatched");
+            btnMark.setText("Mark Dispatched");
         }
-        btnMarkDelivered.setVisible(true);
-        btnDispatch.setVisible(true);
-
+        enableButtons(true);
     }//GEN-LAST:event_tableMouseClicked
 
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to cancel this order?", "Cancel order", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
+        int ord_num = (int) table.getValueAt(table.getSelectedRow(), 0);
+        if (MayfairStatic.outputConfirm(this, "Cancel Order", "Are you sure you want to cancel order " + ord_num + "?") == JOptionPane.YES_OPTION)
         {
-            int ord_num = (int) table.getValueAt(table.getSelectedRow(), 0);
-
-            try (Connection con = db.getConnection())
+            try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                Statement statement2 = con.createStatement();
-                ResultSet rs;
-
-                db.writeToLog("CANCEL SALES ORDER " + ord_num);
-                ArrayList<Integer> prod_nums = new ArrayList();
-                rs = statement.executeQuery("SELECT prod_num FROM sales_order_details WHERE ord_num = " + ord_num);
+                Map<Integer, Pair<Integer, Integer>> productCounts = new HashMap();
+                ResultSet rs = selectStatement.executeQuery("SELECT " + SOD_PRODNUM + ", " 
+                        + SOD_FROMSTOCK + ", " 
+                        + SOD_FROMORDER + ", " 
+                        + PRODUCT_INSTOCK + ", " 
+                        + PRODUCT_INORDER + " "
+                        + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                        + "JOIN " + PRODUCTS_TABLE + " "
+                        + "ON " + SOD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                        + "WHERE " + SOD_ORDNUM + " = " + ord_num);
                 while (rs.next())
                 {
-                    prod_nums.add(rs.getInt("prod_num"));
+                    int in_stock = rs.getInt(PRODUCT_INSTOCK) + rs.getInt(SOD_FROMSTOCK);
+                    int in_order = rs.getInt(PRODUCT_INORDER) + rs.getInt(SOD_FROMORDER);
+                    productCounts.put(rs.getInt(SOD_PRODNUM), new Pair(in_stock, in_order));
                 }
 
-                for (int prod_num : prod_nums)
+                Map<String, Pair<Integer, Integer>> purchaseOrders = new HashMap();
+                rs = selectStatement.executeQuery("SELECT " + PS_PONUM + ", " 
+                        + PS_PRODNUM + ", " 
+                        + PS_QUANTITY + ", " 
+                        + POD_AVALIABLE + " "
+                        + "FROM " + PURCHASE_SALES_ORDER_TABLE + " "
+                        + "JOIN " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                        + "ON " + PS_PONUM + "=" + POD_ORDNUM + ""
+                        + "WHERE " + PS_SONUM + " = " + ord_num);
+                while (rs.next())
                 {
-                    rs = statement.executeQuery("SELECT in_stock, in_order FROM products WHERE prod_num = " + prod_num);
-                    rs.next();
+                    int avaliable = rs.getInt(POD_AVALIABLE) + rs.getInt(PS_QUANTITY);
+                    purchaseOrders.put(rs.getString(PS_PONUM), new Pair(rs.getInt(PS_PRODNUM), avaliable));
+                }
 
-                    int in_stock = rs.getInt("in_stock");
-                    int in_order = rs.getInt("in_order");
-
-                    rs = statement.executeQuery("SELECT fromStock, fromOrder FROM sales_order_details WHERE prod_num = " + prod_num + " AND ord_num = " + ord_num);
-                    rs.next();
-                    int fromStock = rs.getInt("fromStock");
-                    int fromOrder = rs.getInt("fromOrder");
-
-                    int newStock = in_stock + fromStock;
-                    int newOrder = in_order + fromOrder;
+                try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
+                {
+                    MayfairStatic.writeToLog("CANCEL SALES ORDER " + ord_num);
+                    String sql;
 
                     // UPDATE PRODUCTS 
-                    sql = "UPDATE products SET in_stock = " + newStock + ", in_order = " + newOrder + " WHERE prod_num = " + prod_num;
-                    statement2.executeUpdate(sql);
-                    db.writeToLog(sql);
+                    for (Map.Entry<Integer, Pair<Integer, Integer>> entry : productCounts.entrySet())
+                    {
+                        sql = "UPDATE " + PRODUCTS_TABLE + " "
+                                + "SET " + PRODUCT_INSTOCK + " = " + entry.getValue().getKey() + ", "
+                                + PRODUCT_INORDER + " = " + entry.getValue().getValue() + " "
+                                + "WHERE " + PRODUCT_PRODNUM + " = " + entry.getKey();
+                        updateStatement.executeUpdate(sql);
+                        MayfairStatic.writeToLog(sql);
+                    }
 
-                    // UPDATE PURCHASE_SALES_ORDER
-                    ArrayList<Pair<String, Integer>> purchaseOrders = new ArrayList();
-                    ArrayList<String> codes = new ArrayList();
-                    rs = statement.executeQuery("SELECT code, po_num, quantity FROM purchase_sales_order WHERE prod_num = " + prod_num + " AND so_num = " + ord_num);
-                    while (rs.next())
-                    {
-                        int quantity = rs.getInt("quantity");
-                        String orderNum = rs.getString("po_num");
-                        purchaseOrders.add(new Pair(orderNum, quantity));
-                        codes.add(rs.getString("code"));
-                    }
-                    for (String code : codes)
-                    {
-                        sql = "DELETE FROM purchase_sales_order WHERE code = " + code;
-                        statement2.executeUpdate(sql);
-                        db.writeToLog(sql);
-                    }
+                    // DELETE FROM PURCHASE_SALES_ORDER
+                    sql = "DELETE FROM " + PURCHASE_SALES_ORDER_TABLE + " WHERE " + PS_SONUM + " = " + ord_num;
+                    updateStatement.executeUpdate(sql);
+                    MayfairStatic.writeToLog(sql);
 
                     // UPDATE PURCHASE ORDER DETAILS
-                    for (Pair<String, Integer> purchaseOrder : purchaseOrders)
+                    for (Map.Entry<String, Pair<Integer, Integer>> entry : purchaseOrders.entrySet())
                     {
-                        rs = statement.executeQuery("SELECT avaliable FROM purchase_order_details WHERE prod_num = " + prod_num + " AND ord_num = '" + purchaseOrder.getKey() + "'");
-                        rs.next();
-                        int avaliable = rs.getInt("avaliable");
-
-                        sql = "UPDATE purchase_order_details SET avaliable = " + (avaliable + purchaseOrder.getValue()) + " WHERE prod_num = " + prod_num + " AND ord_num = '" + purchaseOrder.getKey() + "'";
-                        statement2.executeUpdate(sql);
-                        db.writeToLog(sql);
+                        sql = "UPDATE " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                                + "SET " + POD_AVALIABLE + " = " + entry.getValue().getValue() + " "
+                                + "WHERE " + POD_PRODNUM + " = " + entry.getValue().getKey() + " "
+                                + "AND " + POD_ORDNUM + " = '" + entry.getKey() + "'";
+                        updateStatement.executeUpdate(sql);
+                        MayfairStatic.writeToLog(sql);
                     }
 
                     // DELETE FROM SALES ORDER DETAILS
-                    sql = "DELETE FROM sales_order_details WHERE prod_num = " + prod_num + " AND ord_num = " + ord_num;
-                    statement2.executeUpdate(sql);
-                    db.writeToLog(sql);
+                    sql = "DELETE FROM " + SALES_ORDER_DETAILS_TABLE + " WHERE " + SOD_ORDNUM + " = " + ord_num;
+                    updateStatement.executeUpdate(sql);
+                    MayfairStatic.writeToLog(sql);
 
+                    // DELETE FROM SALES ORDER
+                    sql = "DELETE FROM " + SALES_ORDER_TABLE + " WHERE " + SO_ORDNUM + " = " + ord_num;
+                    updateStatement.executeUpdate(sql);
+                    MayfairStatic.writeToLog(sql);
+                    MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
+
+                    MayfairStatic.outputMessage(this, "Order Cancelled", "Order number " + ord_num + " cancelled.", INFORMATION_MESSAGE);
+                    btnClearActionPerformed(null);
+                    btnFindActionPerformed(null);
                 }
-
-                // DELETE FROM SALES ORDER
-                sql = "DELETE FROM sales_order WHERE ord_num = " + ord_num;
-                statement2.executeUpdate(sql);
-                db.writeToLog(sql);
-                db.writeToLog(MayfairStatic.LOG_SEPERATOR);
-
-                JOptionPane.showMessageDialog(CurrentSalesOrders.this, "Order cancelled");
-                fieldOrderNumber.setText("");
-                fieldName.setText("");
-                btnFindActionPerformed(null);
-
             }
-            catch (SQLException e)
+            catch (SQLException ex)
             {
-                JOptionPane.showMessageDialog(CurrentSalesOrders.this, e.getMessage());
+                MayfairStatic.outputMessage(this, ex);
             }
         }
     }//GEN-LAST:event_btnCancelActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        EditMain salesOrder = new EditMain(Integer.parseInt(fieldOrderNumber.getText()), desktop);
-        desktop.add(salesOrder);
-        salesOrder.show();
-
+        EditSalesOrderStep1 jFrame = new EditSalesOrderStep1(Integer.parseInt(fieldOrderNumber.getText()), desktop);
+        desktop.add(jFrame);
+        jFrame.show();
         this.dispose();
     }//GEN-LAST:event_btnEditActionPerformed
 
-    private void btnMarkDispatchedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMarkDispatchedActionPerformed
-        int selectedOption;
-        if (btnMarkDispatched.getText().equals("Mark Dispatched"))
+    private void btnMarkActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMarkActionPerformed
+        String status = btnMark.getText().substring(btnMark.getText().indexOf(' ') + 1);
+        if (MayfairStatic.outputConfirm(this, "Mark " + status, "Are you sure you want to Mark as " + status) == JOptionPane.YES_OPTION)
         {
-            selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to Mark as Dispatched?", "Mark Dispatched", JOptionPane.YES_NO_OPTION);
-        }
-        else
-        {
-            selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to Mark as Undispatched?", "Mark Undispatched", JOptionPane.YES_NO_OPTION);
-        }
-
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            try (Statement statement = db.getConnection().createStatement())
+            try (Statement statement = MayfairStatic.getConnection().createStatement())
             {
-                if (btnMarkDispatched.getText().equals("Mark Dispatched"))
+                String ord_num = fieldOrderNumber.getText();
+                String sql = "UPDATE " + SALES_ORDER_TABLE + " ";
+                if (status.equals("Dispatched"))
                 {
-//                    // CHECK FOR UNDELIVERED PURCHASE ORDER
-//                    StringBuilder message = new StringBuilder();
-//                    boolean onPO = false;
-//                    ResultSet rs = statement2.executeQuery("SELECT po_num, quantity FROM purchase_sales_order WHERE so_num = " + fieldOrderNumber.getText());
-//                    while (rs.next())
-//                    {
-//                        onPO = true;
-//                        message.append("Order Num - ").append(rs.getString("po_num")).append(" Product Number - ").append(rs.getString("po_num")).append(" Quantity - ").append(rs.getInt("quantity")).append("\n");
-//                    }
-//
-//                    if (onPO)
-//                    {
-//                        JOptionPane.showMessageDialog(Current.this, "Cannot mark as dispatched as Order takes from the following undelivered Purchase Order(s):\n" + message.toString());
-//                    }
-//                    else
-//                    {
-                    db.writeToLog("MARK DISPATCHED " + fieldOrderNumber.getText());
-                    sql = "UPDATE sales_order SET dispatched = true, dispatched_date = CURRENT_TIMESTAMP WHERE ord_num = " + fieldOrderNumber.getText();
-                    statement.executeUpdate(sql);
-                    db.writeToLog(sql);
-                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
-
-                    JOptionPane.showMessageDialog(CurrentSalesOrders.this, "State of order has been updated.");
-                    fieldOrderNumber.setText("");
-                    fieldName.setText("");
-//                    }
+                    sql += "SET " + SO_DISPATCHED + " = true, "
+                            + SO_DISPATCHDATE + " = CURRENT_TIMESTAMP ";
                 }
                 else
                 {
-                    db.writeToLog("MARK UNDISPATCHED " + fieldOrderNumber.getText());
-                    sql = "UPDATE sales_order SET dispatched = false, dispatched_date = null WHERE ord_num = " + fieldOrderNumber.getText();
-                    statement.executeUpdate(sql);
-                    db.writeToLog(sql);
-                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
-
-                    JOptionPane.showMessageDialog(CurrentSalesOrders.this, "State of order has been updated.");
-                    fieldOrderNumber.setText("");
-                    fieldName.setText("");
+                    sql += "SET " + SO_DISPATCHED + " = false, "
+                            + SO_DISPATCHDATE + " = null ";
                 }
+                sql += "WHERE " + SO_ORDNUM + " = " + ord_num;
+                statement.executeUpdate(sql);
 
+                MayfairStatic.writeToLog("MARK " + status.toUpperCase() + " " + ord_num);
+                MayfairStatic.writeToLog(sql);
+                MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
+
+                MayfairStatic.outputMessage(this, "Order Updated", ord_num + " marked as " + status, INFORMATION_MESSAGE);
+                btnClearActionPerformed(null);
             }
-            catch (SQLException e)
+            catch (SQLException ex)
             {
-                JOptionPane.showMessageDialog(CurrentSalesOrders.this, e.getMessage());
+                MayfairStatic.outputMessage(this, ex);
             }
         }
-    }//GEN-LAST:event_btnMarkDispatchedActionPerformed
+    }//GEN-LAST:event_btnMarkActionPerformed
 
     private void btnMarkDeliveredActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMarkDeliveredActionPerformed
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to Mark as Delivered?", "Mark Delivered", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
+        if (MayfairStatic.outputConfirm(this, "Mark Delivered", "Are you sure you want to Mark as Delivered") == JOptionPane.YES_OPTION)
         {
-            boolean mark = true;
-
-            if (mark)
+            try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                try (Connection con = db.getConnection())
+                String ord_num = fieldOrderNumber.getText();
+                StringBuilder message = new StringBuilder();
+                boolean onPurchaseOrder = false;
+
+                ResultSet rs = selectStatement.executeQuery("SELECT " + PS_PONUM + ", " + PS_QUANTITY + ", " + PRODUCT_CODE + " "
+                        + "FROM " + PURCHASE_SALES_ORDER_TABLE + " "
+                        + "JOIN " + PRODUCTS_TABLE + " "
+                        + "ON " + PS_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                        + "WHERE " + PS_SONUM + " = " + ord_num);
+                while (rs.next())
                 {
-                    Statement statement = con.createStatement();
-                    Statement statement2 = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-
-                    // CHECK FOR UNDELIVERED PURCHASE ORDER
-                    StringBuilder message = new StringBuilder();
-                    boolean onPO = false;
-                    ResultSet rs = statement2.executeQuery("SELECT po_num, prod_num, quantity FROM purchase_sales_order WHERE so_num = " + fieldOrderNumber.getText());
-                    while (rs.next())
-                    {
-                        onPO = true;
-                        message.append("Order Num - ").append(rs.getString("po_num")).append(" Product Number - ").append(rs.getString("prod_num")).append(" Quantity - ").append(rs.getInt("quantity")).append("\n");
-                    }
-
-                    if (onPO)
-                    {
-                        JOptionPane.showMessageDialog(CurrentSalesOrders.this, "Cannot mark as delivered as Order takes from the following undelivered Purchase Order(s):\n" + message.toString());
-                    }
-                    else
-                    {
-                        sql = ("UPDATE sales_order SET delivered = true, dispatched = true, del_date = CURRENT_TIMESTAMP WHERE ord_num = " + fieldOrderNumber.getText());
-                        statement.executeUpdate(sql);
-
-                        db.writeToLog("MARK SALES DELIVERED " + fieldOrderNumber.getText());
-                        db.writeToLog(sql);
-
-                        db.writeToLog(MayfairStatic.LOG_SEPERATOR);
-                        fieldOrderNumber.setText("");
-                        fieldName.setText("");
-                    }
-                    btnFindActionPerformed(null);
+                    onPurchaseOrder = true;
+                    message.append(rs.getInt(PS_QUANTITY)).append(" x ").append(rs.getString(PRODUCT_CODE)).append(" on ").append(rs.getString(PS_PONUM));
                 }
-                catch (SQLException e)
+
+                if (onPurchaseOrder)
                 {
-                    JOptionPane.showMessageDialog(CurrentSalesOrders.this, e.getMessage());
+                    JOptionPane.showMessageDialog(CurrentSalesOrders.this, "Cannot mark as delivered as order takes from the following undelivered Purchase Order(s):\n" + message.toString());
                 }
+                else
+                {
+                    try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
+                    {
+                        String sql = ("UPDATE " + SALES_ORDER_TABLE + " "
+                                + "SET " + SO_DELIVERED + " = true, "
+                                + SO_DISPATCHED + " = true, "
+                                + SO_DELDATE + " = CURRENT_TIMESTAMP "
+                                + "WHERE " + SO_ORDNUM + " = " + ord_num);
+                        updateStatement.executeUpdate(sql);
+
+                        MayfairStatic.writeToLog("MARK SALES DELIVERED " + ord_num);
+                        MayfairStatic.writeToLog(sql);
+                        MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
+
+                        btnClearActionPerformed(null);
+                        btnFindActionPerformed(null);
+                        MayfairStatic.outputMessage(this, "Order Delivered", ord_num + " marked as delivered.", INFORMATION_MESSAGE);
+                    }
+                }
+            }
+            catch (SQLException ex)
+            {
+                MayfairStatic.outputMessage(this, ex);
             }
         }
     }//GEN-LAST:event_btnMarkDeliveredActionPerformed
@@ -610,56 +590,7 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
     private void btnDispatchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDispatchActionPerformed
         int ord_num = (Integer) table.getValueAt(table.getSelectedRow(), 0);
         String cust_name = (String) table.getValueAt(table.getSelectedRow(), 1);
-        int selectedOption = JOptionPane.showConfirmDialog(null, "<html> Are you sure you want to create a dispatch note for order <b>" + ord_num + "</b>?", "Dispatch Note", YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            DispatchNoteXls dispatchNote = new DispatchNoteXls();
-            dispatchNote.setLoggingComponent(this);
-            dispatchNote.setReportName("Dispatch Note");
-            dispatchNote.setOrd_num(ord_num);
-            dispatchNote.setCust_name(cust_name);
-
-            // Select order information
-            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                ResultSet rs = statement.executeQuery(
-                        "SELECT DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a') AS del_date, customers.cust_num, customers.reference, customers.del_address "
-                        + "FROM sales_order JOIN customers ON sales_order.cust_num = customers.cust_num "
-                        + "WHERE sales_order.ord_num = " + ord_num);
-                rs.next();
-                dispatchNote.setDel_date(rs.getString("del_date"));
-                dispatchNote.setCust_num(rs.getInt("customers.cust_num"));
-                dispatchNote.setCust_reference(rs.getString("customers.reference"));
-                dispatchNote.setDel_address(rs.getString("customers.del_address"));
-            }
-            catch (SQLException e)
-            {
-                JOptionPane.showMessageDialog(CurrentSalesOrders.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(CurrentSalesOrders.this, e);
-            }
-
-            // Select Products
-            Map<String, Integer> products = new HashMap();
-            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                ResultSet rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity "
-                        + "FROM sales_order_details JOIN products ON sales_order_details.prod_num = products.prod_num "
-                        + "WHERE sales_order_details.ord_num = " + ord_num);
-                while (rs.next())
-                {
-                    products.put(rs.getString("products.code"), rs.getInt("sales_order_details.quantity"));
-                }
-                dispatchNote.setProducts(products);
-            }
-            catch (SQLException e)
-            {
-                JOptionPane.showMessageDialog(CurrentSalesOrders.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(CurrentSalesOrders.this, e.getStackTrace());
-            }
-            
-            dispatchNote.populateWorkbook();
-            dispatchNote.save(dispatchNote.getFilename());
-        }
+        ReportGenerator.createDispatchNote(this, ord_num, cust_name);
     }//GEN-LAST:event_btnDispatchActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
@@ -667,121 +598,10 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
         fieldName.setText("");
     }//GEN-LAST:event_btnClearActionPerformed
 
-    private void btnExcelSummaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelSummaryActionPerformed
-        int ordNum = (int) table.getValueAt(table.getSelectedRow(), 0);
-        int selectedOption = JOptionPane.showConfirmDialog(null, "<html> Are you sure you want to create an excel summary for order <b>" + ordNum + "</b>?", "Excel Summary", YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            int cust_num;
-            String name;
-            String del_date;
-            double price;
-
-            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                ResultSet rs;
-
-                rs = statement.executeQuery("SELECT cust_num, del_date, price FROM sales_order WHERE ord_num = " + ordNum);
-                rs.next();
-                cust_num = rs.getInt("cust_num");
-                String[] date = rs.getString("del_date").split(" ");
-                del_date = date[0];
-
-                price = rs.getDouble("price");
-
-                rs = statement.executeQuery("SELECT name, del_address FROM customers WHERE cust_num = " + cust_num);
-                rs.next();
-                name = rs.getString("name");
-
-                String fileName = "S://SALES ORDERS/SALES ORDER - " + ordNum + ".xls";
-                try (FileOutputStream fileOut = new FileOutputStream(fileName))
-                {
-                    HSSFWorkbook wb = new HSSFWorkbook();
-                    HSSFSheet worksheet = wb.createSheet(String.valueOf(ordNum));
-                    CellStyle editableStyle = wb.createCellStyle();
-                    editableStyle.setLocked(false);
-
-                    HSSFRow row = worksheet.createRow((short) 0);
-                    HSSFCell cell = row.createCell(0);
-                    cell.setCellValue("Order Number");
-                    cell = row.createCell(1);
-                    cell.setCellValue(ordNum);
-
-                    row = worksheet.createRow((short) 1);
-                    cell = row.createCell(0);
-                    cell.setCellValue("Delivery Date");
-                    cell = row.createCell(1);
-                    cell.setCellValue(del_date);
-
-                    row = worksheet.createRow((short) 3);
-                    cell = row.createCell(0);
-                    cell.setCellValue("Customer Number");
-                    cell = row.createCell(1);
-                    cell.setCellValue(cust_num);
-
-                    row = worksheet.createRow((short) 4);
-                    cell = row.createCell(0);
-                    cell.setCellValue("Customer Name");
-                    cell = row.createCell(1);
-                    cell.setCellValue(name);
-
-                    row = worksheet.createRow((short) 6);
-                    cell = row.createCell(0);
-                    cell.setCellValue("Product Code");
-                    cell = row.createCell(1);
-                    cell.setCellValue("Quantity");
-
-                    int i = 7;
-                    rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity FROM sales_order_details JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + ordNum);
-                    while (rs.next())
-                    {
-                        String code = rs.getString("code");
-                        int quantity = rs.getInt("quantity");
-
-                        row = worksheet.createRow((short) i);
-                        cell = row.createCell(0);
-                        cell.setCellValue(code);
-                        cell = row.createCell(1);
-                        cell.setCellValue(quantity);
-
-                        i++;
-                    }
-
-                    row = worksheet.createRow((short) i + 1);
-                    cell = row.createCell(0);
-                    cell.setCellValue("Order Price");
-                    cell = row.createCell(1);
-                    cell.setCellValue(price);
-
-                    rs = statement.executeQuery("SELECT SUM(quantity) as total FROM sales_order_details WHERE ord_num = " + ordNum);
-                    rs.next();
-
-                    row = worksheet.createRow((short) i + 2);
-                    cell = row.createCell(0);
-                    cell.setCellValue("Total Units");
-                    cell = row.createCell(1);
-                    cell.setCellValue(rs.getInt("total"));
-
-                    // Auto Size Columns
-                    for (int k = 0; k < 2; k++)
-                    {
-                        worksheet.autoSizeColumn(k);
-                        worksheet.setDefaultColumnStyle(i + 4, editableStyle);
-                    }
-
-                    wb.write(fileOut);
-                    fileOut.flush();
-
-                    JOptionPane.showMessageDialog(CurrentSalesOrders.this, "<html> <b>Excel summary created successfully.</b> \n<html> <i> " + fileName + " </i>", "Excel Summary Created", INFORMATION_MESSAGE);
-                }
-            }
-            catch (SQLException | IOException e)
-            {
-                JOptionPane.showMessageDialog(CurrentSalesOrders.this, "<html> Error while creating dispatch note, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(CurrentSalesOrders.this, e);
-            }
-        }
-    }//GEN-LAST:event_btnExcelSummaryActionPerformed
+    private void btnSummaryReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSummaryReportActionPerformed
+        int ord_num = (int) table.getValueAt(table.getSelectedRow(), 0);
+        ReportGenerator.createSalesOrderSummaryReport(this, ord_num);
+    }//GEN-LAST:event_btnSummaryReportActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -789,10 +609,10 @@ public class CurrentSalesOrders extends javax.swing.JInternalFrame
     private javax.swing.JButton btnClear;
     private javax.swing.JButton btnDispatch;
     private javax.swing.JButton btnEdit;
-    private javax.swing.JButton btnExcelSummary;
     private javax.swing.JButton btnFind;
+    private javax.swing.JButton btnMark;
     private javax.swing.JButton btnMarkDelivered;
-    private javax.swing.JButton btnMarkDispatched;
+    private javax.swing.JButton btnSummaryReport;
     private javax.swing.JButton btnViewSummary;
     private javax.swing.JTextField fieldName;
     private javax.swing.JTextField fieldOrderNumber;

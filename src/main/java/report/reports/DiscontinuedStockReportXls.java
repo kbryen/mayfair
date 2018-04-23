@@ -2,13 +2,11 @@
  * Mayfair Stock Control.
  *
  */
-package main.java.report.xls;
+package main.java.report.reports;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import static main.java.MayfairStatic.STOCK_REPORTS_DIR;
 import org.apache.poi.hssf.usermodel.HSSFCell;
@@ -33,6 +31,7 @@ public class DiscontinuedStockReportXls extends XlsReport
         super(new HSSFWorkbook());
     }
 
+    @Override
     public void populateWorkbook()
     {
         HSSFSheet sheet = getWorkbook().createSheet(getReportName());
@@ -71,6 +70,7 @@ public class DiscontinuedStockReportXls extends XlsReport
         autoSizeColumns(sheet, cellCount);
     }
 
+    @Override
     public String getFilename()
     {
         return outputDir + getReportName() + " " + date + EXTENSION;

@@ -4,39 +4,46 @@
  */
 package main.java.order.sales;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
-import main.java.Database;
 import main.java.MayfairStatic;
+import static main.java.MayfairStatic.CUSTOMERS_TABLE;
+import static main.java.MayfairStatic.CUSTOMER_CUSTNUM;
+import static main.java.MayfairStatic.CUSTOMER_NAME;
+import static main.java.MayfairStatic.CUSTOMER_PROFORMA;
+import static main.java.MayfairStatic.SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SO_CUSTNUM;
+import static main.java.MayfairStatic.SO_ORDNUM;
+import static main.java.MayfairStatic.SO_TOTALUNITS;
 
 /**
  *
  * @author kian_bryen
  */
-public class CustomerNumber extends javax.swing.JInternalFrame
+public class NewSalesOrderStep1 extends javax.swing.JInternalFrame
 {
 
     private final JDesktopPane desktop;
-    private final Database db = new Database();
-    private String sql;
 
     /**
      * Creates new form SalesOrder
      *
      * @param pane Desktop Pane
      */
-    public CustomerNumber(JDesktopPane pane)
+    public NewSalesOrderStep1(JDesktopPane pane)
     {
         initComponents();
         this.desktop = pane;
-        comboFindCustomers.setVisible(false);
-        btnNext.setEnabled(false);
+        enableButtons(false);
+    }
+
+    private void enableButtons(boolean enable)
+    {
+        comboFindCustomers.setVisible(enable);
+        btnNext.setEnabled(enable);
     }
 
     /**
@@ -76,14 +83,6 @@ public class CustomerNumber extends javax.swing.JInternalFrame
         jLabel5.setText("Customer Details");
 
         jLabel3.setText("Customer Number");
-
-        fieldCustomerNumber.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                fieldCustomerNumberActionPerformed(evt);
-            }
-        });
 
         jLabel4.setText("OR");
 
@@ -197,93 +196,82 @@ public class CustomerNumber extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        ArrayList<String> customers = new ArrayList<>();
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            ResultSet rs = statement.executeQuery("SELECT cust_num, name FROM customers WHERE cust_num LIKE '%" + fieldCustomerNumber.getText() + "%' AND name LIKE '%" + fieldCustomerName.getText() + "%' ORDER BY cust_num ASC");
+            comboFindCustomers.removeAllItems();
+            ResultSet rs = statement.executeQuery("SELECT " + CUSTOMER_CUSTNUM + ", " + CUSTOMER_NAME + " "
+                    + "FROM " + CUSTOMERS_TABLE + " "
+                    + "WHERE " + CUSTOMER_CUSTNUM + " LIKE '%" + fieldCustomerNumber.getText() + "%' "
+                    + "AND " + CUSTOMER_NAME + " LIKE '%" + fieldCustomerName.getText() + "%' "
+                    + "ORDER BY " + CUSTOMER_CUSTNUM + " ASC");
             while (rs.next())
             {
-                customers.add(rs.getString("cust_num") + " - " + rs.getString("name"));
+                comboFindCustomers.addItem(rs.getString(CUSTOMER_CUSTNUM) + " - " + rs.getString(CUSTOMER_NAME));
             }
-
-            comboFindCustomers.setVisible(true);
-            comboFindCustomers.setModel(new javax.swing.DefaultComboBoxModel(customers.toArray()));
-            btnNext.setEnabled(true);
+            enableButtons(true);
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(CustomerNumber.this, e.getMessage());
+            MayfairStatic.outputMessage(this, ex);
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
-        if (!fieldCustomerNumber.getText().isEmpty())
+        String cust_num = fieldCustomerNumber.getText();
+        if (!cust_num.isEmpty())
         {
-            String cust_num = fieldCustomerNumber.getText();
-            Connection con = db.getConnection();
-            try
+            try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
             {
-                Statement statement = con.createStatement();
-                db.writeToLog("CREATE NEW SALES ORDER");
-                sql = "INSERT INTO sales_order (cust_num, total_units) VALUES (" + cust_num + ", 0)";
-                statement.executeUpdate(sql);
-                db.writeToLog(sql);
+                String sql = "INSERT INTO " + SALES_ORDER_TABLE + " (" + SO_CUSTNUM + ", " + SO_TOTALUNITS + ") "
+                        + "VALUES (" + cust_num + ", 0)";
+                updateStatement.executeUpdate(sql);
 
-                Statement statement2 = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = statement2.executeQuery("SELECT ord_num FROM sales_order where cust_num = " + cust_num + " ORDER BY ord_num DESC LIMIT 1");
+                MayfairStatic.writeToLog("CREATE NEW SALES ORDER");
+                MayfairStatic.writeToLog(sql);
 
-                int orderNum = rs.getInt("ord_num");
-
-                AddProduct salesOrder = new AddProduct(desktop, orderNum, 1);
-                desktop.add(salesOrder);
-                MayfairStatic.setMaximum(salesOrder);
-                salesOrder.show();
-                this.dispose();
-            }
-            catch (SQLException e)
-            {
-                JOptionPane.showMessageDialog(CustomerNumber.this, e.getMessage());
-            }
-            finally
-            {
-                try
+                try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
-                    con.close();
+                    ResultSet rs = selectStatement.executeQuery("SELECT " + SO_ORDNUM + " "
+                            + "FROM " + SALES_ORDER_TABLE + " "
+                            + "WHERE " + SO_CUSTNUM + " = " + cust_num + " "
+                            + "ORDER BY " + SO_ORDNUM + " DESC LIMIT 1");
+                    NewSalesOrderStep2 jFrame = new NewSalesOrderStep2(desktop, rs.getInt(SO_ORDNUM), 1);
+                    desktop.add(jFrame);
+                    MayfairStatic.setMaximum(jFrame);
+                    jFrame.show();
+                    this.dispose();
                 }
-                catch (Exception e)
-                {
-                    /* ignored */ }
+            }
+            catch (SQLException ex)
+            {
+                MayfairStatic.outputMessage(this, ex);
             }
         }
         else
         {
-            JOptionPane.showMessageDialog(CustomerNumber.this, "Please select a customer");
+            MayfairStatic.outputMessage(this, "Customer", "Please select a customer.", WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnNextActionPerformed
-
-    private void fieldCustomerNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldCustomerNumberActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fieldCustomerNumberActionPerformed
 
     private void comboFindCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboFindCustomersActionPerformed
         String[] selected = ((String) comboFindCustomers.getSelectedItem()).split(" - ", 2);
         fieldCustomerNumber.setText(selected[0]);
         fieldCustomerName.setText(selected[1]);
 
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            ResultSet rs = statement.executeQuery("SELECT proforma FROM customers WHERE cust_num = " + fieldCustomerNumber.getText());
+            ResultSet rs = statement.executeQuery("SELECT " + CUSTOMER_PROFORMA + " "
+                    + "FROM " + CUSTOMERS_TABLE + " "
+                    + "WHERE " + CUSTOMER_CUSTNUM + " = " + fieldCustomerNumber.getText());
             rs.next();
-            boolean proforma = rs.getBoolean("proforma");
-
-            if (proforma)
+            if (rs.getBoolean(CUSTOMER_PROFORMA))
             {
-                JOptionPane.showMessageDialog(CustomerNumber.this, "<html><b>WARNING:</b> " + fieldCustomerName.getText() + " is a pro forma.</html>\nDo not send stock before the pro forma invoice is sent.", "Pro Forma Alert", WARNING_MESSAGE);
+                MayfairStatic.outputMessage(this, "Pro Forma Alert", "<html><b>WARNING:</b> " + fieldCustomerName.getText() + " is a pro forma.</html>\nDo not send stock before the pro forma invoice is sent.", WARNING_MESSAGE);
             }
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(CustomerNumber.this, e.getMessage());
+            MayfairStatic.outputMessage(this, ex);
         }
     }//GEN-LAST:event_comboFindCustomersActionPerformed
 

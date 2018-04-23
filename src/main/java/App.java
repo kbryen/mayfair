@@ -4,15 +4,18 @@
  */
 package main.java;
 
+import java.awt.EventQueue;
 import static java.awt.Frame.MAXIMIZED_BOTH;
 import javax.swing.JFrame;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 import main.java.product.Products;
 import main.java.customer.Customers;
 import main.java.order.purchase.CurrentPurchaseOrders;
 import main.java.order.purchase.NewPurchaseOrderStep1;
 import main.java.order.purchase.PastPurchaseOrders;
 import main.java.order.sales.CurrentSalesOrders;
-import main.java.order.sales.CustomerNumber;
+import main.java.order.sales.NewSalesOrderStep1;
 import main.java.order.sales.PastSalesOrders;
 import main.java.reminders.Reminders;
 import main.java.report.Reports;
@@ -21,10 +24,10 @@ import main.java.report.Reports;
  *
  * @author kian_bryen
  */
-public class Main extends JFrame
+public class App extends JFrame
 {
 
-    public Main()
+    public App()
     {
         initComponents();
     }
@@ -34,14 +37,9 @@ public class Main extends JFrame
      */
     public static void main(String args[])
     {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
         try
         {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels())
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
             {
                 if ("Nimbus".equals(info.getName()))
                 {
@@ -50,31 +48,17 @@ public class Main extends JFrame
                 }
             }
         }
-        catch (ClassNotFoundException ex)
+        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
         {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            MayfairStatic.outputMessage(null, ex);
         }
-        catch (InstantiationException ex)
-        {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (IllegalAccessException ex)
-        {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        catch (javax.swing.UnsupportedLookAndFeelException ex)
-        {
-            java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-        //</editor-fold>
-
+        
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(() ->
+        EventQueue.invokeLater(() ->
         {
-            Main main  = new Main();
-            main.setVisible(true);
-            main.setExtendedState(MAXIMIZED_BOTH);
+            App jFrame  = new App();
+            jFrame.setVisible(true);
+            jFrame.setExtendedState(MAXIMIZED_BOTH);
         });
     }
 
@@ -313,7 +297,7 @@ public class Main extends JFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnNewSOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNewSOActionPerformed
-        CustomerNumber jFrame = new CustomerNumber(desktop);
+        NewSalesOrderStep1 jFrame = new NewSalesOrderStep1(desktop);
         desktop.add(jFrame);
         jFrame.show();
     }//GEN-LAST:event_btnNewSOActionPerformed

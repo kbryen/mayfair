@@ -4,24 +4,23 @@
  */
 package main.java.order.sales;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
-import main.java.Database;
 import main.java.MayfairStatic;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.CellStyle;
+import static main.java.MayfairStatic.CUSTOMERS_TABLE;
+import static main.java.MayfairStatic.CUSTOMER_CUSTNUM;
+import static main.java.MayfairStatic.CUSTOMER_NAME;
+import static main.java.MayfairStatic.SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SO_CUSTNUM;
+import static main.java.MayfairStatic.SO_DELDATE;
+import static main.java.MayfairStatic.SO_DELIVERED;
+import static main.java.MayfairStatic.SO_ORDDATE;
+import static main.java.MayfairStatic.SO_ORDNUM;
+import static main.java.MayfairStatic.SO_PRICE;
+import main.java.report.ReportGenerator;
 
 /**
  *
@@ -31,24 +30,30 @@ public class PastSalesOrders extends javax.swing.JInternalFrame
 {
 
     private final JDesktopPane desktop;
-    private final Database db = new Database();
-    private String sql;
 
     public PastSalesOrders(JDesktopPane pane)
     {
-        initComponents();
-        this.setTitle("Past Sales Orders");
-
-        table.getColumnModel().getColumn(1).setHeaderValue("Customer");
-        labelName.setText("Customer Name");
-        btnMarkUndelivered.setEnabled(false);
-
-        desktop = pane;
-        scrollPane.setVisible(false);
-        btnViewSummary.setEnabled(false);
-        btnExcelSummary.setVisible(false);
+        setUpGUI();
+        this.desktop = pane;
         btnFindActionPerformed(null);
+    }
+
+    private void setUpGUI()
+    {
+        initComponents();
+        enableButtons(false);
         table.setAutoCreateRowSorter(true);
+        MayfairStatic.addDateSorter(table, new int[]
+        {
+            2, 3, 7
+        });
+    }
+
+    private void enableButtons(boolean enable)
+    {
+        btnMarkUndelivered.setEnabled(enable);
+        btnViewSummary.setEnabled(enable);
+        btnExcelSummary.setVisible(enable);
     }
 
     /**
@@ -106,14 +111,6 @@ public class PastSalesOrders extends javax.swing.JInternalFrame
             public void actionPerformed(java.awt.event.ActionEvent evt)
             {
                 btnFindActionPerformed(evt);
-            }
-        });
-
-        fieldOrderNumber.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                fieldOrderNumberActionPerformed(evt);
             }
         });
 
@@ -264,103 +261,67 @@ public class PastSalesOrders extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnViewSummaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewSummaryActionPerformed
-        ViewSalesSummary salesOrder = new ViewSalesSummary(Integer.parseInt(fieldOrderNumber.getText()));
-        desktop.add(salesOrder);
-        salesOrder.show();
+        ViewSalesOrderSummary jFrame = new ViewSalesOrderSummary(Integer.parseInt(fieldOrderNumber.getText()));
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnViewSummaryActionPerformed
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        Connection con = db.getConnection();
-        try
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs;
-            if (!fieldOrderNumber.getText().equals(""))
+            String sql = "SELECT " + SO_ORDNUM + ", " 
+                    + CUSTOMER_NAME + ", " 
+                    + MayfairStatic.sqlDateFormat(SO_ORDDATE) + ", " 
+                    + MayfairStatic.sqlDateFormat(SO_DELDATE) + ", " 
+                    + SO_PRICE + " "
+                    + "FROM " + SALES_ORDER_TABLE + " "
+                    + "JOIN " + CUSTOMERS_TABLE + " "
+                    + "ON " + SO_CUSTNUM + "=" + CUSTOMER_CUSTNUM + " "
+                    + "WHERE " + SO_DELIVERED + " = true ";
+            if (fieldOrderNumber.getText().isEmpty())
             {
-                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.price FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order.ord_num LIKE '%" + fieldOrderNumber.getText() + "%' and delivered = true ORDER BY sales_order.del_date DESC");
+                sql += "AND " + CUSTOMER_NAME + " LIKE '%" + fieldName.getText() + "%' ";
             }
             else
             {
-                rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.price FROM sales_order INNER JOIN customers ON sales_order.cust_num=customers.cust_num WHERE customers.name LIKE '%" + fieldName.getText() + "%' and delivered = true ORDER BY sales_order.del_date DESC");
+                sql += "AND " + SO_ORDNUM + " LIKE '%" + fieldOrderNumber.getText() + "%' ";
             }
+            sql += "ORDER BY " + SO_DELDATE + " DESC";
 
-            scrollPane.setVisible(true);
-            getContentPane().validate();
-            getContentPane().repaint();
-            while (table.getRowCount() > 0)
-            {
-                ((DefaultTableModel) table.getModel()).removeRow(0);
-            }
-            int columns = rs.getMetaData().getColumnCount();
-            while (rs.next())
-            {
-                Object[] row = new Object[columns];
-                for (int i = 1; i <= columns; i++)
-                {
-                    row[i - 1] = rs.getObject(i);
-                }
-                ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
-            }
-
-            btnExcelSummary.setVisible(false);
+            MayfairStatic.fillTable(table, statement.executeQuery(sql));
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(PastSalesOrders.this, e.getMessage());
-        }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
+            MayfairStatic.outputMessage(this, ex);
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
-    private void fieldOrderNumberActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fieldOrderNumberActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fieldOrderNumberActionPerformed
-
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
-        fieldOrderNumber.setText(String.valueOf((int) table.getValueAt(table.getSelectedRow(), 0)));
-        fieldName.setText((String) table.getValueAt(table.getSelectedRow(), 1));
-        btnViewSummary.setEnabled(true);
-        btnMarkUndelivered.setEnabled(true);
-        btnExcelSummary.setVisible(true);
+        fieldOrderNumber.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 0)));
+        fieldName.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 1)));
+        enableButtons(true);
     }//GEN-LAST:event_tableMouseClicked
 
     private void btnMarkUndeliveredActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnMarkUndeliveredActionPerformed
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to Mark as Undelivered?", "Cancel order", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
+        if (MayfairStatic.outputConfirm(this, "Mark Unelivered", "Are you sure you want to Mark as Undelivered") == JOptionPane.YES_OPTION)
         {
-            Connection con = db.getConnection();
-            try
+            try (Statement statement = MayfairStatic.getConnection().createStatement())
             {
-                db.writeToLog("MARK SALES ORDER UNDELIVERED " + fieldOrderNumber.getText());
-                Statement statement = con.createStatement();
-                sql = "UPDATE sales_order SET delivered = false WHERE ord_num = " + Integer.parseInt(fieldOrderNumber.getText());
+                String sql = "UPDATE " + SALES_ORDER_TABLE + " "
+                        + "SET " + SO_DELIVERED + " = false "
+                        + "WHERE " + SO_ORDNUM + " = " + Integer.parseInt(fieldOrderNumber.getText());
                 statement.executeUpdate(sql);
-                db.writeToLog(sql);
-                db.writeToLog(MayfairStatic.LOG_SEPERATOR);
+                
+                MayfairStatic.writeToLog("MARK SALES ORDER UNDELIVERED " + fieldOrderNumber.getText());
+                MayfairStatic.writeToLog(sql);
+                MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
-                fieldOrderNumber.setText("");
-                fieldName.setText("");
+                btnClearActionPerformed(null);
                 btnFindActionPerformed(null);
             }
             catch (SQLException e)
             {
                 JOptionPane.showMessageDialog(PastSalesOrders.this, e.getMessage());
-            }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
             }
         }
     }//GEN-LAST:event_btnMarkUndeliveredActionPerformed
@@ -371,130 +332,8 @@ public class PastSalesOrders extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnExcelSummaryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcelSummaryActionPerformed
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to Create an Excel Version of the Order?", "Excel Summary", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            int ord_num = (int) table.getValueAt(table.getSelectedRow(), 0);
-            int cust_num;
-            String name;
-            String del_date;
-            double price;
-
-            // SQL
-            Connection con = db.getConnection();
-            Statement statement;
-            try
-            {
-                statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = statement.executeQuery("SELECT cust_num, del_date, price FROM sales_order WHERE ord_num = " + ord_num);
-                rs.next();
-                cust_num = rs.getInt("cust_num");
-                String[] date = rs.getString("del_date").split(" ");
-                del_date = date[0];
-
-                price = rs.getDouble("price");
-
-                rs = statement.executeQuery("SELECT name, del_address FROM customers WHERE cust_num = " + cust_num);
-                rs.next();
-                name = rs.getString("name");
-
-                FileOutputStream fileOut;
-                fileOut = new FileOutputStream("S:/SALES ORDERS/SALES ORDER - " + ord_num + ".xls");
-
-                HSSFWorkbook wb = new HSSFWorkbook();
-                HSSFSheet worksheet = wb.createSheet(String.valueOf(ord_num));
-                CellStyle editableStyle = wb.createCellStyle();
-                editableStyle.setLocked(false);
-
-                HSSFRow row = worksheet.createRow((short) 0);
-                HSSFCell cell = row.createCell(0);
-                cell.setCellValue("Order Number");
-                cell = row.createCell(1);
-                cell.setCellValue(ord_num);
-
-                row = worksheet.createRow((short) 1);
-                cell = row.createCell(0);
-                cell.setCellValue("Delivery Date");
-                cell = row.createCell(1);
-                cell.setCellValue(del_date);
-
-                row = worksheet.createRow((short) 3);
-                cell = row.createCell(0);
-                cell.setCellValue("Customer Number");
-                cell = row.createCell(1);
-                cell.setCellValue(cust_num);
-
-                row = worksheet.createRow((short) 4);
-                cell = row.createCell(0);
-                cell.setCellValue("Customer Name");
-                cell = row.createCell(1);
-                cell.setCellValue(name);
-
-                row = worksheet.createRow((short) 6);
-                cell = row.createCell(0);
-                cell.setCellValue("Product Code");
-                cell = row.createCell(1);
-                cell.setCellValue("Quantity");
-
-                int i = 7;
-                rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity FROM sales_order_details JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + ord_num);
-                while (rs.next())
-                {
-                    String code = rs.getString("code");
-                    int quantity = rs.getInt("quantity");
-
-                    row = worksheet.createRow((short) i);
-                    cell = row.createCell(0);
-                    cell.setCellValue(code);
-                    cell = row.createCell(1);
-                    cell.setCellValue(quantity);
-
-                    i++;
-                }
-
-                row = worksheet.createRow((short) i + 1);
-                cell = row.createCell(0);
-                cell.setCellValue("Order Price");
-                cell = row.createCell(1);
-                cell.setCellValue(price);
-
-                rs = statement.executeQuery("SELECT SUM(quantity) FROM sales_order_details WHERE ord_num = " + ord_num);
-                rs.next();
-
-                row = worksheet.createRow((short) i + 2);
-                cell = row.createCell(0);
-                cell.setCellValue("Total Units");
-                cell = row.createCell(1);
-                cell.setCellValue(rs.getInt("quantity"));
-
-                // Auto Size Columns
-                for (int k = 0; k < 2; k++)
-                {
-                    worksheet.autoSizeColumn(k);
-                    worksheet.setDefaultColumnStyle(i + 2, editableStyle);
-                }
-
-                wb.write(fileOut);
-                fileOut.flush();
-                fileOut.close();
-
-                JOptionPane.showMessageDialog(PastSalesOrders.this, "Excel Order Summary Created.\n'SALES ORDER - " + ord_num + ".xls'");
-            }
-
-            catch (SQLException | IOException ex)
-            {
-                Logger.getLogger(CurrentSalesOrders.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
-            }
-        }
+        int ord_num = (int) table.getValueAt(table.getSelectedRow(), 0);
+        ReportGenerator.createSalesOrderSummaryReport(this, ord_num);
     }//GEN-LAST:event_btnExcelSummaryActionPerformed
 
 

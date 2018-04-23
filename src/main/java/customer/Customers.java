@@ -18,7 +18,7 @@ import static main.java.MayfairStatic.CUSTOMER_DELIVERY;
 import static main.java.MayfairStatic.CUSTOMER_EMAIL;
 import static main.java.MayfairStatic.CUSTOMER_FAX;
 import static main.java.MayfairStatic.CUSTOMER_NAME;
-import static main.java.MayfairStatic.CUSTOMER_NUM;
+import static main.java.MayfairStatic.CUSTOMER_CUSTNUM;
 import static main.java.MayfairStatic.CUSTOMER_PROFORMA;
 import static main.java.MayfairStatic.CUSTOMER_REFERENCE;
 import static main.java.MayfairStatic.CUSTOMER_TEL;
@@ -236,7 +236,7 @@ public class Customers extends javax.swing.JInternalFrame
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
         try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            String sql = "SELECT " + CUSTOMER_NUM + ", "
+            String sql = "SELECT " + CUSTOMER_CUSTNUM + ", "
                     + CUSTOMER_REFERENCE + ", "
                     + CUSTOMER_NAME + ", "
                     + CUSTOMER_DELADDRESS + ", "
@@ -251,7 +251,7 @@ public class Customers extends javax.swing.JInternalFrame
                     + "FROM " + CUSTOMERS_TABLE + " ";
             if (!fieldNumber.getText().isEmpty())
             {
-                sql += "WHERE " + CUSTOMER_NUM + " = " + fieldNumber.getText() + " ";
+                sql += "WHERE " + CUSTOMER_CUSTNUM + " = " + fieldNumber.getText() + " ";
             }
             else if (!fieldReference.getText().isEmpty())
             {

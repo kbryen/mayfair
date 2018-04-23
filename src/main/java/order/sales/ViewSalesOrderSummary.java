@@ -4,31 +4,47 @@
  */
 package main.java.order.sales;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
-import main.java.Database;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.CUSTOMERS_TABLE;
+import static main.java.MayfairStatic.CUSTOMER_CUSTNUM;
+import static main.java.MayfairStatic.CUSTOMER_DELADDRESS;
+import static main.java.MayfairStatic.CUSTOMER_NAME;
+import static main.java.MayfairStatic.PRODUCTS_TABLE;
+import static main.java.MayfairStatic.PRODUCT_CODE;
+import static main.java.MayfairStatic.PRODUCT_PRODNUM;
+import static main.java.MayfairStatic.PRODUCT_SALESPRICE;
+import static main.java.MayfairStatic.SALES_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SOD_FROMORDER;
+import static main.java.MayfairStatic.SOD_FROMSTOCK;
+import static main.java.MayfairStatic.SOD_ORDNUM;
+import static main.java.MayfairStatic.SOD_PRICE;
+import static main.java.MayfairStatic.SOD_PRODNUM;
+import static main.java.MayfairStatic.SO_COMMENTS;
+import static main.java.MayfairStatic.SO_CUSTNUM;
+import static main.java.MayfairStatic.SO_DELDATE;
+import static main.java.MayfairStatic.SO_ORDDATE;
+import static main.java.MayfairStatic.SO_ORDNUM;
+import static main.java.MayfairStatic.SO_PRICE;
+import static main.java.MayfairStatic.SO_TOTALUNITS;
 import main.java.PrintUtilities;
 
 /**
  *
  * @author kian_bryen
  */
-public final class ViewSalesSummary extends javax.swing.JInternalFrame
+public final class ViewSalesOrderSummary extends javax.swing.JInternalFrame
 {
-    private final Database db = new Database();
-    private final int orderNum;
 
-    public ViewSalesSummary(int orderNum)
+    private final int ord_num;
+
+    public ViewSalesOrderSummary(int ord_num)
     {
-        initComponents();
-        this.orderNum = orderNum;
-        labelAddress.setVisible(false);
-        table.setAutoCreateRowSorter(true);
-        FillLabels();
+        this.ord_num = ord_num;
+        setUpGUI();
     }
 
     /**
@@ -47,26 +63,24 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
         btnPrint = new javax.swing.JButton();
         panePrint = new javax.swing.JPanel();
         labelDetails = new javax.swing.JLabel();
+        label1 = new javax.swing.JLabel();
         labelNumber = new javax.swing.JLabel();
-        labelNumber2 = new javax.swing.JLabel();
-        labelName2 = new javax.swing.JLabel();
         labelName = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
+        label2 = new javax.swing.JLabel();
+        label4 = new javax.swing.JLabel();
         labelDelDate = new javax.swing.JLabel();
         labelOrdNum = new javax.swing.JLabel();
-        jLabel7 = new javax.swing.JLabel();
+        label6 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         table = new javax.swing.JTable();
         jLabel8 = new javax.swing.JLabel();
-        labelOrdTotal = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
+        labelPrice = new javax.swing.JLabel();
         labelOrdDate = new javax.swing.JLabel();
-        jLabel10 = new javax.swing.JLabel();
+        label5 = new javax.swing.JLabel();
+        label3 = new javax.swing.JLabel();
         labelAddress = new javax.swing.JLabel();
-        labelAddress2 = new javax.swing.JLabel();
         jLabel11 = new javax.swing.JLabel();
-        labelTotalUnits = new javax.swing.JLabel();
-        jLabel12 = new javax.swing.JLabel();
+        labelUnits = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JSeparator();
         scrollPane = new javax.swing.JScrollPane();
         fieldComments = new javax.swing.JTextArea();
@@ -99,11 +113,23 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
         });
 
         labelDetails.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
-        labelDetails.setText("Details");
+        labelDetails.setText("Customer Details");
 
-        jLabel6.setText("Order Number : ");
+        label1.setText("Customer Number:");
 
-        jLabel7.setText("Delivery Date : ");
+        labelNumber.setText("1");
+
+        labelName.setText("1");
+
+        label2.setText("Customer Name:");
+
+        label4.setText("Order Number : ");
+
+        labelDelDate.setText("1");
+
+        labelOrdNum.setText("1");
+
+        label6.setText("Delivery Date : ");
 
         jScrollPane1.setBorder(null);
         jScrollPane1.setForeground(new java.awt.Color(255, 255, 255));
@@ -145,69 +171,64 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
 
         jLabel8.setText("Products Ordered : ");
 
-        labelOrdTotal.setText("100");
+        labelPrice.setText("Order Total: £");
 
-        jLabel9.setText("Order Total : £");
+        labelOrdDate.setText("1");
 
-        jLabel10.setText("Order Date : ");
+        label5.setText("Order Date : ");
 
-        labelAddress.setText("Delivery Address:");
+        label3.setText("Delivery Address:");
+
+        labelAddress.setText("1");
 
         jLabel11.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
         jLabel11.setText("Order Details");
 
-        labelTotalUnits.setText("100");
-
-        jLabel12.setText("Total Units :");
+        labelUnits.setText("Total Units:");
 
         javax.swing.GroupLayout panePrintLayout = new javax.swing.GroupLayout(panePrint);
         panePrint.setLayout(panePrintLayout);
         panePrintLayout.setHorizontalGroup(
             panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panePrintLayout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panePrintLayout.createSequentialGroup()
-                        .addComponent(jLabel9)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(labelOrdTotal))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panePrintLayout.createSequentialGroup()
-                        .addComponent(jLabel12)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(labelTotalUnits))))
             .addGroup(panePrintLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1)
+                .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panePrintLayout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(labelPrice, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(labelUnits, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
             .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panePrintLayout.createSequentialGroup()
                     .addContainerGap()
                     .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addGroup(panePrintLayout.createSequentialGroup()
-                            .addComponent(jLabel7)
+                            .addComponent(label6)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(labelDelDate))
                         .addComponent(jLabel8)
                         .addComponent(labelDetails)
                         .addGroup(panePrintLayout.createSequentialGroup()
+                            .addComponent(label1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(labelNumber)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(labelNumber2)
                             .addGap(18, 18, 18)
-                            .addComponent(labelName)
+                            .addComponent(label2)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(labelName2))
+                            .addComponent(labelName))
                         .addGroup(panePrintLayout.createSequentialGroup()
-                            .addComponent(labelAddress)
+                            .addComponent(label3)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(labelAddress2))
+                            .addComponent(labelAddress))
                         .addComponent(jLabel11)
                         .addGroup(panePrintLayout.createSequentialGroup()
-                            .addComponent(jLabel6)
+                            .addComponent(label4)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(labelOrdNum))
                         .addGroup(panePrintLayout.createSequentialGroup()
-                            .addComponent(jLabel10)
+                            .addComponent(label5)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                             .addComponent(labelOrdDate)))
                     .addContainerGap(319, Short.MAX_VALUE)))
@@ -215,16 +236,12 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
         panePrintLayout.setVerticalGroup(
             panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panePrintLayout.createSequentialGroup()
-                .addGap(0, 237, Short.MAX_VALUE)
+                .addGap(0, 255, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 196, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel9)
-                    .addComponent(labelOrdTotal))
+                .addComponent(labelPrice)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel12)
-                    .addComponent(labelTotalUnits)))
+                .addComponent(labelUnits))
             .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(panePrintLayout.createSequentialGroup()
                     .addContainerGap()
@@ -233,28 +250,28 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
                             .addComponent(labelDetails)
                             .addGap(18, 18, 18)
                             .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                .addComponent(labelNumber)
-                                .addComponent(labelNumber2)))
+                                .addComponent(label1)
+                                .addComponent(labelNumber)))
                         .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(labelName)
-                            .addComponent(labelName2)))
+                            .addComponent(label2)
+                            .addComponent(labelName)))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(labelAddress)
-                        .addComponent(labelAddress2))
+                        .addComponent(label3)
+                        .addComponent(labelAddress))
                     .addGap(18, 18, 18)
                     .addComponent(jLabel11)
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel6)
+                        .addComponent(label4)
                         .addComponent(labelOrdNum))
                     .addGap(13, 13, 13)
                     .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel10)
+                        .addComponent(label5)
                         .addComponent(labelOrdDate))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addGroup(panePrintLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel7)
+                        .addComponent(label6)
                         .addComponent(labelDelDate))
                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                     .addComponent(jLabel8)
@@ -321,78 +338,60 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
     /**
      * Fill Labels
      */
-    private void FillLabels()
+    private void setUpGUI()
     {
-        Connection con = db.getConnection();
-
-        try
+        initComponents();
+        table.setAutoCreateRowSorter(true);
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = statement.executeQuery("SELECT customers.cust_num, customers.name, sales_order.ord_num, sales_order.del_date, sales_order.ord_date, sales_order.price, sales_order.total_units, sales_order.comments "
-                    + "FROM sales_order "
-                    + "JOIN customers ON sales_order.cust_num = customers.cust_num "
-                    + "WHERE sales_order.ord_num = " + orderNum);
+            ResultSet rs = statement.executeQuery("SELECT " + CUSTOMER_CUSTNUM + ", "
+                    + CUSTOMER_NAME + ", "
+                    + SO_ORDNUM + ", "
+                    + MayfairStatic.sqlDateFormat(SO_DELDATE, "%d/%m/%Y") + ", "
+                    + MayfairStatic.sqlDateFormat(SO_ORDDATE, "%d/%m/%Y") + ", "
+                    + SO_PRICE + ", "
+                    + SO_TOTALUNITS + ", "
+                    + CUSTOMER_DELADDRESS + ", "
+                    + SO_COMMENTS + " "
+                    + "FROM " + SALES_ORDER_TABLE + " "
+                    + "JOIN " + CUSTOMERS_TABLE + " "
+                    + "ON " + SO_CUSTNUM + "=" + CUSTOMER_CUSTNUM + " "
+                    + "WHERE " + SO_ORDNUM + " = '" + ord_num + "'");
             rs.next();
 
-            // Fill labels
-            labelDetails.setText("Customer Details");
-            labelNumber.setText("Customer Number : ");
-            labelNumber2.setText(rs.getString("cust_num"));
-            labelName.setText("Customer Name : ");
-            labelName2.setText(rs.getString("name"));
-            labelOrdNum.setText(rs.getString("ord_num"));
-            String[] date = rs.getString("ord_date").split(" ");
-            labelOrdDate.setText(date[0]);
-            date = rs.getString("del_date").split(" ");
-            labelDelDate.setText(date[0]);
-            labelOrdTotal.setText(String.format("%.02f", rs.getFloat("price")));
-            labelTotalUnits.setText(String.valueOf(rs.getInt("total_units")));
+            labelNumber.setText(rs.getString(CUSTOMER_CUSTNUM));
+            labelName.setText(rs.getString(CUSTOMER_NAME));
+            labelOrdNum.setText(rs.getString(SO_ORDNUM));
+            labelOrdDate.setText(rs.getString(SO_ORDDATE));
+            labelDelDate.setText(rs.getString(SO_DELDATE));
+            labelUnits.setText("Total Units: " + rs.getString(SO_TOTALUNITS));
+            labelPrice.setText("Order Total: £" + String.format("%.02f", rs.getFloat(SO_PRICE)));
+            labelAddress.setText(rs.getString(CUSTOMER_DELADDRESS));
 
-            if (rs.getString("comments").equals(""))
+            String comments = rs.getString(SO_COMMENTS);
+            if (comments.isEmpty())
             {
                 labelComments.setVisible(false);
                 scrollPane.setVisible(false);
             }
             else
             {
-                fieldComments.setText(rs.getString("comments"));
+                fieldComments.setText(comments);
             }
 
-            labelAddress.setVisible(true);
-            rs = statement.executeQuery("SELECT del_address FROM customers WHERE cust_num = " + labelNumber2.getText());
-            rs.next();
-            labelAddress2.setText(rs.getString("del_address"));
-
-            rs = statement.executeQuery("SELECT products.code, sales_order_details.fromStock, sales_order_details.fromOrder, products.sales_price, sales_order_details.price FROM sales_order_details JOIN products ON sales_order_details.prod_num = products.prod_num WHERE sales_order_details.ord_num = " + orderNum);
-
-            // Fill table
-            while (table.getRowCount() > 0)
-            {
-                ((DefaultTableModel) table.getModel()).removeRow(0);
-            }
-            int columns = rs.getMetaData().getColumnCount();
-            while (rs.next())
-            {
-                Object[] row = new Object[columns];
-                for (int i = 1; i <= columns; i++)
-                {
-                    row[i - 1] = rs.getObject(i);
-                }
-                ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
-            }
+            rs = statement.executeQuery("SELECT " + PRODUCT_CODE + ", "
+                    + SOD_FROMSTOCK + ", "
+                    + SOD_FROMORDER + ", "
+                    + PRODUCT_SALESPRICE + ", " + SOD_PRICE + " "
+                    + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                    + "JOIN " + PRODUCTS_TABLE + " "
+                    + "ON " + SOD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                    + "WHERE " + SOD_ORDNUM + " = " + ord_num);
+            MayfairStatic.fillTable(table, rs);
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(ViewSalesSummary.this, e.getMessage());
-        }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
+            MayfairStatic.outputMessage(this, ex);
         }
     }
 
@@ -410,29 +409,27 @@ public final class ViewSalesSummary extends javax.swing.JInternalFrame
     private javax.swing.JButton btnPrint;
     private javax.swing.JTextArea fieldComments;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
-    private javax.swing.JLabel jLabel12;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator3;
+    private javax.swing.JLabel label1;
+    private javax.swing.JLabel label2;
+    private javax.swing.JLabel label3;
+    private javax.swing.JLabel label4;
+    private javax.swing.JLabel label5;
+    private javax.swing.JLabel label6;
     private javax.swing.JLabel labelAddress;
-    private javax.swing.JLabel labelAddress2;
     private javax.swing.JLabel labelComments;
     private javax.swing.JLabel labelDelDate;
     private javax.swing.JLabel labelDetails;
     private javax.swing.JLabel labelName;
-    private javax.swing.JLabel labelName2;
     private javax.swing.JLabel labelNumber;
-    private javax.swing.JLabel labelNumber2;
     private javax.swing.JLabel labelOrdDate;
     private javax.swing.JLabel labelOrdNum;
-    private javax.swing.JLabel labelOrdTotal;
-    private javax.swing.JLabel labelTotalUnits;
+    private javax.swing.JLabel labelPrice;
+    private javax.swing.JLabel labelUnits;
     private javax.swing.JPanel panePrint;
     private javax.swing.JScrollPane scrollPane;
     private javax.swing.JTable table;

@@ -20,7 +20,7 @@ import static main.java.MayfairStatic.CUSTOMER_DELIVERY;
 import static main.java.MayfairStatic.CUSTOMER_EMAIL;
 import static main.java.MayfairStatic.CUSTOMER_FAX;
 import static main.java.MayfairStatic.CUSTOMER_NAME;
-import static main.java.MayfairStatic.CUSTOMER_NUM;
+import static main.java.MayfairStatic.CUSTOMER_CUSTNUM;
 import static main.java.MayfairStatic.CUSTOMER_PROFORMA;
 import static main.java.MayfairStatic.CUSTOMER_REFERENCE;
 import static main.java.MayfairStatic.CUSTOMER_TEL;
@@ -411,7 +411,7 @@ public class CustomerInfo extends javax.swing.JInternalFrame
         {
             ResultSet rs = statement.executeQuery("SELECT * "
                     + "FROM " + CUSTOMERS_TABLE + " "
-                    + "WHERE " + CUSTOMER_NUM + " = " + custNum);
+                    + "WHERE " + CUSTOMER_CUSTNUM + " = " + custNum);
             if (rs.next())
             {
                 fieldReference.setText(rs.getString(CUSTOMER_REFERENCE));
@@ -570,7 +570,7 @@ public class CustomerInfo extends javax.swing.JInternalFrame
                                     + CUSTOMER_COMMENTS + " = '" + fieldComments.getText() + "', "
                                     + CUSTOMER_PROFORMA + " = " + proforma.isSelected() + ", "
                                     + CUSTOMER_DELIVERY + " = '" + instructions + "' "
-                                    + "WHERE " + CUSTOMER_NUM + " = " + custNum;
+                                    + "WHERE " + CUSTOMER_CUSTNUM + " = " + custNum;
                             MayfairStatic.outputMessage(this, "Success", "Customer Updated", INFORMATION_MESSAGE);
                             break;
                     }

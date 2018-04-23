@@ -5,18 +5,27 @@
 package main.java.order.purchase;
 
 import java.awt.HeadlessException;
-import java.beans.PropertyVetoException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
-import javax.swing.table.DefaultTableModel;
-import main.java.Database;
-import main.java.Main;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.POD_AVALIABLE;
+import static main.java.MayfairStatic.POD_CODE;
+import static main.java.MayfairStatic.POD_ORDNUM;
+import static main.java.MayfairStatic.POD_PRICE;
+import static main.java.MayfairStatic.POD_PRODNUM;
+import static main.java.MayfairStatic.POD_QUANTITY;
+import static main.java.MayfairStatic.PRODUCTS_TABLE;
+import static main.java.MayfairStatic.PRODUCT_CODE;
+import static main.java.MayfairStatic.PRODUCT_INORDER;
+import static main.java.MayfairStatic.PRODUCT_INSTOCK;
+import static main.java.MayfairStatic.PRODUCT_PRODNUM;
+import static main.java.MayfairStatic.PRODUCT_PURCHASEPRICE;
+import static main.java.MayfairStatic.PRODUCT_TOTAL;
+import static main.java.MayfairStatic.PURCHASE_ORDER_DETAILS_TABLE;
 
 /**
  *
@@ -25,19 +34,20 @@ import main.java.Main;
 public class EditPurchaseOrderStep2 extends javax.swing.JInternalFrame
 {
 
-    private final Database db = new Database();
-    private String sql;
-    private final String orderNum;
+    private final String ord_num;
     private final JDesktopPane desktop;
 
-    public EditPurchaseOrderStep2(String num, JDesktopPane pane)
+    public EditPurchaseOrderStep2(String ord_num, JDesktopPane pane)
+    {
+        setUpGUI();
+        this.ord_num = ord_num;
+        this.desktop = pane;
+        btnFindActionPerformed(null);
+    }
+
+    private void setUpGUI()
     {
         initComponents();
-        this.orderNum = num;
-        this.desktop = pane;
-        this.setTitle("Edit Purchase Order");
-
-        scrollPane.setVisible(false);
         btnAdd.setEnabled(false);
         table.setAutoCreateRowSorter(true);
     }
@@ -68,10 +78,10 @@ public class EditPurchaseOrderStep2 extends javax.swing.JInternalFrame
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
-        setTitle("Edit Sales Order");
+        setTitle("Edit Purchase Order");
 
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
-        jLabel1.setText("Edit Order");
+        jLabel1.setText("Add Product");
 
         jLabel5.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
         jLabel5.setText("Select Product");
@@ -196,129 +206,101 @@ public class EditPurchaseOrderStep2 extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        try
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            this.setMaximum(true);
+            ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_PRODNUM + ", "
+                    + PRODUCT_CODE + ", "
+                    + PRODUCT_PURCHASEPRICE + ", "
+                    + PRODUCT_INSTOCK + ", "
+                    + PRODUCT_INORDER + ", "
+                    + PRODUCT_TOTAL + " "
+                    + "FROM " + PRODUCTS_TABLE + " "
+                    + "WHERE " + PRODUCT_CODE + " LIKE '%" + fieldProdCode.getText() + "%' "
+                    + "ORDER BY " + PRODUCT_PRODNUM + " ASC");
+            MayfairStatic.fillTable(table, rs);
         }
-        catch (PropertyVetoException ex)
+        catch (SQLException ex)
         {
-            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        Connection con = db.getConnection();
-        try
-        {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs;
-
-            scrollPane.setVisible(true);
-            getContentPane().validate();
-            getContentPane().repaint();
-
-            rs = statement.executeQuery("SELECT prod_num, code, purchase_price, in_stock, in_order, total FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' ORDER BY prod_num ASC");
-            while (table.getRowCount() > 0)
-            {
-                ((DefaultTableModel) table.getModel()).removeRow(0);
-            }
-            int columns = rs.getMetaData().getColumnCount();
-            while (rs.next())
-            {
-                Object[] row = new Object[columns];
-                for (int i = 1; i <= columns; i++)
-                {
-                    row[i - 1] = rs.getObject(i);
-                }
-                ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
-            }
-
-        }
-        catch (SQLException e)
-        {
-            JOptionPane.showMessageDialog(EditPurchaseOrderStep2.this, e.getMessage());
-        }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
+            MayfairStatic.outputMessage(this, ex);
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
-        fieldProdCode.setText((String) table.getValueAt(table.getSelectedRow(), 1));
+        fieldProdCode.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 1)));
         btnAdd.setEnabled(true);
     }//GEN-LAST:event_tableMouseClicked
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         try
         {
-            Connection con = db.getConnection();
-            try
+            int newQuantity = Integer.parseInt(fieldQuant.getText());
+            if (newQuantity <= 0)
+            {
+                throw new NumberFormatException();
+            }
+
+            try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
                 int prod_num = (int) table.getValueAt(table.getSelectedRow(), 0);
 
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                Statement statement2 = con.createStatement();
-                ResultSet rs = statement.executeQuery("SELECT purchase_price, in_order FROM products WHERE prod_num = " + prod_num);
+                ResultSet rs = selectStatement.executeQuery("SELECT " + PRODUCT_PURCHASEPRICE + ", " + PRODUCT_INORDER + " "
+                        + "FROM " + PRODUCTS_TABLE + " "
+                        + "WHERE " + PRODUCT_PRODNUM + " = " + prod_num);
                 rs.next();
+                double purchase_price = rs.getDouble(PRODUCT_PURCHASEPRICE);
+                int in_order = rs.getInt(PRODUCT_INORDER) + newQuantity;
 
-                double price = rs.getDouble("purchase_price");
-                int in_order = rs.getInt("in_order");
-
-                db.writeToLog("ADD PRODUCT " + prod_num);
-
-                int quantity = Integer.parseInt(fieldQuant.getText());
-                if (quantity > 0)
+                MayfairStatic.writeToLog("ADD PRODUCT " + prod_num);
+                String sql;
+                rs = selectStatement.executeQuery("SELECT " + POD_CODE + ", " + POD_QUANTITY + ", " + POD_AVALIABLE + " "
+                        + "FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                        + "WHERE " + POD_PRODNUM + " = " + prod_num + " "
+                        + "AND " + POD_ORDNUM + " = '" + ord_num + "'");
+                if (rs.next())
                 {
-                    rs = statement.executeQuery("SELECT code, quantity, avaliable FROM purchase_order_details WHERE prod_num = " + prod_num + " AND ord_num = '" + orderNum + "'");
-                    if (rs.next())
-                    {
-                        int num = rs.getInt("quantity");
-                        int code = rs.getInt("code");
-                        int avaliable = rs.getInt("avaliable");
-                        sql = "UPDATE purchase_order_details SET quantity = " + (num + quantity) + ", avaliable = " + (avaliable + quantity) + ", price = " + ((num + quantity) * price) + " WHERE code = " + code;
-                    }
-                    else
-                    {
-                        sql = "INSERT INTO purchase_order_details (ord_num, prod_num, quantity, avaliable, price) VALUES ('" + orderNum + "', " + prod_num + ", " + quantity + ", " + quantity + ", " + (quantity * price) + ")";
-                    }
-                    statement2.executeUpdate(sql);
-                    db.writeToLog(sql);
-                    sql = "UPDATE products SET in_order = " + (in_order + quantity) + " WHERE prod_num = " + prod_num;
-                    statement2.executeUpdate(sql);
-                    db.writeToLog(sql);
-
-                    JOptionPane.showMessageDialog(EditPurchaseOrderStep2.this, "Product added");
-                    EditPurchaseOrderStep1 editMain = new EditPurchaseOrderStep1(orderNum, desktop);
-                    desktop.add(editMain);
-                    editMain.show();
-                    this.dispose();
+                    int code = rs.getInt(POD_CODE);
+                    int quantity = rs.getInt(POD_QUANTITY) + newQuantity;
+                    int avaliable = rs.getInt(POD_AVALIABLE) + newQuantity;
+                    double price = quantity * purchase_price;
+                    sql = "UPDATE " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                            + "SET " + POD_QUANTITY + " = " + quantity + ", "
+                            + POD_AVALIABLE + " = " + avaliable + ", "
+                            + POD_PRICE + " = " + price + " "
+                            + "WHERE " + POD_CODE + " = " + code;
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(EditPurchaseOrderStep2.this, "Quantity must be greater than 0");
+                    double price = newQuantity * purchase_price;
+                    sql = "INSERT INTO " + PURCHASE_ORDER_DETAILS_TABLE + " (" + POD_ORDNUM + ", " + POD_PRODNUM + ", " + POD_QUANTITY + ", " + POD_AVALIABLE + ", " + POD_PRICE + ") "
+                            + "VALUES ('" + ord_num + "', " + prod_num + ", " + newQuantity + ", " + newQuantity + ", " + price + ")";
                 }
-            }
-            catch (SQLException e)
-            {
-                JOptionPane.showMessageDialog(EditPurchaseOrderStep2.this, e.getMessage());
-            }
-            finally
-            {
-                try
+
+                try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
                 {
-                    con.close();
+                    updateStatement.executeUpdate(sql);
+                    MayfairStatic.writeToLog(sql);
+
+                    sql = "UPDATE " + PRODUCTS_TABLE + " "
+                            + "SET " + PRODUCT_INORDER + " = " + in_order + " "
+                            + "WHERE " + PRODUCT_PRODNUM + " = " + prod_num;
+                    updateStatement.executeUpdate(sql);
+                    MayfairStatic.writeToLog(sql);
+
+                    MayfairStatic.outputMessage(this, "Product Added", "Product added to order " + ord_num + ".", INFORMATION_MESSAGE);
+                    EditPurchaseOrderStep1 jFrame = new EditPurchaseOrderStep1(ord_num, desktop);
+                    desktop.add(jFrame);
+                    jFrame.show();
+                    this.dispose();
                 }
-                catch (Exception e)
-                { /* ignored */ }
+            }
+            catch (SQLException ex)
+            {
+                MayfairStatic.outputMessage(this, ex);
             }
         }
-        catch (NumberFormatException | HeadlessException e)
+        catch (NumberFormatException | HeadlessException ex)
         {
-            JOptionPane.showMessageDialog(EditPurchaseOrderStep2.this, "Please enter a valid quantity");
+            MayfairStatic.outputMessage(this, "Invalid quantity", "Please enter a valid quantity.", WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnAddActionPerformed
 
