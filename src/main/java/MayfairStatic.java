@@ -12,6 +12,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
@@ -21,6 +24,7 @@ import javax.swing.JInternalFrame;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.QUESTION_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
@@ -154,9 +158,10 @@ public class MayfairStatic
     public static final String PORT = "3306";
     public static final String URL = "jdbc:mysql://" + IP + ":" + PORT + "/" + MAYFAIR;
 
-    public static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy EEE");
+    public static final SimpleDateFormat CAL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final DateTimeFormatter SQL_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy EEE");
     public static final Comparator DATE_COMPARATOR = (Comparator) (Object o1, Object o2)
-            -> LocalDate.parse(o1.toString(), DATE_FORMAT).compareTo(LocalDate.parse(o2.toString(), DATE_FORMAT));
+            -> LocalDate.parse(o1.toString(), SQL_DATE_FORMAT).compareTo(LocalDate.parse(o2.toString(), SQL_DATE_FORMAT));
 
     public static void addDateSorter(JTable table, int[] indexes)
     {
@@ -249,5 +254,44 @@ public class MayfairStatic
     public static String outputInput(Component component, String title, String message)
     {
         return JOptionPane.showInputDialog(component, message, title, QUESTION_MESSAGE);
+    }
+
+    public static boolean validateSalesOrderDelDate(Component component, String date, int ord_num) throws SQLException, ParseException
+    {
+        if (!date.isEmpty())
+        {
+            try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+            {
+                Date minDate = new Date();
+                ResultSet rs = statement.executeQuery("SELECT " + PO_DELDATE + " "
+                        + "FROM " + PURCHASE_ORDER_TABLE + " "
+                        + "JOIN " + PURCHASE_SALES_ORDER_TABLE + " "
+                        + "ON " + PO_ORDNUM + "=" + PS_PONUM + " "
+                        + "WHERE " + PS_SONUM + " = " + ord_num);
+                while (rs.next())
+                {
+                    Date delivery_date = rs.getDate(PO_DELDATE);
+                    if (delivery_date.after(minDate))
+                    {
+                        minDate = delivery_date;
+                    }
+                }
+
+                Date orderDate = CAL_DATE_FORMAT.parse(date);
+                if (orderDate.after(minDate) || orderDate.equals(minDate))
+                {
+                    return true;
+                }
+                else
+                {
+                    MayfairStatic.outputMessage(component, "Invalid date", "Delivery date must be after " + minDate, WARNING_MESSAGE);
+                }
+            }
+        }
+        else
+        {
+            MayfairStatic.outputMessage(component, "Invalid date", "Please enter a delivery date.", WARNING_MESSAGE);
+        }
+        return false;
     }
 }

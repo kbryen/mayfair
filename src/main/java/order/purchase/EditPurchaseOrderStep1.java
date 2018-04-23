@@ -74,6 +74,50 @@ public class EditPurchaseOrderStep1 extends javax.swing.JInternalFrame
         btnDelete.setEnabled(enable);
     }
 
+    private void fillLables()
+    {
+        try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        {
+            updatePurchaseOrderDetails();
+            ResultSet rs = selectStatement.executeQuery("SELECT " + PO_ORDNUM + ", "
+                    + PO_DELDATE + " AS del_datetime, "
+                    + MayfairStatic.sqlDateFormat(PO_DELDATE) + ", "
+                    + PO_PRICE + ", "
+                    + PO_COMMENTS + ", "
+                    + SUPPLIER_SUPPNUM + ", "
+                    + SUPPLIER_NAME + " "
+                    + "FROM " + PURCHASE_ORDER_TABLE + " "
+                    + "JOIN " + SUPPLIERS_TABLE + " "
+                    + "ON " + PO_SUPPNUM + "=" + SUPPLIER_SUPPNUM + " "
+                    + "WHERE " + PO_ORDNUM + " = '" + ord_num + "'");
+            rs.next();
+
+            labelOrdNum.setText(rs.getString(PO_ORDNUM));
+            calDate.setDate(rs.getDate("del_datetime"));
+            labelDelDate.setText(rs.getString(PO_DELDATE));
+            labelPrice.setText(String.format("%.02f", rs.getFloat(PO_PRICE)));
+            fieldComments.setText(rs.getString(PO_COMMENTS));
+            labelSuppNum.setText(rs.getString(SUPPLIER_SUPPNUM));
+            labelSuppName.setText(rs.getString(SUPPLIER_NAME));
+
+            rs = selectStatement.executeQuery("SELECT " + PRODUCT_CODE + ", "
+                    + POD_QUANTITY + ", "
+                    + PRODUCT_PURCHASEPRICE + ", "
+                    + POD_PRICE + " "
+                    + "FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                    + "JOIN " + PRODUCTS_TABLE + " "
+                    + "ON " + POD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                    + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'");
+            MayfairStatic.fillTable(table, rs);
+
+            MayfairStatic.writeToLog("EDIT PURCHASE ORDER " + ord_num);
+        }
+        catch (SQLException ex)
+        {
+            MayfairStatic.outputMessage(this, ex);
+        }
+    }
+
     private void updatePurchaseOrderDetails() throws SQLException
     {
         try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
@@ -358,50 +402,6 @@ public class EditPurchaseOrderStep1 extends javax.swing.JInternalFrame
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void fillLables()
-    {
-        try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-        {
-            updatePurchaseOrderDetails();
-            ResultSet rs = selectStatement.executeQuery("SELECT " + PO_ORDNUM + ", "
-                    + PO_DELDATE + " AS del_datetime, "
-                    + MayfairStatic.sqlDateFormat(PO_DELDATE) + ", "
-                    + PO_PRICE + ", "
-                    + PO_COMMENTS + ", "
-                    + SUPPLIER_SUPPNUM + ", "
-                    + SUPPLIER_NAME + " "
-                    + "FROM " + PURCHASE_ORDER_TABLE + " "
-                    + "JOIN " + SUPPLIERS_TABLE + " "
-                    + "ON " + PO_SUPPNUM + "=" + SUPPLIER_SUPPNUM + " "
-                    + "WHERE " + PO_ORDNUM + " = '" + ord_num + "'");
-            rs.next();
-
-            labelOrdNum.setText(rs.getString(PO_ORDNUM));
-            calDate.setDate(rs.getDate("del_datetime"));
-            labelDelDate.setText(rs.getString(PO_DELDATE));
-            labelPrice.setText(String.format("%.02f", rs.getFloat(PO_PRICE)));
-            fieldComments.setText(rs.getString(PO_COMMENTS));
-            labelSuppNum.setText(rs.getString(SUPPLIER_SUPPNUM));
-            labelSuppName.setText(rs.getString(SUPPLIER_NAME));
-
-            rs = selectStatement.executeQuery("SELECT " + PRODUCT_CODE + ", "
-                    + POD_QUANTITY + ", "
-                    + PRODUCT_PURCHASEPRICE + ", "
-                    + POD_PRICE + " "
-                    + "FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
-                    + "JOIN " + PRODUCTS_TABLE + " "
-                    + "ON " + POD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
-                    + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'");
-            MayfairStatic.fillTable(table, rs);
-
-            MayfairStatic.writeToLog("EDIT PURCHASE ORDER " + ord_num);
-        }
-        catch (SQLException ex)
-        {
-            MayfairStatic.outputMessage(this, ex);
-        }
-    }
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         EditPurchaseOrderStep2 jFrame = new EditPurchaseOrderStep2(ord_num, desktop);

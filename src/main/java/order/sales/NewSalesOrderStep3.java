@@ -4,22 +4,12 @@
  */
 package main.java.order.sales;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import javax.swing.JDesktopPane;
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import javax.swing.JTextField;
 import main.java.MayfairStatic;
-import static main.java.MayfairStatic.PO_DELDATE;
-import static main.java.MayfairStatic.PO_ORDNUM;
-import static main.java.MayfairStatic.PS_PONUM;
-import static main.java.MayfairStatic.PS_SONUM;
-import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
-import static main.java.MayfairStatic.PURCHASE_SALES_ORDER_TABLE;
 import static main.java.MayfairStatic.SALES_ORDER_TABLE;
 import static main.java.MayfairStatic.SO_COMMENTS;
 import static main.java.MayfairStatic.SO_DELDATE;
@@ -32,7 +22,6 @@ import static main.java.MayfairStatic.SO_ORDNUM;
 public class NewSalesOrderStep3 extends javax.swing.JInternalFrame
 {
 
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     private final JDesktopPane desktop;
     private final int ord_num;
 
@@ -146,64 +135,30 @@ public class NewSalesOrderStep3 extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        String date = ((JTextField) calDelDate.getDateEditor().getUiComponent()).getText();
-        if (!date.isEmpty())
+        try (Statement statement = MayfairStatic.getConnection().createStatement())
         {
-            try (Statement statement = MayfairStatic.getConnection().createStatement())
+            String date = ((JTextField) calDelDate.getDateEditor().getUiComponent()).getText();
+            if (MayfairStatic.validateSalesOrderDelDate(this, date, ord_num))
             {
-                Date minDate = getMinDelDate(ord_num);
-                if (FORMAT.parse(date).after(minDate))
-                {
-                    String sql = "UPDATE " + SALES_ORDER_TABLE + " "
-                            + "SET " + SO_DELDATE + " = '" + date + "', " 
-                            + SO_COMMENTS + " = '" + fieldComments.getText() + "' "
-                            + "WHERE " + SO_ORDNUM + " = " + ord_num;
-                    statement.executeUpdate(sql);
-                    MayfairStatic.writeToLog(sql);
-                    MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
+                String sql = "UPDATE " + SALES_ORDER_TABLE + " "
+                        + "SET " + SO_DELDATE + " = '" + date + "', "
+                        + SO_COMMENTS + " = '" + fieldComments.getText() + "' "
+                        + "WHERE " + SO_ORDNUM + " = " + ord_num;
+                statement.executeUpdate(sql);
+                MayfairStatic.writeToLog(sql);
+                MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
-                    ViewSalesOrderSummary jFrame = new ViewSalesOrderSummary(ord_num);
-                    desktop.add(jFrame);
-                    jFrame.show();
-                    this.dispose();
-                }
-                else
-                {
-                    MayfairStatic.outputMessage(this, "Invalid date", "Delivery date must be after " + minDate, WARNING_MESSAGE);
-                }
-            }
-            catch (ParseException | SQLException ex)
-            {
-                MayfairStatic.outputMessage(this, ex);
+                ViewSalesOrderSummary jFrame = new ViewSalesOrderSummary(ord_num);
+                desktop.add(jFrame);
+                jFrame.show();
+                this.dispose();
             }
         }
-        else
+        catch (SQLException | ParseException ex)
         {
-            MayfairStatic.outputMessage(this, "Invalid date", "Please enter a delivery date.", WARNING_MESSAGE);
+            MayfairStatic.outputMessage(this, ex);
         }
     }//GEN-LAST:event_btnSaveActionPerformed
-
-    private Date getMinDelDate(int ord_num) throws SQLException
-    {
-        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-        {
-            Date date = new Date();
-            ResultSet rs = statement.executeQuery("SELECT " + PO_DELDATE + " "
-                    + "FROM " + PURCHASE_ORDER_TABLE + " "
-                    + "JOIN " + PURCHASE_SALES_ORDER_TABLE + " "
-                    + "ON " + PO_ORDNUM + "=" + PS_PONUM + " "
-                    + "WHERE " + PS_SONUM + " = " + ord_num);
-            while (rs.next())
-            {
-                Date delivery_date = rs.getDate(PO_DELDATE);
-                if (delivery_date.after(date))
-                {
-                    date = delivery_date;
-                }
-            }
-            return date;
-        }
-    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnSave;
