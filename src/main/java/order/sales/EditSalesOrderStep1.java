@@ -8,22 +8,43 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import javax.swing.JTextField;
 import main.java.MayfairStatic;
+import static main.java.MayfairStatic.CUSTOMERS_TABLE;
+import static main.java.MayfairStatic.CUSTOMER_CUSTNUM;
+import static main.java.MayfairStatic.CUSTOMER_NAME;
+import static main.java.MayfairStatic.POD_AVALIABLE;
+import static main.java.MayfairStatic.POD_ORDNUM;
+import static main.java.MayfairStatic.POD_PRODNUM;
+import static main.java.MayfairStatic.PRODUCTS_TABLE;
+import static main.java.MayfairStatic.PRODUCT_CODE;
+import static main.java.MayfairStatic.PRODUCT_INORDER;
+import static main.java.MayfairStatic.PRODUCT_INSTOCK;
+import static main.java.MayfairStatic.PRODUCT_PRODNUM;
+import static main.java.MayfairStatic.PRODUCT_SALESPRICE;
+import static main.java.MayfairStatic.PS_CODE;
+import static main.java.MayfairStatic.PS_PONUM;
+import static main.java.MayfairStatic.PS_PRODNUM;
+import static main.java.MayfairStatic.PS_QUANTITY;
+import static main.java.MayfairStatic.PS_SONUM;
+import static main.java.MayfairStatic.PURCHASE_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.PURCHASE_SALES_ORDER_TABLE;
 import static main.java.MayfairStatic.SALES_ORDER_DETAILS_TABLE;
 import static main.java.MayfairStatic.SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SOD_FROMORDER;
+import static main.java.MayfairStatic.SOD_FROMSTOCK;
 import static main.java.MayfairStatic.SOD_ORDNUM;
 import static main.java.MayfairStatic.SOD_PRICE;
+import static main.java.MayfairStatic.SOD_PRODNUM;
 import static main.java.MayfairStatic.SOD_QUANTITY;
 import static main.java.MayfairStatic.SO_COMMENTS;
+import static main.java.MayfairStatic.SO_CUSTNUM;
 import static main.java.MayfairStatic.SO_DELDATE;
 import static main.java.MayfairStatic.SO_ORDNUM;
 import static main.java.MayfairStatic.SO_PRICE;
@@ -38,8 +59,7 @@ public class EditSalesOrderStep1 extends javax.swing.JInternalFrame
 
     private final int ord_num;
     private final JDesktopPane desktop;
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
+    
     public EditSalesOrderStep1(int ord_num, JDesktopPane pane)
     {
         setUpGUI();
@@ -61,18 +81,23 @@ public class EditSalesOrderStep1 extends javax.swing.JInternalFrame
         try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             updateSalesOrderDetails();
-            ResultSet rs = statement.executeQuery("SELECT customers.cust_num, customers.name, sales_order.ord_num, sales_order.del_date, sales_order.comments "
-                    + "FROM sales_order "
-                    + "JOIN customers ON sales_order.cust_num=customers.cust_num "
-                    + "WHERE sales_order.ord_num = " + ord_num);
+            ResultSet rs = statement.executeQuery("SELECT " + CUSTOMER_CUSTNUM + ", " 
+                    + CUSTOMER_NAME + ", " 
+                    + SO_ORDNUM + ", " 
+                    + SO_DELDATE + ", " 
+                    + SO_COMMENTS + " "
+                    + "FROM " + SALES_ORDER_TABLE + " "
+                    + "JOIN " + CUSTOMERS_TABLE + " "
+                    + "ON " + SO_CUSTNUM + "=" + CUSTOMER_CUSTNUM + " "
+                    + "WHERE " + SO_ORDNUM + " = " + ord_num);
             rs.next();
 
-            labelNumber.setText(rs.getString("cust_num"));
-            labelName.setText(rs.getString("name"));
-            labelOrdNum.setText(rs.getString("ord_num"));
-            fieldComments.setText(rs.getString("comments"));
+            labelNumber.setText(rs.getString(CUSTOMER_CUSTNUM));
+            labelName.setText(rs.getString(CUSTOMER_NAME));
+            labelOrdNum.setText(rs.getString(SO_ORDNUM));
+            fieldComments.setText(rs.getString(SO_COMMENTS));
 
-            Date delDate = rs.getDate("del_date");
+            Date delDate = rs.getDate(SO_DELDATE);
             String date;
             if (delDate == null)
             {
@@ -86,11 +111,14 @@ public class EditSalesOrderStep1 extends javax.swing.JInternalFrame
             labelDelDate.setText(date);
             calDelDate.setDate(delDate);
 
-            rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity, products.sales_price, sales_order_details.price "
-                    + "FROM sales_order_details "
-                    + "JOIN products "
-                    + "ON sales_order_details.prod_num=products.prod_num "
-                    + "WHERE sales_order_details.ord_num = " + ord_num);
+            rs = statement.executeQuery("SELECT " + PRODUCT_CODE + ", " 
+                    + SOD_QUANTITY + ", " 
+                    + PRODUCT_SALESPRICE + ", " 
+                    + SOD_PRICE + " "
+                    + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                    + "JOIN " + PRODUCTS_TABLE + " "
+                    + "ON " + SOD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                    + "WHERE " + SOD_ORDNUM + " = " + ord_num);
             MayfairStatic.fillTable(table, rs);
             MayfairStatic.writeToLog("EDIT SALES ORDER " + ord_num);
         }
@@ -465,31 +493,38 @@ public class EditSalesOrderStep1 extends javax.swing.JInternalFrame
         {
             try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                ResultSet rs = selectStatement.executeQuery("SELECT prod_num, in_stock, in_order, fromStock, fromOrder "
-                        + "FROM sales_order_details "
-                        + "JOIN products "
-                        + "ON prod_num=prodnum "
-                        + "WHERE ord_num = " + ord_num + " "
-                        + "AND code = '" + prodCode + "'");
+                ResultSet rs = selectStatement.executeQuery("SELECT " + PRODUCT_PRODNUM + ", " 
+                        + PRODUCT_INSTOCK + ", " 
+                        + PRODUCT_INORDER + ", " 
+                        + SOD_FROMSTOCK + ", " 
+                        + SOD_FROMORDER + " "
+                        + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                        + "JOIN " + PRODUCTS_TABLE + " "
+                        + "ON " + SOD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                        + "WHERE " + SOD_ORDNUM + " = " + ord_num + " "
+                        + "AND " + PRODUCT_CODE + " = '" + prodCode + "'");
                 rs.next();
-                int prod_num = rs.getInt("prod_num");
-                int in_stock = rs.getInt("in_stock") + rs.getInt("fromStock");
-                int in_order = rs.getInt("in_order") + rs.getInt("fromOrder");
+                int prod_num = rs.getInt(PRODUCT_PRODNUM);
+                int in_stock = rs.getInt(PRODUCT_INSTOCK) + rs.getInt(SOD_FROMSTOCK);
+                int in_order = rs.getInt(PRODUCT_INORDER) + rs.getInt(SOD_FROMORDER);
 
                 // UPDATE PURCHASE_SALES_ORDER
                 Map<String, Integer> purchaseOrders = new HashMap();
                 ArrayList<String> psCodes = new ArrayList();
-                rs = selectStatement.executeQuery("SELECT code, po_num, quantity, avaliable "
-                        + "FROM purchase_sales_order "
-                        + "JOIN purchase_order_details "
-                        + "ON purchase_sales_order.po_num=purchase_order_details.ord_num "
-                        + "AND purchase_sales_order.prod_prodnum=purchase_order_details.prod_num "
-                        + "WHERE prod_num = " + prod_num + " "
-                        + "AND so_num = " + ord_num);
+                rs = selectStatement.executeQuery("SELECT " + PS_CODE + ", " 
+                        + PS_PONUM + ", " 
+                        + PS_QUANTITY + ", " 
+                        + POD_AVALIABLE + " "
+                        + "FROM " + PURCHASE_SALES_ORDER_TABLE + " "
+                        + "JOIN " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                        + "ON " + PS_PONUM + "=" + POD_ORDNUM + " "
+                        + "AND " + PS_PRODNUM + "=" + POD_PRODNUM + " "
+                        + "WHERE " + PS_PRODNUM + " = " + prod_num + " "
+                        + "AND " + PS_SONUM + " = " + ord_num);
                 while (rs.next())
                 {
-                    purchaseOrders.put(rs.getString("po_num"), rs.getInt("avaliable") + rs.getInt("quantity"));
-                    psCodes.add(rs.getString("code"));
+                    purchaseOrders.put(rs.getString(PS_PONUM), rs.getInt(POD_AVALIABLE) + rs.getInt(PS_QUANTITY));
+                    psCodes.add(rs.getString(PS_CODE));
                 }
 
                 try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
@@ -497,16 +532,17 @@ public class EditSalesOrderStep1 extends javax.swing.JInternalFrame
                     MayfairStatic.writeToLog("DELETE PRODUCT " + prodCode);
 
                     // UPDATE PRODUCTS 
-                    String sql = "UPDATE products "
-                            + "SET in_stock = " + in_stock + ", in_order = " + in_order + " "
-                            + "WHERE prod_num = " + prod_num;
+                    String sql = "UPDATE " + PRODUCTS_TABLE + " "
+                            + "SET " + PRODUCT_INSTOCK + " = " + in_stock + ", " 
+                            + PRODUCT_INORDER + " = " + in_order + " "
+                            + "WHERE " + PRODUCT_PRODNUM + " = " + prod_num;
                     updateStatement.executeUpdate(sql);
                     MayfairStatic.writeToLog(sql);
 
                     for (String code : psCodes)
                     {
-                        sql = "DELETE FROM purchase_sales_order "
-                                + "WHERE code = " + code;
+                        sql = "DELETE FROM " + PURCHASE_SALES_ORDER_TABLE + " "
+                                + "WHERE " + PS_CODE + " = " + code;
                         updateStatement.executeUpdate(sql);
                         MayfairStatic.writeToLog(sql);
                     }
@@ -514,18 +550,18 @@ public class EditSalesOrderStep1 extends javax.swing.JInternalFrame
                     // UPDATE PURCHASE ORDER DETAILS
                     for (Map.Entry<String, Integer> purchaseOrder : purchaseOrders.entrySet())
                     {
-                        sql = "UPDATE purchase_order_details "
-                                + "SET avaliable = " + purchaseOrder.getValue() + " "
-                                + "WHERE prod_num = " + prod_num + " "
-                                + "AND ord_num = '" + purchaseOrder.getKey() + "'";
+                        sql = "UPDATE " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                                + "SET " + POD_AVALIABLE + " = " + purchaseOrder.getValue() + " "
+                                + "WHERE " + POD_PRODNUM + " = " + prod_num + " "
+                                + "AND " + POD_ORDNUM + " = '" + purchaseOrder.getKey() + "'";
                         updateStatement.executeUpdate(sql);
                         MayfairStatic.writeToLog(sql);
                     }
 
                     // DELETE FROM SALES ORDER DETAILS
-                    sql = "DELETE FROM sales_order_details "
-                            + "WHERE prod_num = " + prod_num + " "
-                            + "AND ord_num = " + ord_num;
+                    sql = "DELETE FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                            + "WHERE " + SOD_PRODNUM + " = " + prod_num + " "
+                            + "AND " + SOD_ORDNUM + " = " + ord_num;
                     updateStatement.executeUpdate(sql);
                     MayfairStatic.writeToLog(sql);
 

@@ -18,7 +18,7 @@ import static main.java.MayfairStatic.*;
  *
  * @author kian_bryen
  */
-public class View extends javax.swing.JInternalFrame
+public class ViewProduct extends javax.swing.JInternalFrame
 {
     private final JDesktopPane desktop;
     private final Database db = new Database();
@@ -36,7 +36,7 @@ public class View extends javax.swing.JInternalFrame
     private int onOrder = 0;
     private int warehouseStock = 0;
     
-    public View(JDesktopPane pane, int num)
+    public ViewProduct(JDesktopPane pane, int num)
     {
         this.desktop = pane;
         prodNum = num;
@@ -74,7 +74,7 @@ public class View extends javax.swing.JInternalFrame
         }
         catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(View.this, e.getMessage());
+            JOptionPane.showMessageDialog(ViewProduct.this, e.getMessage());
         }
     }
     
@@ -132,7 +132,7 @@ public class View extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(View.this, e.getMessage());
+                JOptionPane.showMessageDialog(ViewProduct.this, e.getMessage());
             }
         }
     }
@@ -525,21 +525,21 @@ public class View extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnViewSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewSalesActionPerformed
-        Sales sales = new Sales(labelProdCode.getText(), Integer.valueOf(labelProdNum.getText()));
+        ProductSales sales = new ProductSales(labelProdCode.getText(), Integer.valueOf(labelProdNum.getText()));
         desktop.add(sales);
         sales.show();
     }//GEN-LAST:event_btnViewSalesActionPerformed
 
     private void btnInStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInStockActionPerformed
-        JOptionPane.showMessageDialog(View.this, "Instantly available stock which is currently in the warehouse and not on an active sales order.", "Available Stock", INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(ViewProduct.this, "Instantly available stock which is currently in the warehouse and not on an active sales order.", "Available Stock", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnInStockActionPerformed
 
     private void btnWarehouseStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWarehouseStockActionPerformed
-        JOptionPane.showMessageDialog(View.this, "Instantly available stock + stock which is on an active sales order but not dispatched from the warehouse.", "Warehouse Stock", INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(ViewProduct.this, "Instantly available stock + stock which is on an active sales order but not dispatched from the warehouse.", "Warehouse Stock", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnWarehouseStockActionPerformed
 
     private void btnOnOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOnOrderActionPerformed
-        JOptionPane.showMessageDialog(View.this, "Stock on undelivered active purchase orders and not on an active sales order.", "On Order", INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(ViewProduct.this, "Stock on undelivered active purchase orders and not on an active sales order.", "On Order", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnOnOrderActionPerformed
 
 

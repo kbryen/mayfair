@@ -5,7 +5,6 @@
 package main.java.order.sales;
 
 import java.awt.HeadlessException;
-import java.beans.PropertyVetoException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,15 +12,37 @@ import java.sql.Statement;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import javax.swing.table.DefaultTableModel;
-import main.java.Database;
-import main.java.App;
 import main.java.MayfairStatic;
+import static main.java.MayfairStatic.POD_AVALIABLE;
+import static main.java.MayfairStatic.POD_ORDNUM;
+import static main.java.MayfairStatic.POD_PRODNUM;
+import static main.java.MayfairStatic.PO_DELDATE;
+import static main.java.MayfairStatic.PO_DELIVERED;
+import static main.java.MayfairStatic.PO_ORDNUM;
+import static main.java.MayfairStatic.PRODUCTS_TABLE;
+import static main.java.MayfairStatic.PRODUCT_CODE;
+import static main.java.MayfairStatic.PRODUCT_INORDER;
+import static main.java.MayfairStatic.PRODUCT_INSTOCK;
+import static main.java.MayfairStatic.PRODUCT_PRODNUM;
+import static main.java.MayfairStatic.PRODUCT_SALESPRICE;
+import static main.java.MayfairStatic.PRODUCT_SSAW;
+import static main.java.MayfairStatic.PRODUCT_TOTAL;
+import static main.java.MayfairStatic.PURCHASE_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
+import static main.java.MayfairStatic.SALES_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.SOD_CODE;
+import static main.java.MayfairStatic.SOD_FROMORDER;
+import static main.java.MayfairStatic.SOD_FROMSTOCK;
+import static main.java.MayfairStatic.SOD_ORDNUM;
+import static main.java.MayfairStatic.SOD_PRICE;
+import static main.java.MayfairStatic.SOD_PRODNUM;
+import static main.java.MayfairStatic.SOD_QUANTITY;
 
 /**
  *
@@ -31,80 +52,46 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
 {
 
     private final JDesktopPane desktop;
-    private final Database db = new Database();
-    private String sql;
-    private final int orderNum;
+    private final int ord_num;
 
-    public EditSalesOrderStep2(JDesktopPane desktop, int orderNum)
+    public EditSalesOrderStep2(JDesktopPane pane, int ord_num)
     {
-
-        initComponents();
-        this.setTitle("New Sales Order");
-
-        this.desktop = desktop;
-        this.orderNum = orderNum;
-
-        FillLabels();
-
-        scrollPane.setVisible(false);
-        btnAddPO.setEnabled(false);
-        btnAddStock.setEnabled(false);
-        table.setAutoCreateRowSorter(true);
-        table2.setAutoCreateRowSorter(true);
-
+        setUpGUI();
+        this.desktop = pane;
+        this.ord_num = ord_num;
     }
 
-    private void FillLabels()
+    private void setUpGUI()
     {
-        labelOrdDetails.setVisible(true);
-        labelOrderTotal.setVisible(true);
-        scrollPane2.setVisible(true);
-        getContentPane().validate();
-        getContentPane().repaint();
-        Connection con = db.getConnection();
+        initComponents();
+        productsTable.setAutoCreateRowSorter(true);
+        orderDetailsTable.setAutoCreateRowSorter(true);
+        productsScroll.setVisible(false);
+        enableButtons(false);
+        fillLables();
+    }
 
-        try
+    private void enableButtons(boolean enable)
+    {
+        btnAddPO.setEnabled(enable);
+        btnAddStock.setEnabled(enable);
+    }
+
+    private void fillLables()
+    {
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = statement.executeQuery("SELECT SUM(price) AS total_price, SUM(quantity) AS total_units FROM sales_order_details WHERE ord_num = '" + orderNum + "'");
-            rs.next();
-            double price = rs.getDouble("total_price");
-            int quantity = rs.getInt("total_units");
-            labelOrdTotal.setText(String.format("%.02f", price));
-            labelTotalUnits.setText(String.valueOf(quantity));
-
-            Statement statement2 = con.createStatement();
-            statement2.executeUpdate("UPDATE sales_order SET price = " + price + " WHERE ord_num = " + orderNum);
-
-            rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity, products.sales_price, sales_order_details.price FROM sales_order_details INNER JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + orderNum);
-            while (table2.getRowCount() > 0)
-            {
-                ((DefaultTableModel) table2.getModel()).removeRow(0);
-            }
-            int columns = rs.getMetaData().getColumnCount();
-            while (rs.next())
-            {
-                Object[] row = new Object[columns];
-                for (int i = 1; i <= columns; i++)
-                {
-                    row[i - 1] = rs.getObject(i);
-                }
-                ((DefaultTableModel) table2.getModel()).insertRow(rs.getRow() - 1, row);
-            }
-
+            MayfairStatic.updateSalesOrderUnitsPrice(ord_num, labelUnits, labelPrice);
+            ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_CODE + ", " + SOD_QUANTITY + ", " + PRODUCT_SALESPRICE + ", " + SOD_PRICE + " "
+                    + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                    + "JOIN " + PRODUCTS_TABLE + " "
+                    + "ON " + SOD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                    + "WHERE " + SOD_ORDNUM + " = " + ord_num);
+            MayfairStatic.fillTable(orderDetailsTable, rs);
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(EditSalesOrderStep2.this, e.getMessage());
-        }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
+            MayfairStatic.outputMessage(this, ex);
         }
     }
 
@@ -124,29 +111,29 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
         jLabel3 = new javax.swing.JLabel();
         fieldStockQuant = new javax.swing.JTextField();
         btnAddPO = new javax.swing.JButton();
-        btnFinish = new javax.swing.JButton();
+        btnSave = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JSeparator();
         jLabel5 = new javax.swing.JLabel();
         labelProdNum = new javax.swing.JLabel();
         jSeparator2 = new javax.swing.JSeparator();
         btnFind = new javax.swing.JButton();
-        scrollPane = new javax.swing.JScrollPane();
-        table = new javax.swing.JTable();
-        scrollPane2 = new javax.swing.JScrollPane();
-        table2 = new javax.swing.JTable();
-        labelOrderTotal = new javax.swing.JLabel();
-        labelOrdTotal = new javax.swing.JLabel();
+        productsScroll = new javax.swing.JScrollPane();
+        productsTable = new javax.swing.JTable();
+        orderDetailsScroll = new javax.swing.JScrollPane();
+        orderDetailsTable = new javax.swing.JTable();
+        labelPrice = new javax.swing.JLabel();
         labelOrdDetails = new javax.swing.JLabel();
         fieldPOQuant = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         btnAddStock = new javax.swing.JButton();
-        labelTotalUnits = new javax.swing.JLabel();
-        labelOrderTotal1 = new javax.swing.JLabel();
+        labelUnits = new javax.swing.JLabel();
 
         setIconifiable(true);
         setMaximizable(true);
         setResizable(true);
+        setTitle("Edit Sales Order");
+        setToolTipText("");
 
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
         jLabel1.setText("Add Product");
@@ -164,12 +151,12 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
             }
         });
 
-        btnFinish.setText("Finish");
-        btnFinish.addActionListener(new java.awt.event.ActionListener()
+        btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener()
         {
             public void actionPerformed(java.awt.event.ActionEvent evt)
             {
-                btnFinishActionPerformed(evt);
+                btnSaveActionPerformed(evt);
             }
         });
 
@@ -187,7 +174,7 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
             }
         });
 
-        table.setModel(new javax.swing.table.DefaultTableModel(
+        productsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
             {
                 {null, null, null, null, null, null, null}
@@ -217,18 +204,18 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
                 return canEdit [columnIndex];
             }
         });
-        table.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        table.addMouseListener(new java.awt.event.MouseAdapter()
+        productsTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+        productsTable.addMouseListener(new java.awt.event.MouseAdapter()
         {
             public void mouseClicked(java.awt.event.MouseEvent evt)
             {
-                tableMouseClicked(evt);
+                productsTableMouseClicked(evt);
             }
         });
-        scrollPane.setViewportView(table);
-        table.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        productsScroll.setViewportView(productsTable);
+        productsTable.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
-        table2.setModel(new javax.swing.table.DefaultTableModel(
+        orderDetailsTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][]
             {
                 {null, null, null, null},
@@ -261,18 +248,9 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
                 return canEdit [columnIndex];
             }
         });
-        table2.addMouseListener(new java.awt.event.MouseAdapter()
-        {
-            public void mouseClicked(java.awt.event.MouseEvent evt)
-            {
-                table2MouseClicked(evt);
-            }
-        });
-        scrollPane2.setViewportView(table2);
+        orderDetailsScroll.setViewportView(orderDetailsTable);
 
-        labelOrderTotal.setText("Order Total : £");
-
-        labelOrdTotal.setText("3");
+        labelPrice.setText("Order Total: £");
 
         labelOrdDetails.setText("Order Details:");
 
@@ -289,9 +267,7 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
             }
         });
 
-        labelTotalUnits.setText("3");
-
-        labelOrderTotal1.setText("Total Units :");
+        labelUnits.setText("Total Units:");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -301,41 +277,9 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(scrollPane2)
+                    .addComponent(productsScroll, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 665, Short.MAX_VALUE)
+                    .addComponent(orderDetailsScroll)
                     .addComponent(jSeparator2)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 574, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(labelOrderTotal1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(labelTotalUnits))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(btnFinish, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel6)
-                                            .addComponent(jLabel4))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel3)
-                                        .addGap(107, 107, 107)))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(fieldPOQuant, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnAddPO))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(fieldStockQuant, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(btnAddStock))))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addComponent(labelOrderTotal)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(labelOrdTotal))))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -352,7 +296,32 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
                                 .addGap(18, 18, 18)
                                 .addComponent(btnFind))
                             .addComponent(labelOrdDetails))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnSave, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(labelPrice, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(labelUnits, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel6)
+                                            .addComponent(jLabel4))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel3)
+                                        .addGap(113, 113, 113)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(fieldPOQuant, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnAddPO))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(fieldStockQuant, javax.swing.GroupLayout.PREFERRED_SIZE, 58, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(btnAddStock)))))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -367,15 +336,15 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
                     .addComponent(jLabel5)
                     .addComponent(labelProdNum))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(fieldProdCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnFind))
-                .addGap(18, 18, 18)
-                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel2)
+                            .addComponent(fieldProdCode, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnFind))
+                        .addGap(18, 18, 18)
+                        .addComponent(productsScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 314, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(fieldStockQuant, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel4)
@@ -383,7 +352,7 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel3)
-                        .addGap(1, 1, 1)))
+                        .addGap(2, 2, 2)))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnAddPO)
                     .addComponent(fieldPOQuant, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -393,17 +362,13 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
                 .addGap(18, 18, 18)
                 .addComponent(labelOrdDetails)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(orderDetailsScroll, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelOrdTotal)
-                    .addComponent(labelOrderTotal))
+                .addComponent(labelPrice)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelTotalUnits)
-                    .addComponent(labelOrderTotal1))
+                .addComponent(labelUnits)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnFinish)
+                .addComponent(btnSave)
                 .addContainerGap())
         );
 
@@ -413,271 +378,186 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
     private void btnAddPOActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddPOActionPerformed
         try
         {
-            Connection con = db.getConnection();
-            int prod_num = (int) table.getValueAt(table.getSelectedRow(), 0);
-
-            try
+            int quantToAdd = Integer.parseInt(fieldPOQuant.getText());
+            if (quantToAdd <= 0)
             {
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = statement.executeQuery("SELECT sales_price, in_order FROM products WHERE prod_num = " + prod_num);
+                throw new NumberFormatException();
+            }
+
+            int prod_num = (int) productsTable.getValueAt(productsTable.getSelectedRow(), 0);
+            try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+            {
+                ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_INORDER + " "
+                        + "FROM " + PRODUCTS_TABLE + " "
+                        + "WHERE " + PRODUCT_PRODNUM + " = " + prod_num);
                 rs.next();
-                int in_order = rs.getInt("in_order");
+                int in_order = rs.getInt(PRODUCT_INORDER);
 
-                int fromOrder;
-                if (fieldPOQuant.getText().equals(""))
+                if (quantToAdd <= in_order)
                 {
-                    fromOrder = 0;
+                    // Order Num -> Avaliable + Date
+                    Map<String, Pair<Integer, Date>> possiblePurchaseOrders = new HashMap();
+
+                    rs = statement.executeQuery("SELECT " + PO_ORDNUM + ", " + PO_DELDATE + ", " + POD_AVALIABLE + " "
+                            + "FROM " + PURCHASE_ORDER_TABLE + " "
+                            + "JOIN " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                            + "ON " + PO_ORDNUM + "=" + POD_ORDNUM + " "
+                            + "WHERE " + POD_PRODNUM + " = " + prod_num + " "
+                            + "AND " + PO_DELIVERED + " = false "
+                            + "AND " + POD_AVALIABLE + " > 0");
+                    while (rs.next())
+                    {
+                        possiblePurchaseOrders.put(rs.getString(PO_ORDNUM), new Pair(rs.getInt(POD_AVALIABLE), rs.getDate(PO_DELDATE)));
+                    }
+
+                    PickPurchaseOrders jFrame = new PickPurchaseOrders(desktop, possiblePurchaseOrders, quantToAdd, prod_num, ord_num);
+                    desktop.add(jFrame);
+                    jFrame.show();
+                    this.dispose();
                 }
                 else
                 {
-                    fromOrder = Integer.parseInt(fieldPOQuant.getText());
+                    MayfairStatic.outputMessage(this, "Invalid quantity", "Not enough avaliable on purchase orders, please reduce quantity or take from stock.", WARNING_MESSAGE);
                 }
-
-                if (fromOrder > 0)
-                {
-                    if (fromOrder <= in_order)
-                    {
-                        // Order Num -> Avaliable + Date
-                        Map<String, Pair<Integer, Date>> possiblePurchaseOrders = new HashMap();
-
-                        rs = statement.executeQuery("SELECT purchase_order.ord_num, purchase_order.del_date, purchase_order_details.avaliable FROM purchase_order JOIN purchase_order_details ON purchase_order.ord_num = purchase_order_details.ord_num WHERE purchase_order_details.prod_num = " + prod_num + " AND purchase_order.delivered = false AND purchase_order_details.avaliable > 0");
-                        while (rs.next())
-                        {
-                            String poNum = rs.getString("ord_num");
-                            int avaliable = rs.getInt("avaliable");
-                            Date date = rs.getDate("del_date");
-
-                            possiblePurchaseOrders.put(poNum, new Pair(avaliable, date));
-                        }
-
-                        EditSalesOrderStep3 pickOrders = new EditSalesOrderStep3(desktop, possiblePurchaseOrders, fromOrder, prod_num, orderNum);
-                        desktop.add(pickOrders);
-                        pickOrders.show();
-                        this.dispose();
-                    }
-                    else
-                    {
-                        JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Not enough avaliable on Purchase Order.");
-                    }
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Quantity must be greater than 0");
-                }
-
             }
-            catch (SQLException e)
+            catch (SQLException ex)
             {
-                JOptionPane.showMessageDialog(EditSalesOrderStep2.this, e.getMessage());
-            }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
+                MayfairStatic.outputMessage(this, ex);
             }
         }
-        catch (NumberFormatException | HeadlessException e)
+        catch (NumberFormatException | HeadlessException ex)
         {
-            JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Please enter a valid quantity");
+            MayfairStatic.outputMessage(this, "Invalid quantity", "Please enter a valid quantity.", WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnAddPOActionPerformed
 
-    private void btnFinishActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFinishActionPerformed
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to finish adding products?", "Finish", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        if (MayfairStatic.outputConfirm(this, "Save Order", "Are you sure you have finished adding products?") == JOptionPane.YES_OPTION)
         {
-            Connection con = db.getConnection();
             try
             {
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = statement.executeQuery("SELECT SUM(price) AS total_price, SUM(quantity) as total_quantity "
-                        + "FROM sales_order_details WHERE ord_num = '" + orderNum + "'");
-                rs.next();
-                double price = rs.getDouble("total_price");
-                int quantity = rs.getInt("total_quantity");
-
-                Statement statement2 = con.createStatement();
-                sql = "UPDATE sales_order SET price = " + price + ", total_units = " + quantity + " WHERE ord_num = " + orderNum;
-                statement2.executeUpdate(sql);
-                db.writeToLog(sql);
-
-                EditSalesOrderStep1 editMain = new EditSalesOrderStep1(orderNum, desktop);
-                desktop.add(editMain);
-                MayfairStatic.setMaximum(editMain);
-                editMain.show();
-
+                MayfairStatic.updateSalesOrderUnitsPrice(ord_num, labelUnits, labelPrice);
+                EditSalesOrderStep1 jFrame = new EditSalesOrderStep1(ord_num, desktop);
+                desktop.add(jFrame);
+                MayfairStatic.setMaximum(jFrame);
+                jFrame.show();
                 this.dispose();
             }
-            catch (SQLException e)
+            catch (SQLException ex)
             {
-                JOptionPane.showMessageDialog(EditSalesOrderStep2.this, e.getMessage());
-            }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
+                MayfairStatic.outputMessage(this, ex);
             }
         }
-    }//GEN-LAST:event_btnFinishActionPerformed
+    }//GEN-LAST:event_btnSaveActionPerformed
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        try
+        MayfairStatic.setMaximum(this);
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            this.setMaximum(true);
-
-        }
-        catch (PropertyVetoException ex)
-        {
-            Logger.getLogger(App.class
-                    .getName()).log(Level.SEVERE, null, ex);
-        }
-        Connection con = db.getConnection();
-        try
-        {
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs = statement.executeQuery("SELECT prod_num, code, sales_price, in_stock, in_order, total, SSAW FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' ORDER BY prod_num ASC");
-
-            scrollPane.setVisible(true);
+            ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_PRODNUM + ", "
+                    + PRODUCT_CODE + ", "
+                    + PRODUCT_SALESPRICE + ", "
+                    + PRODUCT_INSTOCK + ", "
+                    + PRODUCT_INORDER + ", "
+                    + PRODUCT_TOTAL + ", "
+                    + PRODUCT_SSAW + " "
+                    + "FROM " + PRODUCTS_TABLE + " "
+                    + "WHERE " + PRODUCT_CODE + " LIKE '%" + fieldProdCode.getText() + "%' "
+                    + "ORDER BY " + PRODUCT_CODE + " ASC");
+            MayfairStatic.fillTable(productsTable, rs);
+            productsScroll.setVisible(true);
             getContentPane().validate();
             getContentPane().repaint();
-            while (table.getRowCount() > 0)
-            {
-                ((DefaultTableModel) table.getModel()).removeRow(0);
-            }
-            int columns = rs.getMetaData().getColumnCount();
-            while (rs.next())
-            {
-                Object[] row = new Object[columns];
-                for (int i = 1; i <= columns; i++)
-                {
-                    row[i - 1] = rs.getObject(i);
-                }
-                ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
-            }
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(EditSalesOrderStep2.this, e.getMessage());
-        }
-        finally
-        {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
+            MayfairStatic.outputMessage(this, ex);
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
-    private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
-        fieldProdCode.setText((String) table.getValueAt(table.getSelectedRow(), 1));
-        btnAddPO.setEnabled(true);
-        btnAddStock.setEnabled(true);
-    }//GEN-LAST:event_tableMouseClicked
-
-    private void table2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_table2MouseClicked
-
-    }//GEN-LAST:event_table2MouseClicked
-
+    private void productsTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_productsTableMouseClicked
+        fieldProdCode.setText((String) productsTable.getValueAt(productsTable.getSelectedRow(), 1));
+        enableButtons(true);
+    }//GEN-LAST:event_productsTableMouseClicked
+    
     private void btnAddStockActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnAddStockActionPerformed
     {//GEN-HEADEREND:event_btnAddStockActionPerformed
         try
         {
-            Connection con = db.getConnection();
-            int prod_num = (int) table.getValueAt(table.getSelectedRow(), 0);
-
-            try
+            int quantToAdd = Integer.parseInt(fieldStockQuant.getText());
+            if (quantToAdd <= 0)
             {
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                Statement statement2 = con.createStatement();
-                ResultSet rs = statement.executeQuery("SELECT sales_price, in_stock FROM products WHERE prod_num = " + prod_num);
+                throw new NumberFormatException();
+            }
+
+            int prod_num = (int) productsTable.getValueAt(productsTable.getSelectedRow(), 0);
+            String prodCode = (String) productsTable.getValueAt(productsTable.getSelectedRow(), 1);
+            try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+            {
+                ResultSet rs = selectStatement.executeQuery("SELECT " + PRODUCT_SALESPRICE + ", " + PRODUCT_INSTOCK + " "
+                        + "FROM " + PRODUCTS_TABLE + " "
+                        + "WHERE " + PRODUCT_PRODNUM + " = " + prod_num);
                 rs.next();
+                double sales_price = rs.getDouble(PRODUCT_SALESPRICE);
+                int in_stock = rs.getInt(PRODUCT_INSTOCK) - quantToAdd;
 
-                double price = rs.getDouble("sales_price");
-                int in_stock = rs.getInt("in_stock");
-
-                // How many they want to take
-                int fromStock;
-                if (fieldStockQuant.getText().equals(""))
+                if (in_stock >= 0)
                 {
-                    fromStock = 0;
-                }
-                else
-                {
-                    fromStock = Integer.parseInt(fieldStockQuant.getText());
-                }
-
-                if (fromStock > 0)
-                {
-                    if (fromStock <= in_stock)
+                    try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
                     {
                         // UPDATE PRODUCTS
-                        int newStock = in_stock - fromStock;
-                        sql = "UPDATE products SET in_stock = " + newStock + " WHERE prod_num = " + prod_num;
-                        statement2.executeUpdate(sql);
-                        db.writeToLog(sql);
+                        String sql = "UPDATE " + PRODUCTS_TABLE + " "
+                                + "SET " + PRODUCT_INSTOCK + " = " + in_stock + " "
+                                + "WHERE " + PRODUCT_PRODNUM + " = " + prod_num;
+                        updateStatement.executeUpdate(sql);
+                        MayfairStatic.writeToLog(sql);
 
                         // UPDATE SALES ORDER DETAILS
-                        rs = statement.executeQuery("SELECT code, quantity, fromStock FROM sales_order_details WHERE prod_num = " + prod_num + " AND ord_num = " + orderNum);
+                        rs = selectStatement.executeQuery("SELECT " + SOD_CODE + ", " + SOD_QUANTITY + ", " + SOD_FROMSTOCK + " "
+                                + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                                + "WHERE " + SOD_PRODNUM + " = " + prod_num + " "
+                                + "AND " + SOD_ORDNUM + " = " + ord_num);
                         if (rs.next())
                         {
-                            int oldQuant = rs.getInt("quantity");
-                            int code = rs.getInt("code");
-                            int oldFromStock = rs.getInt("fromStock");
-
-                            sql = "UPDATE sales_order_details SET quantity = " + (oldQuant + fromStock) + ", price = " + ((oldQuant + fromStock) * price) + ", fromStock = " + (oldFromStock + fromStock) + " WHERE code = " + code;
+                            int code = rs.getInt(SOD_CODE);
+                            int quantity = rs.getInt(SOD_QUANTITY) + quantToAdd;
+                            int fromStock = rs.getInt(SOD_FROMSTOCK) + quantToAdd;
+                            double price = quantity * sales_price;
+                            sql = "UPDATE " + SALES_ORDER_DETAILS_TABLE + " "
+                                    + "SET " + SOD_QUANTITY + " = " + quantity + ", "
+                                    + SOD_PRICE + " = " + price + ", "
+                                    + SOD_FROMSTOCK + " = " + fromStock + " "
+                                    + "WHERE " + SOD_CODE + " = " + code;
                         }
                         else
                         {
-                            sql = "INSERT INTO sales_order_details (ord_num, prod_num, quantity, price, fromStock, fromOrder) VALUES (" + orderNum + ", " + prod_num + ", " + fromStock + ", " + (fromStock * price) + ", " + fromStock + ", 0)";
+                            double price = quantToAdd * sales_price;
+                            sql = "INSERT INTO " + SALES_ORDER_DETAILS_TABLE + " (" + SOD_ORDNUM + ", " + SOD_PRODNUM + ", " + SOD_QUANTITY + ", " + SOD_PRICE + ", " + SOD_FROMSTOCK + ", " + SOD_FROMORDER + ") "
+                                    + "VALUES (" + ord_num + ", " + prod_num + ", " + quantToAdd + ", " + price + ", " + quantToAdd + ", 0)";
                         }
-                        statement2.executeUpdate(sql);
-                        db.writeToLog(sql);
+                        updateStatement.executeUpdate(sql);
+                        MayfairStatic.writeToLog(sql);
 
-                        JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Product added");
-                        EditSalesOrderStep2 addProducts = new EditSalesOrderStep2(desktop, orderNum);
-                        desktop.add(addProducts);
-                        MayfairStatic.setMaximum(addProducts);
-                        addProducts.show();
+                        MayfairStatic.outputMessage(this, "Product Added", quantToAdd + " x " + prodCode + " added.", INFORMATION_MESSAGE);
+                        EditSalesOrderStep2 jFrame = new EditSalesOrderStep2(desktop, ord_num);
+                        desktop.add(jFrame);
+                        jFrame.show();
                         this.dispose();
-                    }
-                    else
-                    {
-                        JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Not enough avaliable in Stock.");
                     }
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Quantity must be greater than 0");
+                    MayfairStatic.outputMessage(this, "Invalid quantity", "Not enough avaliable in stock, please reduce quantity or take from purchase order.", WARNING_MESSAGE);
                 }
-
             }
-            catch (SQLException e)
+            catch (SQLException ex)
             {
-                JOptionPane.showMessageDialog(EditSalesOrderStep2.this, e.getMessage());
-            }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
+                MayfairStatic.outputMessage(this, ex);
             }
         }
-        catch (NumberFormatException | HeadlessException e)
+        catch (NumberFormatException | HeadlessException ex)
         {
-            JOptionPane.showMessageDialog(EditSalesOrderStep2.this, "Please enter a valid quantity");
+            MayfairStatic.outputMessage(this, "Invalid quantity", "Please enter a valid quantity.", WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnAddStockActionPerformed
 
@@ -685,7 +565,7 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
     private javax.swing.JButton btnAddPO;
     private javax.swing.JButton btnAddStock;
     private javax.swing.JButton btnFind;
-    private javax.swing.JButton btnFinish;
+    private javax.swing.JButton btnSave;
     private javax.swing.JTextField fieldPOQuant;
     private javax.swing.JTextField fieldProdCode;
     private javax.swing.JTextField fieldStockQuant;
@@ -698,14 +578,12 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JLabel labelOrdDetails;
-    private javax.swing.JLabel labelOrdTotal;
-    private javax.swing.JLabel labelOrderTotal;
-    private javax.swing.JLabel labelOrderTotal1;
+    private javax.swing.JLabel labelPrice;
     private javax.swing.JLabel labelProdNum;
-    private javax.swing.JLabel labelTotalUnits;
-    private javax.swing.JScrollPane scrollPane;
-    private javax.swing.JScrollPane scrollPane2;
-    private javax.swing.JTable table;
-    private javax.swing.JTable table2;
+    private javax.swing.JLabel labelUnits;
+    private javax.swing.JScrollPane orderDetailsScroll;
+    private javax.swing.JTable orderDetailsTable;
+    private javax.swing.JScrollPane productsScroll;
+    private javax.swing.JTable productsTable;
     // End of variables declaration//GEN-END:variables
 }

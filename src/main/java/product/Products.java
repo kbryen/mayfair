@@ -1,7 +1,6 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Mayfair Stock Control.
+ *
  */
 package main.java.product;
 
@@ -14,7 +13,6 @@ import java.util.List;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
-import main.java.Database;
 import main.java.MayfairStatic;
 
 /**
@@ -25,14 +23,7 @@ public class Products extends javax.swing.JInternalFrame
 {
 
     private final JDesktopPane desktop;
-    private final Database db = new Database();
-    private String sql;
 
-    /**
-     * Creates new form ViewEditProducts
-     *
-     * @param pane Desktop Pane
-     */
     public Products(JDesktopPane pane)
     {
         desktop = pane;
@@ -424,7 +415,7 @@ public class Products extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnDiscontinueActionPerformed
 
     private void btnViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewActionPerformed
-        View prod = new View(desktop, (int) table.getValueAt(table.getSelectedRow(), 0));
+        ViewProduct prod = new ViewProduct(desktop, (int) table.getValueAt(table.getSelectedRow(), 0));
         desktop.add(prod);
         prod.show();
     }//GEN-LAST:event_btnViewActionPerformed
@@ -494,13 +485,13 @@ public class Products extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        Edit prod = new Edit(desktop, (int) table.getValueAt(table.getSelectedRow(), 0));
+        EditProduct prod = new EditProduct(desktop, (int) table.getValueAt(table.getSelectedRow(), 0));
         desktop.add(prod);
         prod.show();
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void AddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddActionPerformed
-        Add prod = new Add();
+        AddProduct prod = new AddProduct();
         desktop.add(prod);
         prod.show();
     }//GEN-LAST:event_AddActionPerformed

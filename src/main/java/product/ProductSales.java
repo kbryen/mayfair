@@ -17,13 +17,13 @@ import main.java.Database;
  *
  * @author kian_bryen
  */
-public class Sales extends javax.swing.JInternalFrame
+public class ProductSales extends javax.swing.JInternalFrame
 {
     private final Database db = new Database();
     private final String prodCode;
     private final int prodNum;
     
-    public Sales(String code, int num)
+    public ProductSales(String code, int num)
     {
         initComponents();
         prodCode = code;
@@ -40,7 +40,8 @@ public class Sales extends javax.swing.JInternalFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         jLabel1 = new javax.swing.JLabel();
         jSeparator1 = new javax.swing.JSeparator();
@@ -72,8 +73,10 @@ public class Sales extends javax.swing.JInternalFrame
         jLabel3.setText("Pick End Date : ");
 
         btnShow.setText("Show");
-        btnShow.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnShow.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnShowActionPerformed(evt);
             }
         });
@@ -83,32 +86,42 @@ public class Sales extends javax.swing.JInternalFrame
         labelTS.setText("Total Sales : ");
 
         btnClose.setText("Close");
-        btnClose.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnClose.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCloseActionPerformed(evt);
             }
         });
 
         calStart.setDateFormatString("yyyy-MM-dd");
-        calStart.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
+        calStart.addFocusListener(new java.awt.event.FocusAdapter()
+        {
+            public void focusLost(java.awt.event.FocusEvent evt)
+            {
                 calStartFocusLost(evt);
             }
         });
-        calStart.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+        calStart.addPropertyChangeListener(new java.beans.PropertyChangeListener()
+        {
+            public void propertyChange(java.beans.PropertyChangeEvent evt)
+            {
                 calStartPropertyChange(evt);
             }
         });
 
         calEnd.setDateFormatString("yyyy-MM-dd");
-        calEnd.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusLost(java.awt.event.FocusEvent evt) {
+        calEnd.addFocusListener(new java.awt.event.FocusAdapter()
+        {
+            public void focusLost(java.awt.event.FocusEvent evt)
+            {
                 calEndFocusLost(evt);
             }
         });
-        calEnd.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
-            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+        calEnd.addPropertyChangeListener(new java.beans.PropertyChangeListener()
+        {
+            public void propertyChange(java.beans.PropertyChangeEvent evt)
+            {
                 calEndPropertyChange(evt);
             }
         });
@@ -243,7 +256,7 @@ public class Sales extends javax.swing.JInternalFrame
             }
             catch (SQLException e)
             {
-                JOptionPane.showMessageDialog(Sales.this, e.getMessage());
+                JOptionPane.showMessageDialog(ProductSales.this, e.getMessage());
             }
             finally
             {
@@ -257,7 +270,7 @@ public class Sales extends javax.swing.JInternalFrame
         }
         else
         {
-            JOptionPane.showMessageDialog(Sales.this, "Please select a start and end date");
+            JOptionPane.showMessageDialog(ProductSales.this, "Please select a start and end date");
         }
     }//GEN-LAST:event_btnShowActionPerformed
 

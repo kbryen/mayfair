@@ -14,7 +14,7 @@ import static main.java.MayfairStatic.*;
  *
  * @author kian_bryen
  */
-public class Add extends javax.swing.JInternalFrame
+public class AddProduct extends javax.swing.JInternalFrame
 {
     private final Database db = new Database();
     private String sql;
@@ -30,7 +30,7 @@ public class Add extends javax.swing.JInternalFrame
     private double purchasePriceCurrent = 0;
     private int inStockCurrent = 0;
     
-    public Add()
+    public AddProduct()
     {
         initComponents();
     }
@@ -47,7 +47,7 @@ public class Add extends javax.swing.JInternalFrame
         
         if(prodCodeCurrent.isEmpty() || leatherCurrent.isEmpty() || styleCurrent.isEmpty() || colourCurrent.isEmpty())
         {
-            JOptionPane.showMessageDialog(Add.this, "Please complete all compulsory fields. (*)");
+            JOptionPane.showMessageDialog(AddProduct.this, "Please complete all compulsory fields. (*)");
             return false;
         }
         
@@ -61,34 +61,34 @@ public class Add extends javax.swing.JInternalFrame
         {
             if (e.getMessage().contains("For input string: \"" + labelInStock.getText() + "\"")) 
             {
-                JOptionPane.showMessageDialog(Add.this, "In Stock must be a whole number");
+                JOptionPane.showMessageDialog(AddProduct.this, "In Stock must be a whole number");
             } 
             else if (e.getMessage().contains("For input string: \"" + labelSalesPrice.getText() + "\"")) 
             {
-                JOptionPane.showMessageDialog(Add.this, "Sales Price must be a number");
+                JOptionPane.showMessageDialog(AddProduct.this, "Sales Price must be a number");
             } 
             else if (e.getMessage().contains("For input string: \"" + labelPurchasePrice.getText() + "\"")) 
             {
-                JOptionPane.showMessageDialog(Add.this, "Purchase Price must be a number");
+                JOptionPane.showMessageDialog(AddProduct.this, "Purchase Price must be a number");
             }
             return false;
         }
         
         if(salesPriceCurrent < 0)
         {
-            JOptionPane.showMessageDialog(Add.this, "Sales Price must not be negative");
+            JOptionPane.showMessageDialog(AddProduct.this, "Sales Price must not be negative");
             salesPriceCurrent = 0;
             return false;
         }
         if(purchasePriceCurrent < 0)
         {
-            JOptionPane.showMessageDialog(Add.this, "Purchase Price must not be negative");
+            JOptionPane.showMessageDialog(AddProduct.this, "Purchase Price must not be negative");
             purchasePriceCurrent = 0;
             return false;
         }
         if(inStockCurrent < 0)
         {
-            JOptionPane.showMessageDialog(Add.this, "Available Stock must not be negative");
+            JOptionPane.showMessageDialog(AddProduct.this, "Available Stock must not be negative");
             inStockCurrent = 0;
             return false;
         }
@@ -103,7 +103,8 @@ public class Add extends javax.swing.JInternalFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         jTextField1 = new javax.swing.JTextField();
         labelBarCode6 = new javax.swing.JTextField();
@@ -163,8 +164,10 @@ public class Add extends javax.swing.JInternalFrame
         jLabel8.setText("Comments:");
 
         btnSave.setText("Save");
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnSave.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnSaveActionPerformed(evt);
             }
         });
@@ -321,18 +324,18 @@ public class Add extends javax.swing.JInternalFrame
                     db.writeToLog(sql);
                     db.writeToLog(LOG_SEPERATOR);
                     
-                    JOptionPane.showMessageDialog(Add.this, "Product Added");
+                    JOptionPane.showMessageDialog(AddProduct.this, "Product Added");
                     this.dispose();
                 }
                 catch (SQLException e)
                 {
                     if (e.getMessage().contains("Duplicate"))
                     {
-                        JOptionPane.showMessageDialog(Add.this, "Product code already in use");
+                        JOptionPane.showMessageDialog(AddProduct.this, "Product code already in use");
                     }
                     else
                     {
-                        JOptionPane.showMessageDialog(Add.this, e.getMessage());
+                        JOptionPane.showMessageDialog(AddProduct.this, e.getMessage());
                     }
                 }
             }

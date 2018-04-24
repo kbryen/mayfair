@@ -44,8 +44,6 @@ import static main.java.MayfairStatic.SOD_PRODNUM;
 import static main.java.MayfairStatic.SOD_QUANTITY;
 import static main.java.MayfairStatic.SO_DELDATE;
 import static main.java.MayfairStatic.SO_ORDNUM;
-import static main.java.MayfairStatic.SO_PRICE;
-import static main.java.MayfairStatic.SO_TOTALUNITS;
 
 /**
  *
@@ -58,11 +56,11 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
     private final int ord_num;
     private final int numOfProducts;
 
-    public NewSalesOrderStep2(JDesktopPane desktop, int orderNum, int numOfProducts)
+    public NewSalesOrderStep2(JDesktopPane desktop, int ord_num, int numOfProducts)
     {
         setUpGUI();
         this.desktop = desktop;
-        this.ord_num = orderNum;
+        this.ord_num = ord_num;
         this.numOfProducts = numOfProducts;
     }
 
@@ -94,44 +92,15 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
 
     private void fillLables()
     {
-        updateSalesOrderDetails();
         try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
+            MayfairStatic.updateSalesOrderUnitsPrice(ord_num, labelUnits, labelPrice);
             ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_CODE + ", " + SOD_QUANTITY + ", " + PRODUCT_SALESPRICE + ", " + SOD_PRICE + " "
                     + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
                     + "JOIN " + PRODUCTS_TABLE + " "
                     + "ON " + SOD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
-                    + "WHERE " + SOD_ORDNUM + " = '" + ord_num + "'");
+                    + "WHERE " + SOD_ORDNUM + " = " + ord_num);
             MayfairStatic.fillTable(orderDetailsTable, rs);
-        }
-        catch (SQLException ex)
-        {
-            MayfairStatic.outputMessage(this, ex);
-        }
-    }
-
-    private void updateSalesOrderDetails()
-    {
-        try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-        {
-            ResultSet rs = selectStatement.executeQuery("SELECT SUM(" + SOD_PRICE + ") AS total_price, "
-                    + "SUM(" + SOD_QUANTITY + ") as total_quantity "
-                    + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
-                    + "WHERE " + SOD_ORDNUM + " = '" + ord_num + "'");
-            rs.next();
-
-            int total_units = rs.getInt("total_units");
-            double total_price = rs.getDouble("total_price");
-            labelUnits.setText("Total Units: " + total_units);
-            labelPrice.setText("Order Total: £" + String.format("%.02f", total_price));
-
-            try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
-            {
-                updateStatement.executeUpdate("UPDATE " + SALES_ORDER_TABLE + " "
-                        + "SET " + SO_PRICE + " = " + total_price + ", "
-                        + SO_TOTALUNITS + " = " + total_units + " "
-                        + "WHERE " + SO_ORDNUM + " = '" + ord_num + "'");
-            }
         }
         catch (SQLException ex)
         {
@@ -492,11 +461,18 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
         if (MayfairStatic.outputConfirm(this, "Complete Order", "Are you sure you want to complete this order?") == JOptionPane.YES_OPTION)
         {
-            updateSalesOrderDetails();
-            NewSalesOrderStep3 jFrame = new NewSalesOrderStep3(desktop, ord_num);
-            desktop.add(jFrame);
-            jFrame.show();
-            this.dispose();
+            try
+            {
+                MayfairStatic.updateSalesOrderUnitsPrice(ord_num, labelUnits, labelPrice);
+                NewSalesOrderStep3 jFrame = new NewSalesOrderStep3(desktop, ord_num);
+                desktop.add(jFrame);
+                jFrame.show();
+                this.dispose();
+            }
+            catch (SQLException ex)
+            {
+                MayfairStatic.outputMessage(this, ex);
+            }
         }
     }//GEN-LAST:event_btnNextActionPerformed
 
@@ -556,7 +532,7 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
                 MayfairStatic.writeToLog(sql);
                 MayfairStatic.writeToLog("ORDER " + action.toUpperCase());
                 MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
-                MayfairStatic.outputMessage(this, "Order " + action, "Order " + ord_num + " successfully " + action.toLowerCase() + ".", INFORMATION_MESSAGE);
+                MayfairStatic.outputMessage(this, "Order " + action, "Order number " + ord_num + " successfully " + action.toLowerCase() + ".", INFORMATION_MESSAGE);
                 this.dispose();
             }
             catch (SQLException ex)

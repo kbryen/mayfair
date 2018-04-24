@@ -6,17 +6,10 @@
             <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/sales/NewSalesOrderStep3.java</file>
             <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/sales/PickPurchaseOrders.java</file>
             <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/MayfairStatic.java</file>
+            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/sales/EditSalesOrderStep2.java</file>
             <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/sales/NewSalesOrderStep2.java</file>
-            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/customer/CustomerInfo.java</file>
-            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/purchase/PastPurchaseOrders.java</file>
-            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/purchase/NewPurchaseOrderStep2.java</file>
-            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/sales/ViewSalesOrderSummary.java</file>
-            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/App.java</file>
-            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/purchase/ViewPurchaseOrderSummary.java</file>
-            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/report/ReportGenerator.java</file>
-            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/product/Add.java</file>
-            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/sales/NewSalesOrderStep1.java</file>
-            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/purchase/NewPurchaseOrderStep3.java</file>
+            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/sales/PastSalesOrders.java</file>
+            <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/product/Products.java</file>
             <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/sales/EditSalesOrderStep1.java</file>
             <file>file:/Users/kian_bryen/Desktop/mayfair/src/main/java/order/sales/CurrentSalesOrders.java</file>
         </group>

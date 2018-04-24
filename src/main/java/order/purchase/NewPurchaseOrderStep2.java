@@ -77,44 +77,15 @@ public class NewPurchaseOrderStep2 extends javax.swing.JInternalFrame
 
     private void fillLables()
     {
-        updatePurchaseOrderDetails();
         try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
+            MayfairStatic.updatePurchaseOrderUnitsPrice(ord_num, labelUnits, labelPrice);
             ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_CODE + ", " + POD_QUANTITY + ", " + PRODUCT_PURCHASEPRICE + ", " + POD_PRICE + " "
                     + "FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
                     + "JOIN " + PRODUCTS_TABLE + " "
                     + "ON " + POD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
                     + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'");
             MayfairStatic.fillTable(orderDetailsTable, rs);
-        }
-        catch (SQLException ex)
-        {
-            MayfairStatic.outputMessage(this, ex);
-        }
-    }
-
-    private void updatePurchaseOrderDetails()
-    {
-        try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-        {
-            ResultSet rs = selectStatement.executeQuery("SELECT SUM(" + POD_PRICE + ") AS total_price, "
-                    + "SUM(" + POD_QUANTITY + ") as total_quantity "
-                    + "FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
-                    + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'");
-            rs.next();
-
-            int total_units = rs.getInt("total_units");
-            double total_price = rs.getDouble("total_price");
-            labelUnits.setText("Total Units: " + total_units);
-            labelPrice.setText("Order Total: £" + String.format("%.02f", total_price));
-
-            try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
-            {
-                updateStatement.executeUpdate("UPDATE " + PURCHASE_ORDER_TABLE + " "
-                        + "SET " + PO_PRICE + " = " + total_price + ", "
-                        + PO_TOTALUNITS + " = " + total_units + " "
-                        + "WHERE " + PO_ORDNUM + " = '" + ord_num + "'");
-            }
         }
         catch (SQLException ex)
         {
@@ -432,11 +403,18 @@ public class NewPurchaseOrderStep2 extends javax.swing.JInternalFrame
     private void btnNextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNextActionPerformed
         if (MayfairStatic.outputConfirm(this, "Complete Order", "Are you sure you want to complete this order?") == JOptionPane.YES_OPTION)
         {
-            updatePurchaseOrderDetails();
-            NewPurchaseOrderStep3 jFrame = new NewPurchaseOrderStep3(desktop, ord_num);
-            desktop.add(jFrame);
-            jFrame.show();
-            this.dispose();
+            try
+            {
+                MayfairStatic.updatePurchaseOrderUnitsPrice(ord_num, labelUnits, labelPrice);
+                NewPurchaseOrderStep3 jFrame = new NewPurchaseOrderStep3(desktop, ord_num);
+                desktop.add(jFrame);
+                jFrame.show();
+                this.dispose();
+            }
+            catch (SQLException ex)
+            {
+                MayfairStatic.outputMessage(this, ex);
+            }
         }
     }//GEN-LAST:event_btnNextActionPerformed
 

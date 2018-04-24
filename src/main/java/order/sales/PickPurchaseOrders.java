@@ -29,7 +29,7 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
 
     private final JDesktopPane desktop;
     private int leftToFulfill;
-    private final int numOfProducts;
+    private int numOfProducts = -1;
     private final int prod_num;
     private String po_ordnum;
     private final int so_ordnum;
@@ -37,13 +37,18 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
 
     public PickPurchaseOrders(JDesktopPane desktop, Map<String, Pair<Integer, Date>> possiblePurchaseOrders, int leftToFulfill, int prod_num, int so_ordnum, int numOfProducts)
     {
+        this(desktop, possiblePurchaseOrders, leftToFulfill, prod_num, so_ordnum);
+        this.numOfProducts = numOfProducts;
+    }
+
+    public PickPurchaseOrders(JDesktopPane desktop, Map<String, Pair<Integer, Date>> possiblePurchaseOrders, int leftToFulfill, int prod_num, int so_ordnum)
+    {
         setUpGUI();
         this.desktop = desktop;
         this.possiblePurchaseOrders = possiblePurchaseOrders;
         this.leftToFulfill = leftToFulfill;
         this.prod_num = prod_num;
         this.so_ordnum = so_ordnum;
-        this.numOfProducts = numOfProducts;
     }
 
     private void setUpGUI()
@@ -404,15 +409,20 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
 
                             MayfairStatic.outputMessage(this, "Product added", quantToAdd + " added to order.", INFORMATION_MESSAGE);
                             JInternalFrame jFrame;
-                            
+
                             leftToFulfill -= quantToAdd;
                             if (leftToFulfill != 0)
                             {
                                 jFrame = new PickPurchaseOrders(desktop, possiblePurchaseOrders, leftToFulfill, prod_num, so_ordnum, numOfProducts);
                             }
-                            else
+                            else if (numOfProducts != -1)
                             {
                                 jFrame = new NewSalesOrderStep2(desktop, so_ordnum, numOfProducts + 1);
+                                MayfairStatic.setMaximum(jFrame);
+                            }
+                            else
+                            {
+                                jFrame = new EditSalesOrderStep2(desktop, so_ordnum);
                                 MayfairStatic.setMaximum(jFrame);
                             }
                             desktop.add(jFrame);

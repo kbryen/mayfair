@@ -18,7 +18,7 @@ import static main.java.MayfairStatic.*;
  *
  * @author kian_bryen
  */
-public class Edit extends javax.swing.JInternalFrame
+public class EditProduct extends javax.swing.JInternalFrame
 {
     private final JDesktopPane desktop;
     private final Database db = new Database();
@@ -49,7 +49,7 @@ public class Edit extends javax.swing.JInternalFrame
     private double salesPriceCurrent = 0;
     private double purchasePriceCurrent = 0;
     
-    public Edit(JDesktopPane pane, int num)
+    public EditProduct(JDesktopPane pane, int num)
     {
         this.desktop = pane;
         prodNum = num;
@@ -87,7 +87,7 @@ public class Edit extends javax.swing.JInternalFrame
         }
         catch (SQLException e)
         {
-            JOptionPane.showMessageDialog(Edit.this, e.getMessage());
+            JOptionPane.showMessageDialog(EditProduct.this, e.getMessage());
         }
     }
     
@@ -121,7 +121,7 @@ public class Edit extends javax.swing.JInternalFrame
         
         if(prodCodeCurrent.isEmpty() || leatherCurrent.isEmpty() || styleCurrent.isEmpty() || colourCurrent.isEmpty())
         {
-            JOptionPane.showMessageDialog(Edit.this, "Please complete all compulsory fields or revert changes. (*)");
+            JOptionPane.showMessageDialog(EditProduct.this, "Please complete all compulsory fields or revert changes. (*)");
             return false;
         }
         
@@ -134,24 +134,24 @@ public class Edit extends javax.swing.JInternalFrame
         {
             if (e.getMessage().contains("For input string: \"" + labelSalesPrice.getText() + "\"")) 
             {
-                JOptionPane.showMessageDialog(Edit.this, "Sales Price must be a number");
+                JOptionPane.showMessageDialog(EditProduct.this, "Sales Price must be a number");
             } 
             else if (e.getMessage().contains("For input string: \"" + labelPurchasePrice.getText() + "\"")) 
             {
-                JOptionPane.showMessageDialog(Edit.this, "Purchase Price must be a number");
+                JOptionPane.showMessageDialog(EditProduct.this, "Purchase Price must be a number");
             }
             return false;
         }
         
         if(salesPriceCurrent < 0)
         {
-            JOptionPane.showMessageDialog(Edit.this, "Sales Price must not be negative");
+            JOptionPane.showMessageDialog(EditProduct.this, "Sales Price must not be negative");
             salesPriceCurrent = 0;
             return false;
         }
         if(purchasePriceCurrent < 0)
         {
-            JOptionPane.showMessageDialog(Edit.this, "Purchase Price must not be negative");
+            JOptionPane.showMessageDialog(EditProduct.this, "Purchase Price must not be negative");
             purchasePriceCurrent = 0;
             return false;
         }
@@ -170,7 +170,8 @@ public class Edit extends javax.swing.JInternalFrame
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
-    private void initComponents() {
+    private void initComponents()
+    {
 
         jTextField1 = new javax.swing.JTextField();
         labelBarCode6 = new javax.swing.JTextField();
@@ -221,8 +222,10 @@ public class Edit extends javax.swing.JInternalFrame
         jTextField1.setText("jTextField1");
 
         btnCancel1.setText("Cancel");
-        btnCancel1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnCancel1.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCancel1ActionPerformed(evt);
             }
         });
@@ -251,8 +254,10 @@ public class Edit extends javax.swing.JInternalFrame
         jLabel8.setText("Comments:");
 
         btnSave.setText("Save");
-        btnSave.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnSave.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnSaveActionPerformed(evt);
             }
         });
@@ -262,8 +267,10 @@ public class Edit extends javax.swing.JInternalFrame
         jLabel12.setText("Season: ");
 
         btnRevert.setText("Revert Changes");
-        btnRevert.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnRevert.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnRevertActionPerformed(evt);
             }
         });
@@ -279,39 +286,49 @@ public class Edit extends javax.swing.JInternalFrame
         jLabel17.setText("£");
 
         btnCancel.setText("Cancel");
-        btnCancel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnCancel.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnCancelActionPerformed(evt);
             }
         });
 
         btnOverrideStock.setText("Override Stock Count");
-        btnOverrideStock.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnOverrideStock.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnOverrideStockActionPerformed(evt);
             }
         });
 
         btnInStock.setFont(new java.awt.Font("Lucida Grande", 0, 8)); // NOI18N
         btnInStock.setText("?");
-        btnInStock.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnInStock.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnInStockActionPerformed(evt);
             }
         });
 
         btnWarehouseStock.setFont(new java.awt.Font("Lucida Grande", 0, 8)); // NOI18N
         btnWarehouseStock.setText("?");
-        btnWarehouseStock.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnWarehouseStock.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnWarehouseStockActionPerformed(evt);
             }
         });
 
         btnOnOrder.setFont(new java.awt.Font("Lucida Grande", 0, 8)); // NOI18N
         btnOnOrder.setText("?");
-        btnOnOrder.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        btnOnOrder.addActionListener(new java.awt.event.ActionListener()
+        {
+            public void actionPerformed(java.awt.event.ActionEvent evt)
+            {
                 btnOnOrderActionPerformed(evt);
             }
         });
@@ -523,18 +540,18 @@ public class Edit extends javax.swing.JInternalFrame
                     db.writeToLog(sql);
                     db.writeToLog(LOG_SEPERATOR);
                     
-                    JOptionPane.showMessageDialog(Edit.this, "Product Saved");
+                    JOptionPane.showMessageDialog(EditProduct.this, "Product Saved");
                     this.dispose();
                 }
                 catch (SQLException e)
                 {
-                    JOptionPane.showMessageDialog(Edit.this, e.getMessage());
+                    JOptionPane.showMessageDialog(EditProduct.this, e.getMessage());
                 }
             }
         }
         else
         {
-            JOptionPane.showMessageDialog(Edit.this, "No changes made.");
+            JOptionPane.showMessageDialog(EditProduct.this, "No changes made.");
             this.dispose();
         }
         }
@@ -550,7 +567,7 @@ public class Edit extends javax.swing.JInternalFrame
         }
         else
         {
-            JOptionPane.showMessageDialog(Edit.this, "No changes made.");
+            JOptionPane.showMessageDialog(EditProduct.this, "No changes made.");
         }
     }//GEN-LAST:event_btnRevertActionPerformed
 
@@ -577,7 +594,7 @@ public class Edit extends javax.swing.JInternalFrame
                 int onSalesOrder = warehouseStock - inStock;
                 if(newWarehouseStock < onSalesOrder)
                 {
-                    JOptionPane.showMessageDialog(Edit.this, "Warehouse stock must be at least " + onSalesOrder + " to fulfill active sales orders");
+                    JOptionPane.showMessageDialog(EditProduct.this, "Warehouse stock must be at least " + onSalesOrder + " to fulfill active sales orders");
                 }
                 else
                 {
@@ -596,26 +613,26 @@ public class Edit extends javax.swing.JInternalFrame
                     }
                     catch (SQLException e)
                     {
-                        JOptionPane.showMessageDialog(Edit.this, e.getMessage());
+                        JOptionPane.showMessageDialog(EditProduct.this, e.getMessage());
                     }
                 }
             }
             catch (NumberFormatException e)
             {
-                JOptionPane.showMessageDialog(Edit.this, "Warehouse stock must be a positive whole number");
+                JOptionPane.showMessageDialog(EditProduct.this, "Warehouse stock must be a positive whole number");
             }
     }//GEN-LAST:event_btnOverrideStockActionPerformed
 
     private void btnInStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInStockActionPerformed
-        JOptionPane.showMessageDialog(Edit.this, "Instantly available stock which is currently in the warehouse and not on an active sales order.", "Available Stock", INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(EditProduct.this, "Instantly available stock which is currently in the warehouse and not on an active sales order.", "Available Stock", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnInStockActionPerformed
 
     private void btnWarehouseStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWarehouseStockActionPerformed
-        JOptionPane.showMessageDialog(Edit.this, "Instantly available stock + stock which is on an active sales order but not dispatched from the warehouse.", "Warehouse Stock", INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(EditProduct.this, "Instantly available stock + stock which is on an active sales order but not dispatched from the warehouse.", "Warehouse Stock", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnWarehouseStockActionPerformed
 
     private void btnOnOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOnOrderActionPerformed
-        JOptionPane.showMessageDialog(Edit.this, "Stock on undelivered active purchase orders and not on an active sales order.", "On Order", INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(EditProduct.this, "Stock on undelivered active purchase orders and not on an active sales order.", "On Order", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnOnOrderActionPerformed
 
 

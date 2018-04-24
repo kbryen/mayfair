@@ -21,6 +21,7 @@ import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import javax.swing.JInternalFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.QUESTION_MESSAGE;
@@ -115,6 +116,7 @@ public class MayfairStatic
     public static final String POD_PRICE = PURCHASE_ORDER_DETAILS_TABLE + ".price";
 
     public static final String PURCHASE_SALES_ORDER_TABLE = "purchase_sales_order";
+    public static final String PS_CODE = PURCHASE_SALES_ORDER_TABLE + ".code";
     public static final String PS_PONUM = PURCHASE_SALES_ORDER_TABLE + ".po_num";
     public static final String PS_SONUM = PURCHASE_SALES_ORDER_TABLE + ".so_num";
     public static final String PS_PRODNUM = PURCHASE_SALES_ORDER_TABLE + ".prod_num";
@@ -293,5 +295,55 @@ public class MayfairStatic
             MayfairStatic.outputMessage(component, "Invalid date", "Please enter a delivery date.", WARNING_MESSAGE);
         }
         return false;
+    }
+
+    public static void updateSalesOrderUnitsPrice(int ord_num, JLabel units, JLabel price) throws SQLException
+    {
+        try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        {
+            ResultSet rs = selectStatement.executeQuery("SELECT SUM(" + SOD_PRICE + ") AS total_price, "
+                    + "SUM(" + SOD_QUANTITY + ") as total_quantity "
+                    + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                    + "WHERE " + SOD_ORDNUM + " = " + ord_num);
+            rs.next();
+
+            int total_units = rs.getInt("total_units");
+            double total_price = rs.getDouble("total_price");
+            units.setText("Total Units: " + total_units);
+            price.setText("Order Total: £" + String.format("%.02f", total_price));
+
+            try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
+            {
+                updateStatement.executeUpdate("UPDATE " + SALES_ORDER_TABLE + " "
+                        + "SET " + SO_PRICE + " = " + total_price + ", "
+                        + SO_TOTALUNITS + " = " + total_units + " "
+                        + "WHERE " + SO_ORDNUM + " = " + ord_num);
+            }
+        }
+    }
+
+    public static void updatePurchaseOrderUnitsPrice(String ord_num, JLabel units, JLabel price) throws SQLException
+    {
+        try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        {
+            ResultSet rs = selectStatement.executeQuery("SELECT SUM(" + POD_PRICE + ") AS total_price, "
+                    + "SUM(" + POD_QUANTITY + ") as total_quantity "
+                    + "FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                    + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'");
+            rs.next();
+
+            int total_units = rs.getInt("total_units");
+            double total_price = rs.getDouble("total_price");
+            units.setText("Total Units: " + total_units);
+            price.setText("Order Total: £" + String.format("%.02f", total_price));
+
+            try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
+            {
+                updateStatement.executeUpdate("UPDATE " + PURCHASE_ORDER_TABLE + " "
+                        + "SET " + PO_PRICE + " = " + total_price + ", "
+                        + PO_TOTALUNITS + " = " + total_units + " "
+                        + "WHERE " + PO_ORDNUM + " = '" + ord_num + "'");
+            }
+        }
     }
 }

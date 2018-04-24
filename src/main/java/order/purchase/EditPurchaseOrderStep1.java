@@ -78,7 +78,7 @@ public class EditPurchaseOrderStep1 extends javax.swing.JInternalFrame
     {
         try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            updatePurchaseOrderDetails();
+            MayfairStatic.updatePurchaseOrderUnitsPrice(ord_num, labelUnits, labelPrice);
             ResultSet rs = selectStatement.executeQuery("SELECT " + PO_ORDNUM + ", "
                     + PO_DELDATE + " AS del_datetime, "
                     + MayfairStatic.sqlDateFormat(PO_DELDATE) + ", "
@@ -115,31 +115,6 @@ public class EditPurchaseOrderStep1 extends javax.swing.JInternalFrame
         catch (SQLException ex)
         {
             MayfairStatic.outputMessage(this, ex);
-        }
-    }
-
-    private void updatePurchaseOrderDetails() throws SQLException
-    {
-        try (Statement selectStatement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-        {
-            ResultSet rs = selectStatement.executeQuery("SELECT SUM(" + POD_PRICE + ") AS total_price, "
-                    + "SUM(" + POD_QUANTITY + ") as total_quantity "
-                    + "FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
-                    + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'");
-            rs.next();
-
-            int total_units = rs.getInt("total_units");
-            double total_price = rs.getDouble("total_price");
-            labelUnits.setText("Total Units: " + total_units);
-            labelPrice.setText("Order Total: £" + String.format("%.02f", total_price));
-
-            try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
-            {
-                updateStatement.executeUpdate("UPDATE " + PURCHASE_ORDER_TABLE + " "
-                        + "SET " + PO_PRICE + " = " + total_price + ", "
-                        + PO_TOTALUNITS + " = " + total_units + " "
-                        + "WHERE " + PO_ORDNUM + " = '" + ord_num + "'");
-            }
         }
     }
 
