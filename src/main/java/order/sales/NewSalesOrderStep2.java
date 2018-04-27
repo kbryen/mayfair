@@ -4,7 +4,6 @@
  */
 package main.java.order.sales;
 
-import java.awt.HeadlessException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -452,7 +451,7 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
                 MayfairStatic.outputMessage(this, ex);
             }
         }
-        catch (NumberFormatException | HeadlessException ex)
+        catch (NumberFormatException ex)
         {
             MayfairStatic.outputMessage(this, "Invalid quantity", "Please enter a valid quantity.", WARNING_MESSAGE);
         }
@@ -618,7 +617,7 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
                 MayfairStatic.outputMessage(this, ex);
             }
         }
-        catch (NumberFormatException | HeadlessException ex)
+        catch (NumberFormatException ex)
         {
             MayfairStatic.outputMessage(this, "Invalid quantity", "Please enter a valid quantity.", WARNING_MESSAGE);
         }

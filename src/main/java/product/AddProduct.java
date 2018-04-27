@@ -7,8 +7,23 @@ package main.java.product;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
-import main.java.Database;
-import static main.java.MayfairStatic.*;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.LOG_SEPERATOR;
+import static main.java.MayfairStatic.PRODUCTS_TABLE;
+import static main.java.MayfairStatic.PRODUCT_BARCODE;
+import static main.java.MayfairStatic.PRODUCT_CODE;
+import static main.java.MayfairStatic.PRODUCT_COLOUR;
+import static main.java.MayfairStatic.PRODUCT_COMMENTS;
+import static main.java.MayfairStatic.PRODUCT_INORDER;
+import static main.java.MayfairStatic.PRODUCT_INSTOCK;
+import static main.java.MayfairStatic.PRODUCT_LEATHER;
+import static main.java.MayfairStatic.PRODUCT_PURCHASEPRICE;
+import static main.java.MayfairStatic.PRODUCT_SALESPRICE;
+import static main.java.MayfairStatic.PRODUCT_SSAW;
+import static main.java.MayfairStatic.PRODUCT_STYLE;
+import static main.java.MayfairStatic.PRODUCT_TOTAL;
 
 /**
  *
@@ -16,83 +31,81 @@ import static main.java.MayfairStatic.*;
  */
 public class AddProduct extends javax.swing.JInternalFrame
 {
-    private final Database db = new Database();
-    private String sql;
-    
-    private String prodCodeCurrent = "";
-    private String barCodeCurrent = "";
-    private String leatherCurrent = "";
-    private String styleCurrent = "";
-    private String colourCurrent = "";
-    private String seasonCurrent = "";
-    private String commentsCurrent = "";
-    private double salesPriceCurrent = 0;
-    private double purchasePriceCurrent = 0;
-    private int inStockCurrent = 0;
-    
+
+    private String code = "";
+    private String barcode = "";
+    private String leather = "";
+    private String style = "";
+    private String colour = "";
+    private String season = "";
+    private String comments = "";
+    private double sales_price = 0;
+    private double purchase_price = 0;
+    private int in_stock = 0;
+
     public AddProduct()
     {
         initComponents();
     }
-    
+
     private boolean validateFields()
     {
-        barCodeCurrent = labelBarCode.getText();
-        prodCodeCurrent = labelProdCode.getText();
-        leatherCurrent = labelLeather.getText();
-        styleCurrent = labelStyle.getText();
-        colourCurrent = labelColour.getText();
-        seasonCurrent = labelSeason.getText();
-        commentsCurrent = labelComments.getText();
-        
-        if(prodCodeCurrent.isEmpty() || leatherCurrent.isEmpty() || styleCurrent.isEmpty() || colourCurrent.isEmpty())
+        barcode = labelBarCode.getText();
+        code = labelProdCode.getText();
+        leather = labelLeather.getText();
+        style = labelStyle.getText();
+        colour = labelColour.getText();
+        season = labelSeason.getText();
+        comments = labelComments.getText();
+
+        if (code.isEmpty() || leather.isEmpty() || style.isEmpty() || colour.isEmpty())
         {
-            JOptionPane.showMessageDialog(AddProduct.this, "Please complete all compulsory fields. (*)");
+            MayfairStatic.outputMessage(this, "Incomplete Product", "Please complete all compulsory fields. (*)", WARNING_MESSAGE);
             return false;
         }
-        
-        try 
+
+        try
         {
-            salesPriceCurrent = labelSalesPrice.getText().isEmpty() ? 0 : Double.valueOf(labelSalesPrice.getText());
-            purchasePriceCurrent = labelPurchasePrice.getText().isEmpty() ? 0 : Double.valueOf(labelPurchasePrice.getText());
-            inStockCurrent = labelInStock.getText().isEmpty() ? 0 : Integer.valueOf(labelInStock.getText());
+            sales_price = labelSalesPrice.getText().isEmpty() ? 0 : Double.valueOf(labelSalesPrice.getText());
+            purchase_price = labelPurchasePrice.getText().isEmpty() ? 0 : Double.valueOf(labelPurchasePrice.getText());
+            in_stock = labelInStock.getText().isEmpty() ? 0 : Integer.valueOf(labelInStock.getText());
         }
         catch (NumberFormatException e)
         {
-            if (e.getMessage().contains("For input string: \"" + labelInStock.getText() + "\"")) 
+            if (e.getMessage().contains(labelInStock.getText()))
             {
-                JOptionPane.showMessageDialog(AddProduct.this, "In Stock must be a whole number");
-            } 
-            else if (e.getMessage().contains("For input string: \"" + labelSalesPrice.getText() + "\"")) 
+                MayfairStatic.outputMessage(this, "Invalid number", "In Stock is not a valid number.", WARNING_MESSAGE);
+            }
+            else if (e.getMessage().contains(labelSalesPrice.getText()))
             {
-                JOptionPane.showMessageDialog(AddProduct.this, "Sales Price must be a number");
-            } 
-            else if (e.getMessage().contains("For input string: \"" + labelPurchasePrice.getText() + "\"")) 
+                MayfairStatic.outputMessage(this, "Invalid number", "Sales Price is not a valid number.", WARNING_MESSAGE);
+            }
+            else if (e.getMessage().contains(labelPurchasePrice.getText()))
             {
-                JOptionPane.showMessageDialog(AddProduct.this, "Purchase Price must be a number");
+                MayfairStatic.outputMessage(this, "Invalid number", "Purchase Price is not a valid number.", WARNING_MESSAGE);
             }
             return false;
         }
-        
-        if(salesPriceCurrent < 0)
+
+        if (sales_price < 0)
         {
-            JOptionPane.showMessageDialog(AddProduct.this, "Sales Price must not be negative");
-            salesPriceCurrent = 0;
+            MayfairStatic.outputMessage(this, "Invalid number", "Sales Price must not be negative.", WARNING_MESSAGE);
+            sales_price = 0;
             return false;
         }
-        if(purchasePriceCurrent < 0)
+        if (purchase_price < 0)
         {
-            JOptionPane.showMessageDialog(AddProduct.this, "Purchase Price must not be negative");
-            purchasePriceCurrent = 0;
+            MayfairStatic.outputMessage(this, "Invalid number", "Purchase Price must not be negative.", WARNING_MESSAGE);
+            purchase_price = 0;
             return false;
         }
-        if(inStockCurrent < 0)
+        if (in_stock < 0)
         {
-            JOptionPane.showMessageDialog(AddProduct.this, "Available Stock must not be negative");
-            inStockCurrent = 0;
+            MayfairStatic.outputMessage(this, "Invalid number", "In Stock must not be negative.", WARNING_MESSAGE);
+            in_stock = 0;
             return false;
         }
-        
+
         return true;
     }
 
@@ -311,31 +324,56 @@ public class AddProduct extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
-        if(validateFields())
+        if (validateFields())
         {
-            if(JOptionPane.showConfirmDialog(null, "Are you sure you want to add this product?", "Add Product", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)
+            if (MayfairStatic.outputConfirm(null, "Are you sure you want to save and add this product?", "Save Product") == JOptionPane.YES_OPTION)
             {
-                sql = "INSERT INTO products (code, barcode, leather, style, colour, sales_price, purchase_price, SSAW, comments, in_stock, in_order, total) VALUES('" + prodCodeCurrent + "', '" + barCodeCurrent + "', '"+ leatherCurrent + "', '" + styleCurrent + "', '" + colourCurrent + "', " + salesPriceCurrent + ", " + purchasePriceCurrent + ", '" + seasonCurrent + "', '" + commentsCurrent + "', " + inStockCurrent + ", 0, " + inStockCurrent + ")";
-            
-                try (Statement statement = db.getConnection().createStatement())
+                try (Statement statement = MayfairStatic.getConnection().createStatement())
                 {
+                    String sql = "INSERT INTO " + PRODUCTS_TABLE + " ("
+                            + PRODUCT_CODE + ", "
+                            + PRODUCT_BARCODE + ", "
+                            + PRODUCT_LEATHER + ", "
+                            + PRODUCT_STYLE + ", "
+                            + PRODUCT_COLOUR + ", "
+                            + PRODUCT_SALESPRICE + ", "
+                            + PRODUCT_PURCHASEPRICE + ", "
+                            + PRODUCT_SSAW + ", "
+                            + PRODUCT_COMMENTS + ", "
+                            + PRODUCT_INSTOCK + ", "
+                            + PRODUCT_INORDER + ", "
+                            + PRODUCT_TOTAL + ") "
+                            + "VALUES('"
+                            + code + "', '"
+                            + barcode + "', '"
+                            + leather + "', '"
+                            + style + "', '"
+                            + colour + "', "
+                            + sales_price + ", "
+                            + purchase_price + ", '"
+                            + season + "', '"
+                            + comments + "', "
+                            + in_stock + ", "
+                            + "0, "
+                            + in_stock + ")";
                     statement.executeUpdate(sql);
-                    db.writeToLog("ADD PRODUCT");
-                    db.writeToLog(sql);
-                    db.writeToLog(LOG_SEPERATOR);
                     
-                    JOptionPane.showMessageDialog(AddProduct.this, "Product Added");
+                    MayfairStatic.writeToLog("ADD PRODUCT");
+                    MayfairStatic.writeToLog(sql);
+                    MayfairStatic.writeToLog(LOG_SEPERATOR);
+
+                    MayfairStatic.outputMessage(this, "Saved", "Product successfully added.", INFORMATION_MESSAGE);
                     this.dispose();
                 }
-                catch (SQLException e)
+                catch (SQLException ex)
                 {
-                    if (e.getMessage().contains("Duplicate"))
+                    if (ex.getMessage().contains("Duplicate"))
                     {
-                        JOptionPane.showMessageDialog(AddProduct.this, "Product code already in use");
+                        MayfairStatic.outputMessage(this, "Duplicate Product Code", "Product code already in use.", WARNING_MESSAGE);
                     }
                     else
                     {
-                        JOptionPane.showMessageDialog(AddProduct.this, e.getMessage());
+                        MayfairStatic.outputMessage(this, ex);
                     }
                 }
             }

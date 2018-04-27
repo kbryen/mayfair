@@ -4,7 +4,6 @@
  */
 package main.java.order.sales;
 
-import java.awt.HeadlessException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -445,7 +444,7 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
                 MayfairStatic.outputMessage(this, "Invalid quantity", "Quantity is greater than number left to fulfill.", WARNING_MESSAGE);
             }
         }
-        catch (NumberFormatException | HeadlessException ex)
+        catch (NumberFormatException ex)
         {
             MayfairStatic.outputMessage(this, "Invalid quantity", "Please enter a valid quantity.", WARNING_MESSAGE);
         }

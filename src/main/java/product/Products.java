@@ -4,7 +4,6 @@
  */
 package main.java.product;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -12,8 +11,37 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import javax.swing.table.DefaultTableModel;
 import main.java.MayfairStatic;
+import static main.java.MayfairStatic.POD_ORDNUM;
+import static main.java.MayfairStatic.POD_PRODNUM;
+import static main.java.MayfairStatic.POD_QUANTITY;
+import static main.java.MayfairStatic.PO_DELIVERED;
+import static main.java.MayfairStatic.PO_DISPATCHED;
+import static main.java.MayfairStatic.PO_ORDNUM;
+import static main.java.MayfairStatic.PRODUCTS_TABLE;
+import static main.java.MayfairStatic.PRODUCT_CODE;
+import static main.java.MayfairStatic.PRODUCT_DISCON;
+import static main.java.MayfairStatic.PRODUCT_INORDER;
+import static main.java.MayfairStatic.PRODUCT_INSTOCK;
+import static main.java.MayfairStatic.PRODUCT_PRODNUM;
+import static main.java.MayfairStatic.PRODUCT_PURCHASEPRICE;
+import static main.java.MayfairStatic.PRODUCT_SALESPRICE;
+import static main.java.MayfairStatic.PRODUCT_SSAW;
+import static main.java.MayfairStatic.PRODUCT_TOTAL;
+import static main.java.MayfairStatic.PURCHASE_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
+import static main.java.MayfairStatic.SALES_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SOD_FROMSTOCK;
+import static main.java.MayfairStatic.SOD_ORDNUM;
+import static main.java.MayfairStatic.SOD_PRODNUM;
+import static main.java.MayfairStatic.SOD_QUANTITY;
+import static main.java.MayfairStatic.SO_DELIVERED;
+import static main.java.MayfairStatic.SO_DISPATCHED;
+import static main.java.MayfairStatic.SO_ORDNUM;
 
 /**
  *
@@ -26,14 +54,23 @@ public class Products extends javax.swing.JInternalFrame
 
     public Products(JDesktopPane pane)
     {
+        setUpGUI();
         desktop = pane;
-        initComponents();
         btnFindActionPerformed(null);
-        btnDiscontinue.setVisible(false);
-        btnView.setEnabled(false);
-        btnDelete.setEnabled(false);
-        btnEdit.setEnabled(false);
+    }
+
+    private void setUpGUI()
+    {
+        initComponents();
         table.setAutoCreateRowSorter(true);
+    }
+
+    private void enableButtons(boolean enable)
+    {
+        btnDiscontinue.setVisible(enable);
+        btnView.setEnabled(enable);
+        btnDelete.setEnabled(enable);
+        btnEdit.setEnabled(enable);
     }
 
     /**
@@ -266,41 +303,54 @@ public class Products extends javax.swing.JInternalFrame
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
-        Connection con = db.getConnection();
-        try
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            List<String> prodNums = new ArrayList();
-            
-            Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ResultSet rs;
-            if (!comboSeason.getSelectedItem().equals("Discontinued"))
+            List<String> prod_nums = new ArrayList();
+            String sql = "SELECT " + PRODUCT_PRODNUM + " "
+                    + "FROM " + PRODUCTS_TABLE + " "
+                    + "WHERE " + PRODUCT_CODE + " LIKE '%" + fieldProdCode.getText() + "%' ";
+            if (comboSeason.getSelectedItem().equals("Discontinued"))
             {
-                rs = statement.executeQuery("SELECT prod_num AS prodNum FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' AND SSAW LIKE '%" + comboSeason.getSelectedItem() + "%' ORDER BY discon, total DESC, code");
+                sql += "AND " + PRODUCT_DISCON + " = true ";
             }
             else
             {
-                rs = statement.executeQuery("SELECT prod_num AS prodNum FROM products WHERE code LIKE '%" + fieldProdCode.getText() + "%' AND discon = true ORDER BY discon, total DESC, code");
+                sql += "AND " + PRODUCT_SSAW + " LIKE '%" + comboSeason.getSelectedItem() + "%' ";
             }
-            
-            while(rs.next())
+            sql += "ORDER BY " + PRODUCT_DISCON + ", "
+                    + PRODUCT_TOTAL + " DESC, "
+                    + PRODUCT_CODE;
+
+            ResultSet rs = statement.executeQuery(sql);
+            while (rs.next())
             {
-                prodNums.add(rs.getString("prodNum"));
+                prod_nums.add(rs.getString(PRODUCT_PRODNUM));
             }
-            
-            // Clear table
-            scrollPane.setVisible(true);
-            getContentPane().validate();
-            getContentPane().repaint();
-            while (table.getRowCount() > 0)
-            {
-                ((DefaultTableModel) table.getModel()).removeRow(0);
-            }
+
+            DefaultTableModel model = (DefaultTableModel) table.getModel();
             int rowNum = 0;
-            
-            for(String prodNum : prodNums)
+            for (String prod_num : prod_nums)
             {
-                rs = statement.executeQuery("SELECT products.prod_num AS prodNum, products.code AS code, products.purchase_price AS purchasePrice, products.sales_price AS salesPrice, products.in_stock AS availableStock, products.in_order AS purchaseOrderStock, products.total AS potentialStock, (IFNULL(SUM(sales_order_details.fromStock), 0)  + products.in_stock) AS warehouseStock, products.SSAW AS season, products.discon AS discontinued FROM sales_order_details LEFT JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num RIGHT JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.dispatched = false AND sales_order.delivered = false AND products.prod_num = " + prodNum);
-            
+                rs = statement.executeQuery("SELECT " + PRODUCT_PRODNUM + ", "
+                        + PRODUCT_CODE + ", "
+                        + PRODUCT_PURCHASEPRICE + ", "
+                        + PRODUCT_SALESPRICE + ", "
+                        + PRODUCT_INSTOCK + ", "
+                        + PRODUCT_INORDER + ", "
+                        + PRODUCT_TOTAL + ", "
+                        + "(IFNULL(SUM(" + SOD_FROMSTOCK + "), 0)  + " + PRODUCT_INSTOCK + ") AS warehouseStock, "
+                        + PRODUCT_SSAW + ", "
+                        + PRODUCT_DISCON + " "
+                        + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                        + "LEFT JOIN " + SALES_ORDER_TABLE + " "
+                        + "ON " + SOD_ORDNUM + "=" + SO_ORDNUM + " "
+                        + "RIGHT JOIN " + PRODUCTS_TABLE + " "
+                        + "ON " + SOD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                        + "WHERE " + SOD_PRODNUM + " = " + prod_num + " "
+                        + "AND " + SO_DISPATCHED + " = false "
+                        + "AND " + SO_DELIVERED + " = false "
+                        + "AND " + PRODUCT_PRODNUM + " = " + prod_num);
+
                 int columns = rs.getMetaData().getColumnCount();
                 while (rs.next())
                 {
@@ -309,34 +359,19 @@ public class Products extends javax.swing.JInternalFrame
                     {
                         row[i - 1] = rs.getObject(i);
                     }
-                    ((DefaultTableModel) table.getModel()).insertRow(rowNum++, row);
+                    model.insertRow(rowNum++, row);
                 }
             }
-            btnDiscontinue.setVisible(false);
-            btnView.setEnabled(false);
-            btnDelete.setEnabled(false);
-            btnEdit.setEnabled(false);
-            
-        }   
-        catch (SQLException e)
-        {
-            JOptionPane.showMessageDialog(Products.this, e.getMessage());
+            enableButtons(false);
         }
-        finally
+        catch (SQLException ex)
         {
-            try
-            {
-                con.close();
-            }
-            catch (Exception e)
-            { /* ignored */ }
+            MayfairStatic.outputMessage(this, ex);
         }
     }//GEN-LAST:event_btnFindActionPerformed
 
     private void tableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMouseClicked
         fieldProdCode.setText((String) table.getValueAt(table.getSelectedRow(), 1));
-
-        btnDiscontinue.setVisible(true);
         if ((boolean) table.getValueAt(table.getSelectedRow(), 9))
         {
             btnDiscontinue.setText("Undiscontinue");
@@ -345,155 +380,124 @@ public class Products extends javax.swing.JInternalFrame
         {
             btnDiscontinue.setText("Discontinue");
         }
-        btnView.setEnabled(true);
-        btnDelete.setEnabled(true);
-        btnEdit.setEnabled(true);
+        enableButtons(true);
     }//GEN-LAST:event_tableMouseClicked
 
     private void btnDiscontinueActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDiscontinueActionPerformed
-        int selectedOption;
-        if (btnDiscontinue.getText().equals("Discontinue"))
+        String code = fieldProdCode.getText();
+        String action = btnDiscontinue.getText();
+        boolean discon = action.equals("Discontinue");
+        if (MayfairStatic.outputConfirm(this, action, "Are you sure you want to " + action.toLowerCase() + " " + code + "?") == JOptionPane.YES_OPTION)
         {
-            selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to discontinue this product?", "Discontinue", JOptionPane.YES_NO_OPTION);
-        }
-        else
-        {
-            selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to undiscontinue this product?", "Undiscontinue", JOptionPane.YES_NO_OPTION);
-        }
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            Connection con = db.getConnection();
-            try
+            try (Statement statement = MayfairStatic.getConnection().createStatement())
             {
-                Statement statement = con.createStatement();
-
-                if (btnDiscontinue.getText().equals("Discontinue"))
+                if (discon && (int) table.getValueAt(table.getSelectedRow(), 5) > 0)
                 {
-                    int number = (int) table.getValueAt(table.getSelectedRow(), 5);
-
-                    if (number > 0)
-                    {
-                        JOptionPane.showMessageDialog(Products.this, "Product cannot be discontinued as a Purchase Order has been placed.");
-                    }
-                    else
-                    {
-                        db.writeToLog("DISCONTINUE PRODUCT " + fieldProdCode.getText());
-                        sql = "UPDATE products SET discon = true WHERE code = '" + fieldProdCode.getText() + "'";
-                        statement.executeUpdate(sql);
-                        db.writeToLog(sql);
-                        db.writeToLog(MayfairStatic.LOG_SEPERATOR);
-                        JOptionPane.showMessageDialog(Products.this, "State of product has been updated.");
-                    }
+                    MayfairStatic.outputMessage(this, "Active Purchase Order", code + " cannot be discontinued as a Purchase Order has been placed for it.", WARNING_MESSAGE);
                 }
                 else
                 {
-                    db.writeToLog("UNDISCONTINUE PRODUCT " + fieldProdCode.getText());
-                    sql = "UPDATE products SET discon = false WHERE code = '" + fieldProdCode.getText() + "'";
+                    MayfairStatic.writeToLog(action.toUpperCase() + " PRODUCT " + code);
+                    String sql = "UPDATE " + PRODUCTS_TABLE + " "
+                            + "SET " + PRODUCT_DISCON + " = " + discon + " "
+                            + "WHERE " + PRODUCT_CODE + " = '" + code + "'";
                     statement.executeUpdate(sql);
-                    db.writeToLog(sql);
-                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
-                    JOptionPane.showMessageDialog(Products.this, "Product has been updated.");
-                }
+                    MayfairStatic.writeToLog(sql);
+                    MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
+                    JOptionPane.showMessageDialog(this, code + " marked as " + action.toLowerCase() + "d.");
 
-                fieldProdCode.setText("");
-                btnFindActionPerformed(null);
-            }
-            catch (SQLException e)
-            {
-                JOptionPane.showMessageDialog(Products.this, e.getMessage());
-            }
-            finally
-            {
-                try
-                {
-                    con.close();
+                    fieldProdCode.setText("");
+                    btnFindActionPerformed(null);
                 }
-                catch (Exception e)
-                { /* ignored */ }
+            }
+            catch (SQLException ex)
+            {
+                MayfairStatic.outputMessage(this, ex);
             }
         }
     }//GEN-LAST:event_btnDiscontinueActionPerformed
 
     private void btnViewActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewActionPerformed
-        ViewProduct prod = new ViewProduct(desktop, (int) table.getValueAt(table.getSelectedRow(), 0));
-        desktop.add(prod);
-        prod.show();
+        ViewProduct jFrame = new ViewProduct(desktop, (int) table.getValueAt(table.getSelectedRow(), 0));
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnViewActionPerformed
 
     private void btnDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDeleteActionPerformed
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this product?", "Delete", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
+        String code = fieldProdCode.getText();
+        if (MayfairStatic.outputConfirm(this, "Delete Product", "Are you sure you want to delete " + code + "?") == JOptionPane.YES_OPTION)
         {
-            Connection con = db.getConnection();
-            try
+            try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = statement.executeQuery("SELECT prod_num FROM products WHERE code = '" + fieldProdCode.getText() + "'");
+                ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_PRODNUM + " "
+                        + "FROM " + PRODUCTS_TABLE + " "
+                        + "WHERE " + PRODUCT_CODE + " = '" + code + "'");
                 rs.next();
-                int prod_num = rs.getInt("prod_num");
+                int prod_num = rs.getInt(PRODUCT_PRODNUM);
 
-                rs = statement.executeQuery("SELECT SUM(sales_order_details.quantity) AS total FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num WHERE sales_order_details.prod_num = " + prod_num + " AND sales_order.dispatched = false AND sales_order.delivered = false");
+                rs = statement.executeQuery("SELECT SUM(" + SOD_QUANTITY + ") AS total "
+                        + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                        + "JOIN " + SALES_ORDER_TABLE + " "
+                        + "ON " + SOD_ORDNUM + "=" + SO_ORDNUM + " "
+                        + "WHERE " + SOD_PRODNUM + " = " + prod_num + " "
+                        + "AND " + SO_DISPATCHED + " = false "
+                        + "AND " + SO_DELIVERED + " = false");
                 rs.next();
                 int on_sales_order = rs.getInt("total");
 
-                rs = statement.executeQuery("SELECT SUM(purchase_order_details.quantity) AS total FROM purchase_order_details JOIN purchase_order ON purchase_order_details.ord_num=purchase_order.ord_num WHERE purchase_order_details.prod_num = " + prod_num + " AND purchase_order.dispatched = false AND purchase_order.delivered = false");
+                rs = statement.executeQuery("SELECT SUM(" + POD_QUANTITY + ") AS total "
+                        + "FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                        + "JOIN " + PURCHASE_ORDER_TABLE + " "
+                        + "ON " + POD_ORDNUM + "=" + PO_ORDNUM + " "
+                        + "WHERE " + POD_PRODNUM + " = " + prod_num + " "
+                        + "AND " + PO_DISPATCHED + " = false "
+                        + "AND " + PO_DELIVERED + " = false");
                 rs.next();
                 int on_purchase_order = rs.getInt("total");
 
                 if ((on_sales_order + on_purchase_order) == 0)
                 {
-                    Statement statement2 = con.createStatement();
-                    db.writeToLog("DELETE PRODUCT " + fieldProdCode.getText());
-                    sql = "DELETE FROM products WHERE code = '" + fieldProdCode.getText() + "'";
-                    statement2.executeUpdate(sql);
-                    db.writeToLog(sql);
-                    db.writeToLog(MayfairStatic.LOG_SEPERATOR);
+                    try (Statement statement2 = MayfairStatic.getConnection().createStatement())
+                    {
+                        MayfairStatic.writeToLog("DELETE PRODUCT " + code);
+                        String sql = "DELETE FROM " + PRODUCTS_TABLE + " "
+                                + "WHERE " + PRODUCT_CODE + " = '" + code + "'";
+                        statement2.executeUpdate(sql);
+                        MayfairStatic.writeToLog(sql);
+                        MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
 
-                    JOptionPane.showMessageDialog(Products.this, "Product Deleted.");
-
-                    fieldProdCode.setText("");
-                    btnFindActionPerformed(null);
+                        MayfairStatic.outputMessage(this, "Delete Product", "Product Deleted.", INFORMATION_MESSAGE);
+                        fieldProdCode.setText("");
+                        btnFindActionPerformed(null);
+                    }
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(Products.this, "Cannot delete product:\n" + on_sales_order + " - on Sales Orders\n" + on_purchase_order + " - on Purchase Orders");
+                    MayfairStatic.outputMessage(this, "Delete Product", "Cannot delete " + code + ":\n" + on_sales_order + " - on Sales Orders\n" + on_purchase_order + " - on Purchase Orders", WARNING_MESSAGE);
                 }
-
             }
-            catch (SQLException e)
+            catch (SQLException ex)
             {
-                JOptionPane.showMessageDialog(Products.this, e.getMessage());
-            }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
+                MayfairStatic.outputMessage(this, ex);
             }
         }
     }//GEN-LAST:event_btnDeleteActionPerformed
 
     private void btnClearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnClearActionPerformed
         fieldProdCode.setText("");
-        btnDiscontinue.setVisible(false);
-        btnView.setEnabled(false);
-        btnDelete.setEnabled(false);
-        btnEdit.setEnabled(false);
+        enableButtons(false);
     }//GEN-LAST:event_btnClearActionPerformed
 
     private void btnEditActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditActionPerformed
-        EditProduct prod = new EditProduct(desktop, (int) table.getValueAt(table.getSelectedRow(), 0));
-        desktop.add(prod);
-        prod.show();
+        EditProduct jFrame = new EditProduct((int) table.getValueAt(table.getSelectedRow(), 0));
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnEditActionPerformed
 
     private void AddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_AddActionPerformed
-        AddProduct prod = new AddProduct();
-        desktop.add(prod);
-        prod.show();
+        AddProduct jFrame = new AddProduct();
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_AddActionPerformed
 
 

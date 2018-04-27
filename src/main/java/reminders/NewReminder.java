@@ -4,14 +4,16 @@
  */
 package main.java.reminders;
 
-import java.beans.PropertyVetoException;
 import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JDesktopPane;
-import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import javax.swing.JTextField;
-import main.java.Database;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.REMINDERS_TABLE;
+import static main.java.MayfairStatic.REMINDER_DATE;
+import static main.java.MayfairStatic.REMINDER_DESCRIPTION;
 
 /**
  *
@@ -20,15 +22,11 @@ import main.java.Database;
 public class NewReminder extends javax.swing.JInternalFrame
 {
 
-    private final Database db = new Database();
-    private String sql;
-    private final JInternalFrame remindersComponent;
     private final JDesktopPane desktop;
 
-    public NewReminder(JInternalFrame remindersComponent, JDesktopPane desktop)
+    public NewReminder(JDesktopPane desktop)
     {
         initComponents();
-        this.remindersComponent = remindersComponent;
         this.desktop = desktop;
     }
 
@@ -73,14 +71,6 @@ public class NewReminder extends javax.swing.JInternalFrame
         });
 
         celDate.setDateFormatString("yyyy-MM-dd");
-
-        fieldDescription.addActionListener(new java.awt.event.ActionListener()
-        {
-            public void actionPerformed(java.awt.event.ActionEvent evt)
-            {
-                fieldDescriptionActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -136,24 +126,23 @@ public class NewReminder extends javax.swing.JInternalFrame
 
     private void btnAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAddActionPerformed
         String date = ((JTextField) celDate.getDateEditor().getUiComponent()).getText();
-        if (!date.equals(""))
+        if (!date.isEmpty())
         {
-            String description = fieldDescription.getText();
-            try (Statement statement = db.getConnection().createStatement())
+            try (Statement statement = MayfairStatic.getConnection().createStatement())
             {
-                db.writeToLog("ADD REMINDER");
-                sql = "INSERT INTO reminders (description, date) VALUES ('" + description + "', '" + date + "')";
+                MayfairStatic.writeToLog("ADD REMINDER");
+                String sql = "INSERT INTO " + REMINDERS_TABLE + " (" + REMINDER_DESCRIPTION + ", " + REMINDER_DATE + ") "
+                        + "VALUES ('" + fieldDescription.getText() + "', '" + date + "')";
                 statement.executeUpdate(sql);
-                db.writeToLog(sql);
+                MayfairStatic.writeToLog(sql);
 
-                JOptionPane.showMessageDialog(NewReminder.this, "Reminder Added");
+                MayfairStatic.outputMessage(this, "New Reminder", "Reminder successfully added.", INFORMATION_MESSAGE);
             }
-            catch (SQLException e)
+            catch (SQLException ex)
             {
-                JOptionPane.showMessageDialog(NewReminder.this, e.getMessage());
+                MayfairStatic.outputMessage(this, ex);
             }
 
-            remindersComponent.dispose();
             Reminders reminders = new Reminders(desktop);
             desktop.add(reminders);
             reminders.show();
@@ -161,23 +150,9 @@ public class NewReminder extends javax.swing.JInternalFrame
         }
         else
         {
-            JOptionPane.showMessageDialog(NewReminder.this, "Please select a completion date.");
+            MayfairStatic.outputMessage(this, "Invalid Date", "Please select a completion date.", WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnAddActionPerformed
-
-    private void calDelDatePropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_calDelDatePropertyChange
-
-    }//GEN-LAST:event_calDelDatePropertyChange
-
-    private void calDelDateFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_calDelDateFocusLost
-
-    }//GEN-LAST:event_calDelDateFocusLost
-
-    private void fieldDescriptionActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_fieldDescriptionActionPerformed
-    {//GEN-HEADEREND:event_fieldDescriptionActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_fieldDescriptionActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;

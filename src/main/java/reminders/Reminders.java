@@ -8,11 +8,36 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import javax.swing.JDesktopPane;
-import javax.swing.JOptionPane;
-import main.java.Database;
 import main.java.MayfairStatic;
+import static main.java.MayfairStatic.CAL_DATE_FORMAT;
+import static main.java.MayfairStatic.CUSTOMERS_TABLE;
+import static main.java.MayfairStatic.CUSTOMER_CUSTNUM;
+import static main.java.MayfairStatic.CUSTOMER_NAME;
+import static main.java.MayfairStatic.PO_DELDATE;
+import static main.java.MayfairStatic.PO_DELIVERED;
+import static main.java.MayfairStatic.PO_DISPATCHDATE;
+import static main.java.MayfairStatic.PO_DISPATCHED;
+import static main.java.MayfairStatic.PO_ORDDATE;
+import static main.java.MayfairStatic.PO_ORDNUM;
+import static main.java.MayfairStatic.PO_SUPPNUM;
+import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
+import static main.java.MayfairStatic.REMINDERS_TABLE;
+import static main.java.MayfairStatic.REMINDER_COMPLETED;
+import static main.java.MayfairStatic.REMINDER_DATE;
+import static main.java.MayfairStatic.REMINDER_DESCRIPTION;
+import static main.java.MayfairStatic.SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SO_CUSTNUM;
+import static main.java.MayfairStatic.SO_DELDATE;
+import static main.java.MayfairStatic.SO_DELIVERED;
+import static main.java.MayfairStatic.SO_DISPATCHDATE;
+import static main.java.MayfairStatic.SO_DISPATCHED;
+import static main.java.MayfairStatic.SO_ORDDATE;
+import static main.java.MayfairStatic.SO_ORDNUM;
+import static main.java.MayfairStatic.SO_TOTALUNITS;
+import static main.java.MayfairStatic.SUPPLIERS_TABLE;
+import static main.java.MayfairStatic.SUPPLIER_NAME;
+import static main.java.MayfairStatic.SUPPLIER_SUPPNUM;
 
 /**
  *
@@ -21,13 +46,16 @@ import main.java.MayfairStatic;
 public class Reminders extends javax.swing.JInternalFrame
 {
 
-    private final Database db = new Database();
-    private final DateTimeFormatter formatters = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final JDesktopPane desktop;
 
     public Reminders(JDesktopPane desktop)
     {
         this.desktop = desktop;
+        setUpGUI();
+    }
+
+    private void setUpGUI()
+    {
         initComponents();
         fillReminders();
         fillSalesOrders();
@@ -37,77 +65,101 @@ public class Reminders extends javax.swing.JInternalFrame
     private void fillReminders()
     {
         tableReminders.setAutoCreateRowSorter(true);
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        MayfairStatic.addDateSorter(tableReminders, 1);
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             LocalDate date = LocalDate.now();
-            String fromDate = date.format(formatters);
+            String startDate = CAL_DATE_FORMAT.format(date);
             date = date.plusWeeks(1);
-            String toDate = date.format(formatters);
+            String endDate = CAL_DATE_FORMAT.format(date);
 
-            ResultSet rs = statement.executeQuery("SELECT description, DATE_FORMAT(date,'%d/%m/%Y %a') "
-                    + "FROM reminders "
-                    + "WHERE date >= '" + fromDate + "' AND date <= '" + toDate + "' AND completed = false "
-                    + "ORDER BY date ASC");
+            ResultSet rs = statement.executeQuery("SELECT " + REMINDER_DESCRIPTION + ", "
+                    + MayfairStatic.sqlDateFormat(REMINDER_DATE) + " "
+                    + "FROM " + REMINDERS_TABLE + " "
+                    + "WHERE DATE(" + REMINDER_DATE + ") BETWEEN '" + startDate + "' AND '" + endDate + "' "
+                    + "AND " + REMINDER_COMPLETED + " = false "
+                    + "ORDER BY " + REMINDER_DATE + " ASC");
 
             MayfairStatic.fillTable(tableReminders, rs);
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(Reminders.this, e.getMessage());
+            MayfairStatic.outputMessage(this, ex);
         }
     }
 
     private void fillSalesOrders()
     {
         tableSales.setAutoCreateRowSorter(true);
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        MayfairStatic.addDateSorter(tableReminders, new int[]
         {
-            LocalDate date = LocalDate.now().plusWeeks(1);
-            String toDate = date.format(formatters);
+            2, 3, 6
+        });
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        {
+            String toDate = CAL_DATE_FORMAT.format(LocalDate.now().plusWeeks(1));
 
-            ResultSet rs = statement.executeQuery("SELECT sales_order.ord_num, customers.name, DATE_FORMAT(sales_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(sales_order.del_date,'%d/%m/%Y %a'), sales_order.total_units, sales_order.dispatched, DATE_FORMAT(sales_order.dispatched_date,'%d/%m/%Y %a') "
-                    + "FROM sales_order "
-                    + "JOIN customers ON sales_order.cust_num=customers.cust_num "
-                    + "WHERE sales_order.del_date <= '" + toDate + "' AND sales_order.del_date and delivered = false "
-                    + "ORDER BY sales_order.del_date, sales_order.ord_num DESC");
-
+            ResultSet rs = statement.executeQuery("SELECT " + SO_ORDNUM + ", "
+                    + CUSTOMER_NAME + ", "
+                    + MayfairStatic.sqlDateFormat(SO_ORDDATE) + ", "
+                    + MayfairStatic.sqlDateFormat(SO_DELDATE) + ", "
+                    + SO_TOTALUNITS + ", "
+                    + SO_DISPATCHED + ", "
+                    + MayfairStatic.sqlDateFormat(SO_DISPATCHDATE) + " "
+                    + "FROM " + SALES_ORDER_TABLE + " "
+                    + "JOIN " + CUSTOMERS_TABLE + " "
+                    + "ON " + SO_CUSTNUM + "=" + CUSTOMER_CUSTNUM + " "
+                    + "WHERE " + SO_DELDATE + " <= '" + toDate + "' "
+                    + "AND  " + SO_DELIVERED + " = false "
+                    + "ORDER BY " + SO_DELDATE + ", " + SO_ORDNUM + " DESC");
             MayfairStatic.fillTable(tableSales, rs);
 
-            rs = statement.executeQuery("SELECT SUM(sales_order.total_units) AS weekly_total_units "
-                    + "FROM sales_order "
-                    + "JOIN customers ON sales_order.cust_num=customers.cust_num "
-                    + "WHERE sales_order.del_date <= '" + toDate + "' AND sales_order.del_date and delivered = false ");
+            rs = statement.executeQuery("SELECT SUM(" + SO_TOTALUNITS + ") AS weekly_total_units "
+                    + "FROM " + SALES_ORDER_TABLE + " "
+                    + "WHERE " + SO_DELDATE + " <= '" + toDate + "' "
+                    + "AND " + SO_DELIVERED + " = false ");
             if (rs.next())
             {
                 labelTotalUnits.setText(rs.getString("weekly_total_units"));
             }
 
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(Reminders.this, e.getMessage());
+            MayfairStatic.outputMessage(this, ex);
         }
     }
 
     private void fillPurchaseOrders()
     {
         tablePurchase.setAutoCreateRowSorter(true);
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        MayfairStatic.addDateSorter(tableReminders, new int[]
+        {
+            2, 3, 5
+        });
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             LocalDate date = LocalDate.now().plusMonths(1);
-            String toDate = date.format(formatters);
+            String toDate = CAL_DATE_FORMAT.format(date);
 
-            ResultSet rs = statement.executeQuery("SELECT purchase_order.ord_num, suppliers.name, DATE_FORMAT(purchase_order.ord_date,'%d/%m/%Y %a'), DATE_FORMAT(purchase_order.del_date,'%d/%m/%Y %a'), purchase_order.dispatched, DATE_FORMAT(purchase_order.dispatched_date,'%d/%m/%Y %a') "
-                    + "FROM purchase_order "
-                    + "JOIN suppliers ON purchase_order.supp_num=suppliers.supp_num "
-                    + "WHERE purchase_order.del_date <= '" + toDate + "' AND purchase_order.del_date and delivered = false "
-                    + "ORDER BY purchase_order.del_date, purchase_order.ord_num DESC");
+            ResultSet rs = statement.executeQuery("SELECT " + PO_ORDNUM + ", "
+                    + SUPPLIER_NAME + ", "
+                    + MayfairStatic.sqlDateFormat(PO_ORDDATE) + ", "
+                    + MayfairStatic.sqlDateFormat(PO_DELDATE) + ", "
+                    + PO_DISPATCHED + ", "
+                    + MayfairStatic.sqlDateFormat(PO_DISPATCHDATE) + " "
+                    + "FROM " + PURCHASE_ORDER_TABLE + " "
+                    + "JOIN " + SUPPLIERS_TABLE + " "
+                    + "ON " + PO_SUPPNUM + "=" + SUPPLIER_SUPPNUM + " "
+                    + "WHERE " + PO_DELDATE + " <= '" + toDate + "' "
+                    + "AND " + PO_DELIVERED + " = false "
+                    + "ORDER BY " + PO_DELDATE + ", " + PO_ORDNUM + " DESC");
 
             MayfairStatic.fillTable(tablePurchase, rs);
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(Reminders.this, e.getMessage());
+            MayfairStatic.outputMessage(this, ex);
         }
     }
 
@@ -364,9 +416,9 @@ public class Reminders extends javax.swing.JInternalFrame
 
     private void btnNewReminderActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnNewReminderActionPerformed
     {//GEN-HEADEREND:event_btnNewReminderActionPerformed
-        NewReminder reminder = new NewReminder(this, desktop);
-        desktop.add(reminder);
-        reminder.show();
+        NewReminder jFrame = new NewReminder(desktop);
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnNewReminderActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

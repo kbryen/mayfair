@@ -4,8 +4,6 @@
  */
 package main.java.order.sales;
 
-import java.awt.HeadlessException;
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -17,7 +15,6 @@ import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
-import javax.swing.table.DefaultTableModel;
 import main.java.MayfairStatic;
 import static main.java.MayfairStatic.POD_AVALIABLE;
 import static main.java.MayfairStatic.POD_ORDNUM;
@@ -425,7 +422,7 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
                 MayfairStatic.outputMessage(this, ex);
             }
         }
-        catch (NumberFormatException | HeadlessException ex)
+        catch (NumberFormatException ex)
         {
             MayfairStatic.outputMessage(this, "Invalid quantity", "Please enter a valid quantity.", WARNING_MESSAGE);
         }
@@ -555,7 +552,7 @@ public class EditSalesOrderStep2 extends javax.swing.JInternalFrame
                 MayfairStatic.outputMessage(this, ex);
             }
         }
-        catch (NumberFormatException | HeadlessException ex)
+        catch (NumberFormatException ex)
         {
             MayfairStatic.outputMessage(this, "Invalid quantity", "Please enter a valid quantity.", WARNING_MESSAGE);
         }

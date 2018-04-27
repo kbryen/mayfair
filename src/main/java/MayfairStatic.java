@@ -54,6 +54,7 @@ public class MayfairStatic
     public static final String PRODUCT_COMMENTS = PRODUCTS_TABLE + ".comments";
     public static final String PRODUCT_TOTAL = PRODUCTS_TABLE + ".total";
     public static final String PRODUCT_SSAW = PRODUCTS_TABLE + ".SSAW";
+    public static final String PRODUCT_DISCON = PRODUCTS_TABLE + ".discon";
 
     public static final String CUSTOMERS_TABLE = "customers";
     public static final String CUSTOMER_CUSTNUM = CUSTOMERS_TABLE + ".cust_num";
@@ -122,6 +123,16 @@ public class MayfairStatic
     public static final String PS_PRODNUM = PURCHASE_SALES_ORDER_TABLE + ".prod_num";
     public static final String PS_QUANTITY = PURCHASE_SALES_ORDER_TABLE + ".quantity";
 
+    public static final String MISSED_SALES_TABLE = "missed_sales";
+    public static final String MS_PRODNUM = MISSED_SALES_TABLE + ".prod_num";
+    public static final String MS_QUANTITY = MISSED_SALES_TABLE + ".quantity";
+    public static final String MS_ORDDATE = MISSED_SALES_TABLE + ".ord_date";
+
+    public static final String REMINDERS_TABLE = "reminders";
+    public static final String REMINDER_DESCRIPTION = REMINDERS_TABLE + ".description";
+    public static final String REMINDER_DATE = REMINDERS_TABLE + ".date";
+    public static final String REMINDER_COMPLETED = REMINDERS_TABLE + ".completed";
+
     // ----------------------- TEMPLATES ----------------------- 
     public static final String MAYFAIR_DIR = "S://MayfairApplication/";
     public static final String TEMPLATES_DIR = MAYFAIR_DIR + "dist/templates/";
@@ -165,18 +176,13 @@ public class MayfairStatic
     public static final Comparator DATE_COMPARATOR = (Comparator) (Object o1, Object o2)
             -> LocalDate.parse(o1.toString(), SQL_DATE_FORMAT).compareTo(LocalDate.parse(o2.toString(), SQL_DATE_FORMAT));
 
-    public static void addDateSorter(JTable table, int[] indexes)
-    {
-        for (Integer index : indexes)
-        {
-            addDateSorter(table, index);
-        }
-    }
-
-    public static void addDateSorter(JTable table, int index)
+    public static void addDateSorter(JTable table, int... indexes)
     {
         TableRowSorter sorter = (TableRowSorter) table.getRowSorter();
-        sorter.setComparator(index, DATE_COMPARATOR);
+        for (Integer index : indexes)
+        {
+            sorter.setComparator(index, DATE_COMPARATOR);
+        }
     }
 
     public static Connection getConnection() throws SQLException
@@ -195,7 +201,6 @@ public class MayfairStatic
             MayfairStatic.outputMessage(null, ex);
         }
     }
-
     public static void fillTable(JTable table, ResultSet rs) throws SQLException
     {
         DefaultTableModel model = (DefaultTableModel) table.getModel();

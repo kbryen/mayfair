@@ -10,9 +10,36 @@ import java.sql.Statement;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
-import javax.swing.table.DefaultTableModel;
-import main.java.Database;
-import static main.java.MayfairStatic.*;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.POD_AVALIABLE;
+import static main.java.MayfairStatic.POD_ORDNUM;
+import static main.java.MayfairStatic.POD_PRODNUM;
+import static main.java.MayfairStatic.PO_DELDATE;
+import static main.java.MayfairStatic.PO_DELIVERED;
+import static main.java.MayfairStatic.PO_ORDNUM;
+import static main.java.MayfairStatic.PRODUCTS_TABLE;
+import static main.java.MayfairStatic.PRODUCT_BARCODE;
+import static main.java.MayfairStatic.PRODUCT_CODE;
+import static main.java.MayfairStatic.PRODUCT_COLOUR;
+import static main.java.MayfairStatic.PRODUCT_COMMENTS;
+import static main.java.MayfairStatic.PRODUCT_INORDER;
+import static main.java.MayfairStatic.PRODUCT_INSTOCK;
+import static main.java.MayfairStatic.PRODUCT_LEATHER;
+import static main.java.MayfairStatic.PRODUCT_PRODNUM;
+import static main.java.MayfairStatic.PRODUCT_PURCHASEPRICE;
+import static main.java.MayfairStatic.PRODUCT_SALESPRICE;
+import static main.java.MayfairStatic.PRODUCT_SEASON;
+import static main.java.MayfairStatic.PRODUCT_STYLE;
+import static main.java.MayfairStatic.PURCHASE_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
+import static main.java.MayfairStatic.SALES_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SOD_FROMSTOCK;
+import static main.java.MayfairStatic.SOD_ORDNUM;
+import static main.java.MayfairStatic.SOD_PRODNUM;
+import static main.java.MayfairStatic.SO_DELIVERED;
+import static main.java.MayfairStatic.SO_DISPATCHED;
+import static main.java.MayfairStatic.SO_ORDNUM;
 
 /**
  *
@@ -20,11 +47,12 @@ import static main.java.MayfairStatic.*;
  */
 public class ViewProduct extends javax.swing.JInternalFrame
 {
+
     private final JDesktopPane desktop;
-    private final Database db = new Database();
-    private final int prodNum;
-    private String prodCode = "";
-    private String barCode = "";
+    private final int prod_num;
+
+    private String code = "";
+    private String barcode = "";
     private String leather = "";
     private String style = "";
     private String colour = "";
@@ -32,29 +60,47 @@ public class ViewProduct extends javax.swing.JInternalFrame
     private String comments = "";
     private double salesPrice = 0;
     private double purchasePrice = 0;
+    private int inOrder = 0;
     private int inStock = 0;
-    private int onOrder = 0;
     private int warehouseStock = 0;
-    
-    public ViewProduct(JDesktopPane pane, int num)
+    private int onSalesOrderStock = 0;
+
+    public ViewProduct(JDesktopPane pane, int prod_num)
     {
+        setUpGUI();
         this.desktop = pane;
-        prodNum = num;
-        initComponents();
-        requestDB();
-        updateLabels();
-        table.setAutoCreateRowSorter(true);
+        this.prod_num = prod_num;
     }
 
-    private void requestDB()
+    private void setUpGUI()
     {
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        initComponents();
+        updateVariables();
+        fillLabels();
+        table.setAutoCreateRowSorter(true);
+        MayfairStatic.addDateSorter(table, 2);
+    }
+
+    private void updateVariables()
+    {
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
-            ResultSet rs = statement.executeQuery("SELECT code, barcode, leather, style, colour, sales_price, purchase_price, SSAW, in_stock, in_order, comments FROM products WHERE prod_num = " + prodNum);
+            ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_CODE + ", "
+                    + PRODUCT_BARCODE + ", "
+                    + PRODUCT_LEATHER + ", "
+                    + PRODUCT_STYLE + ", "
+                    + PRODUCT_COLOUR + ", "
+                    + PRODUCT_SEASON + ", "
+                    + PRODUCT_COMMENTS + ", "
+                    + PRODUCT_SALESPRICE + ", "
+                    + PRODUCT_PURCHASEPRICE + ", "
+                    + PRODUCT_INSTOCK + ", "
+                    + PRODUCT_INORDER + " "
+                    + "FROM " + PRODUCTS_TABLE + " "
+                    + "WHERE " + PRODUCT_PRODNUM + " = " + prod_num);
             rs.next();
-            
-            prodCode = rs.getString(PRODUCT_CODE);
-            barCode = rs.getString(PRODUCT_BARCODE);
+            code = rs.getString(PRODUCT_CODE);
+            barcode = rs.getString(PRODUCT_BARCODE);
             leather = rs.getString(PRODUCT_LEATHER);
             style = rs.getString(PRODUCT_STYLE);
             colour = rs.getString(PRODUCT_COLOUR);
@@ -63,27 +109,31 @@ public class ViewProduct extends javax.swing.JInternalFrame
             salesPrice = rs.getDouble(PRODUCT_SALESPRICE);
             purchasePrice = rs.getDouble(PRODUCT_PURCHASEPRICE);
             inStock = rs.getInt(PRODUCT_INSTOCK);
-            onOrder = rs.getInt(PRODUCT_INORDER);
-            
-            rs = statement.executeQuery("SELECT SUM(sales_order_details.fromStock) AS total FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.dispatched = false AND sales_order.delivered = false");
-            rs.next();
-            
-            int notYetDispatched = rs.getInt("total");
-            warehouseStock = inStock + notYetDispatched;
+            inOrder = rs.getInt(PRODUCT_INORDER);
 
+            rs = statement.executeQuery("SELECT SUM(" + SOD_FROMSTOCK + ") AS total "
+                    + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                    + "JOIN " + SALES_ORDER_TABLE + " "
+                    + "ON " + SOD_ORDNUM + "=" + SO_ORDNUM + " "
+                    + "WHERE " + SOD_PRODNUM + " = " + prod_num + " "
+                    + "AND " + SO_DISPATCHED + " = false "
+                    + "AND " + SO_DELIVERED + " = false");
+            rs.next();
+            onSalesOrderStock = rs.getInt("total");
+            warehouseStock = inStock + onSalesOrderStock;
         }
-        catch (SQLException e)
+        catch (SQLException ex)
         {
-            JOptionPane.showMessageDialog(ViewProduct.this, e.getMessage());
+            MayfairStatic.outputMessage(this, ex);
         }
     }
-    
-    private void updateLabels()
+
+    private void fillLabels()
     {
-        labelHeader.setText(prodCode);
-        labelProdNum.setText(String.valueOf(prodNum));
-        labelBarCode.setText(barCode);
-        labelProdCode.setText(prodCode);
+        labelHeader.setText(code);
+        labelProdNum.setText(String.valueOf(prod_num));
+        labelBarCode.setText(barcode);
+        labelProdCode.setText(code);
         labelLeather.setText(leather);
         labelStyle.setText(style);
         labelColour.setText(colour);
@@ -93,40 +143,29 @@ public class ViewProduct extends javax.swing.JInternalFrame
         labelPurchasePrice.setText(String.valueOf(purchasePrice));
         labelInStock.setText(String.valueOf(inStock));
         labelWarehouseStock.setText(String.valueOf(warehouseStock));
-        
+
         // Show a breakdown of stock on purchase orders
-        labelOnOrder.setText(String.valueOf(onOrder));
-        if(onOrder == 0)
+        labelInOrder.setText(String.valueOf(inOrder));
+        if (inOrder == 0)
         {
             scrollPane.setVisible(false);
             table.setVisible(false);
         }
         else
         {
-            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+            try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                ResultSet rs = statement.executeQuery("SELECT purchase_order.ord_num, purchase_order_details.avaliable, DATE(purchase_order.del_date) AS del_date FROM purchase_order JOIN purchase_order_details ON purchase_order.ord_num = purchase_order_details.ord_num WHERE purchase_order.delivered=false AND purchase_order_details.prod_num = " + prodNum);
-            
-                scrollPane.setVisible(true);
-                table.setVisible(true);
-                getContentPane().validate();
-                getContentPane().repaint();
-                while (table.getRowCount() > 0)
-                {
-                    ((DefaultTableModel) table.getModel()).removeRow(0);
-                }
-                int columns = rs.getMetaData().getColumnCount();
-                while (rs.next())
-                {
-                    Object[] row = new Object[columns];
-                    for (int i = 1; i <= columns; i++)
-                    {
-                        row[i - 1] = rs.getObject(i);
-                    }
-                    ((DefaultTableModel) table.getModel()).insertRow(rs.getRow() - 1, row);
-                }
-                
-                table.setSize(table.getWidth(),table.getRowCount() * table.getRowHeight());
+                ResultSet rs = statement.executeQuery("SELECT " + PO_ORDNUM + ", "
+                        + POD_AVALIABLE + ", "
+                        + MayfairStatic.sqlDateFormat(PO_DELDATE) + " "
+                        + "FROM " + PURCHASE_ORDER_TABLE + " "
+                        + "JOIN " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                        + "ON " + PO_ORDNUM + "=" + POD_ORDNUM + " "
+                        + "WHERE " + PO_DELIVERED + " = false "
+                        + "AND " + POD_PRODNUM + " = " + prod_num);
+
+                MayfairStatic.fillTable(table, rs);
+                table.setSize(table.getWidth(), table.getRowCount() * table.getRowHeight());
                 scrollPane.setSize(table.getSize());
                 getContentPane().setSize(scrollPane.getSize());
             }
@@ -172,7 +211,7 @@ public class ViewProduct extends javax.swing.JInternalFrame
         labelSeason = new javax.swing.JLabel();
         labelInStock = new javax.swing.JLabel();
         labelComments = new javax.swing.JLabel();
-        labelOnOrder = new javax.swing.JLabel();
+        labelInOrder = new javax.swing.JLabel();
         jLabel13 = new javax.swing.JLabel();
         btnViewSales = new javax.swing.JButton();
         jLabel14 = new javax.swing.JLabel();
@@ -249,7 +288,7 @@ public class ViewProduct extends javax.swing.JInternalFrame
 
         labelComments.setText("Comments");
 
-        labelOnOrder.setText("0");
+        labelInOrder.setText("0");
 
         jLabel13.setText("On Order:");
 
@@ -399,7 +438,7 @@ public class ViewProduct extends javax.swing.JInternalFrame
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jLabel13)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(labelOnOrder))
+                                .addComponent(labelInOrder))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(btnInStock, javax.swing.GroupLayout.PREFERRED_SIZE, 13, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -499,7 +538,7 @@ public class ViewProduct extends javax.swing.JInternalFrame
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(labelOnOrder)
+                        .addComponent(labelInOrder)
                         .addComponent(btnOnOrder, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 16, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -525,21 +564,21 @@ public class ViewProduct extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnViewSalesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnViewSalesActionPerformed
-        ProductSales sales = new ProductSales(labelProdCode.getText(), Integer.valueOf(labelProdNum.getText()));
-        desktop.add(sales);
-        sales.show();
+        ProductSales jFrame = new ProductSales(labelProdCode.getText(), Integer.valueOf(labelProdNum.getText()));
+        desktop.add(jFrame);
+        jFrame.show();
     }//GEN-LAST:event_btnViewSalesActionPerformed
 
     private void btnInStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInStockActionPerformed
-        JOptionPane.showMessageDialog(ViewProduct.this, "Instantly available stock which is currently in the warehouse and not on an active sales order.", "Available Stock", INFORMATION_MESSAGE);
+        MayfairStatic.outputMessage(this, "Available Stock", "Instantly available stock which is currently in the warehouse and not on an active sales order.", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnInStockActionPerformed
 
     private void btnWarehouseStockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWarehouseStockActionPerformed
-        JOptionPane.showMessageDialog(ViewProduct.this, "Instantly available stock + stock which is on an active sales order but not dispatched from the warehouse.", "Warehouse Stock", INFORMATION_MESSAGE);
+        MayfairStatic.outputMessage(this, "Warehouse Stock", "Instantly available stock + stock which is on an active sales order but not dispatched from the warehouse.", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnWarehouseStockActionPerformed
 
     private void btnOnOrderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOnOrderActionPerformed
-        JOptionPane.showMessageDialog(ViewProduct.this, "Stock on undelivered active purchase orders and not on an active sales order.", "On Order", INFORMATION_MESSAGE);
+        MayfairStatic.outputMessage(this, "On Order", "Stock on undelivered active purchase orders and not on an active sales order.", INFORMATION_MESSAGE);
     }//GEN-LAST:event_btnOnOrderActionPerformed
 
 
@@ -573,9 +612,9 @@ public class ViewProduct extends javax.swing.JInternalFrame
     private javax.swing.JLabel labelColour;
     private javax.swing.JLabel labelComments;
     private javax.swing.JLabel labelHeader;
+    private javax.swing.JLabel labelInOrder;
     private javax.swing.JLabel labelInStock;
     private javax.swing.JLabel labelLeather;
-    private javax.swing.JLabel labelOnOrder;
     private javax.swing.JLabel labelProdCode;
     private javax.swing.JLabel labelProdNum;
     private javax.swing.JLabel labelPurchasePrice;

@@ -101,7 +101,7 @@
                               <EmptySpace max="-2" attributes="0"/>
                               <Component id="jLabel13" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="32767" attributes="0"/>
-                              <Component id="labelOnOrder" min="-2" max="-2" attributes="0"/>
+                              <Component id="labelInOrder" min="-2" max="-2" attributes="0"/>
                           </Group>
                           <Group type="102" alignment="0" attributes="0">
                               <Group type="103" groupAlignment="0" attributes="0">
@@ -229,7 +229,7 @@
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="103" alignment="0" groupAlignment="0" attributes="0">
-                      <Component id="labelOnOrder" min="-2" max="-2" attributes="0"/>
+                      <Component id="labelInOrder" min="-2" max="-2" attributes="0"/>
                       <Component id="btnOnOrder" alignment="1" min="-2" pref="16" max="-2" attributes="0"/>
                   </Group>
                   <Component id="jLabel13" alignment="1" min="-2" max="-2" attributes="0"/>
@@ -376,7 +376,7 @@
         <Property name="text" type="java.lang.String" value="Comments"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JLabel" name="labelOnOrder">
+    <Component class="javax.swing.JLabel" name="labelInOrder">
       <Properties>
         <Property name="text" type="java.lang.String" value="0"/>
       </Properties>

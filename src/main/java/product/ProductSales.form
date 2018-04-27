@@ -64,7 +64,7 @@
                           <Component id="jLabel5" alignment="0" min="-2" max="-2" attributes="0"/>
                           <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
                               <Group type="102" alignment="0" attributes="0">
-                                  <Component id="labelTS" min="-2" max="-2" attributes="0"/>
+                                  <Component id="lavelTS" min="-2" max="-2" attributes="0"/>
                                   <EmptySpace max="32767" attributes="0"/>
                                   <Component id="labelSales" min="-2" max="-2" attributes="0"/>
                               </Group>
@@ -110,7 +110,7 @@
               <Component id="jSeparator2" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
-                  <Component id="labelTS" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lavelTS" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="labelSales" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
@@ -163,7 +163,7 @@
     </Component>
     <Component class="javax.swing.JLabel" name="labelCode">
     </Component>
-    <Component class="javax.swing.JLabel" name="labelTS">
+    <Component class="javax.swing.JLabel" name="lavelTS">
       <Properties>
         <Property name="text" type="java.lang.String" value="Total Sales : "/>
       </Properties>
@@ -182,19 +182,11 @@
       <Properties>
         <Property name="dateFormatString" type="java.lang.String" value="yyyy-MM-dd"/>
       </Properties>
-      <Events>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="calStartFocusLost"/>
-        <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="calStartPropertyChange"/>
-      </Events>
     </Component>
     <Component class="com.toedter.calendar.JDateChooser" name="calEnd">
       <Properties>
         <Property name="dateFormatString" type="java.lang.String" value="yyyy-MM-dd"/>
       </Properties>
-      <Events>
-        <EventHandler event="focusLost" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="calEndFocusLost"/>
-        <EventHandler event="propertyChange" listener="java.beans.PropertyChangeListener" parameters="java.beans.PropertyChangeEvent" handler="calEndPropertyChange"/>
-      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="labelMissed">
     </Component>

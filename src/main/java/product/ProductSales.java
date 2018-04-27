@@ -4,14 +4,23 @@
  */
 package main.java.product;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
-import javax.swing.JOptionPane;
+import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import javax.swing.JTextField;
-import main.java.Database;
+import main.java.MayfairStatic;
+import static main.java.MayfairStatic.MISSED_SALES_TABLE;
+import static main.java.MayfairStatic.MS_ORDDATE;
+import static main.java.MayfairStatic.MS_PRODNUM;
+import static main.java.MayfairStatic.MS_QUANTITY;
+import static main.java.MayfairStatic.SALES_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SOD_ORDNUM;
+import static main.java.MayfairStatic.SOD_PRODNUM;
+import static main.java.MayfairStatic.SOD_QUANTITY;
+import static main.java.MayfairStatic.SO_DELDATE;
+import static main.java.MayfairStatic.SO_ORDNUM;
 
 /**
  *
@@ -19,17 +28,22 @@ import main.java.Database;
  */
 public class ProductSales extends javax.swing.JInternalFrame
 {
-    private final Database db = new Database();
-    private final String prodCode;
-    private final int prodNum;
-    
+
+    private final String code;
+    private final int prod_num;
+
     public ProductSales(String code, int num)
     {
+        setUpGUI();
+        this.code = code;
+        this.prod_num = num;
+    }
+
+    private void setUpGUI()
+    {
         initComponents();
-        prodCode = code;
-        prodNum = num;
-        labelCode.setText(prodCode);
-        labelTS.setVisible(false);
+        labelCode.setText(code);
+        lavelTS.setVisible(false);
         labelMS.setVisible(false);
     }
 
@@ -51,7 +65,7 @@ public class ProductSales extends javax.swing.JInternalFrame
         btnShow = new javax.swing.JButton();
         jLabel5 = new javax.swing.JLabel();
         labelCode = new javax.swing.JLabel();
-        labelTS = new javax.swing.JLabel();
+        lavelTS = new javax.swing.JLabel();
         labelSales = new javax.swing.JLabel();
         btnClose = new javax.swing.JButton();
         calStart = new com.toedter.calendar.JDateChooser();
@@ -83,7 +97,7 @@ public class ProductSales extends javax.swing.JInternalFrame
 
         jLabel5.setText("Product Code : ");
 
-        labelTS.setText("Total Sales : ");
+        lavelTS.setText("Total Sales : ");
 
         btnClose.setText("Close");
         btnClose.addActionListener(new java.awt.event.ActionListener()
@@ -95,36 +109,8 @@ public class ProductSales extends javax.swing.JInternalFrame
         });
 
         calStart.setDateFormatString("yyyy-MM-dd");
-        calStart.addFocusListener(new java.awt.event.FocusAdapter()
-        {
-            public void focusLost(java.awt.event.FocusEvent evt)
-            {
-                calStartFocusLost(evt);
-            }
-        });
-        calStart.addPropertyChangeListener(new java.beans.PropertyChangeListener()
-        {
-            public void propertyChange(java.beans.PropertyChangeEvent evt)
-            {
-                calStartPropertyChange(evt);
-            }
-        });
 
         calEnd.setDateFormatString("yyyy-MM-dd");
-        calEnd.addFocusListener(new java.awt.event.FocusAdapter()
-        {
-            public void focusLost(java.awt.event.FocusEvent evt)
-            {
-                calEndFocusLost(evt);
-            }
-        });
-        calEnd.addPropertyChangeListener(new java.beans.PropertyChangeListener()
-        {
-            public void propertyChange(java.beans.PropertyChangeEvent evt)
-            {
-                calEndPropertyChange(evt);
-            }
-        });
 
         labelMS.setText("Missed Sales : ");
 
@@ -162,7 +148,7 @@ public class ProductSales extends javax.swing.JInternalFrame
                             .addComponent(jLabel5)
                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                    .addComponent(labelTS)
+                                    .addComponent(lavelTS)
                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(labelSales))
                                 .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
@@ -197,7 +183,7 @@ public class ProductSales extends javax.swing.JInternalFrame
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(labelTS)
+                    .addComponent(lavelTS)
                     .addComponent(labelSales))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -216,80 +202,41 @@ public class ProductSales extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnCloseActionPerformed
 
     private void btnShowActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnShowActionPerformed
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        String start = ((JTextField) calStart.getDateEditor().getUiComponent()).getText();
-        String end = ((JTextField) calEnd.getDateEditor().getUiComponent()).getText();
-        if (!start.equals("") & !end.equals(""))
+        String startDate = ((JTextField) calStart.getDateEditor().getUiComponent()).getText();
+        String endDate = ((JTextField) calEnd.getDateEditor().getUiComponent()).getText();
+        if (!startDate.isEmpty() & !endDate.isEmpty())
         {
-            Connection con = db.getConnection();
-            try
+            try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                Statement statement = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-                ResultSet rs = statement.executeQuery("SELECT SUM(sales_order_details.quantity) AS total FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.del_date >= '" + start + "' AND sales_order.del_date <= '" + end + "'");
+                ResultSet rs = statement.executeQuery("SELECT IFNULL(SUM(" + SOD_QUANTITY + "),0) AS total "
+                        + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                        + "JOIN " + SALES_ORDER_TABLE + " "
+                        + "ON " + SOD_ORDNUM + "=" + SO_ORDNUM + " "
+                        + "WHERE " + SOD_PRODNUM + " = " + prod_num + " "
+                        + "AND DATE(" + SO_DELDATE + ") BETWEEN '" + startDate + "' AND '" + endDate + "' ");
                 rs.next();
-                String total = rs.getString("total");
+                labelSales.setText(rs.getString("total"));
 
-                if (total == null)
-                {
-                    labelSales.setText("0");
-                }
-                else
-                {
-                    labelSales.setText(total);
-                }
-
-                rs = statement.executeQuery("SELECT SUM(quantity) AS total FROM missed_sales WHERE prod_num = " + prodNum + " AND ord_date >= '" + start + "' AND ord_date <= '" + end + "'");
+                rs = statement.executeQuery("SELECT IFNULL(SUM(" + MS_QUANTITY + "),0) AS total "
+                        + "FROM " + MISSED_SALES_TABLE + " "
+                        + "WHERE " + MS_PRODNUM + " = " + prod_num + " "
+                        + "AND DATE(" + MS_ORDDATE + ") BETWEEN '" + startDate + "' AND '" + endDate + "' ");
                 rs.next();
-                total = rs.getString("total");
+                labelMissed.setText(rs.getString("total"));
 
-                if (total == null)
-                {
-                    labelMissed.setText("0");
-                }
-                else
-                {
-                    labelMissed.setText(total);
-                }
-
-                labelTS.setVisible(true);
+                lavelTS.setVisible(true);
                 labelMS.setVisible(true);
             }
-            catch (SQLException e)
+            catch (SQLException ex)
             {
-                JOptionPane.showMessageDialog(ProductSales.this, e.getMessage());
-            }
-            finally
-            {
-                try
-                {
-                    con.close();
-                }
-                catch (Exception e)
-                { /* ignored */ }
+                MayfairStatic.outputMessage(this, ex);
             }
         }
         else
         {
-            JOptionPane.showMessageDialog(ProductSales.this, "Please select a start and end date");
+            MayfairStatic.outputMessage(this, "Invalid date", "Please select a start and end date.", WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnShowActionPerformed
-
-    private void calStartFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_calStartFocusLost
-
-    }//GEN-LAST:event_calStartFocusLost
-
-    private void calStartPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_calStartPropertyChange
-
-    }//GEN-LAST:event_calStartPropertyChange
-
-    private void calEndFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_calEndFocusLost
-        // TODO add your handling code here:
-    }//GEN-LAST:event_calEndFocusLost
-
-    private void calEndPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_calEndPropertyChange
-        // TODO add your handling code here:
-    }//GEN-LAST:event_calEndPropertyChange
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClose;
@@ -306,6 +253,6 @@ public class ProductSales extends javax.swing.JInternalFrame
     private javax.swing.JLabel labelMS;
     private javax.swing.JLabel labelMissed;
     private javax.swing.JLabel labelSales;
-    private javax.swing.JLabel labelTS;
+    private javax.swing.JLabel lavelTS;
     // End of variables declaration//GEN-END:variables
 }
