@@ -45,7 +45,7 @@ public class PastSalesOrders extends javax.swing.JInternalFrame
         table.setAutoCreateRowSorter(true);
         MayfairStatic.addDateSorter(table, new int[]
         {
-            2, 3, 7
+            2, 3
         });
     }
 

@@ -4,11 +4,15 @@
  */
 package main.java;
 
+import java.awt.Color;
+import static java.awt.Color.white;
 import java.awt.EventQueue;
 import static java.awt.Frame.MAXIMIZED_BOTH;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
-import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.UnsupportedLookAndFeelException;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import main.java.MayfairStatic.DesktopPanePainter;
 import main.java.product.Products;
 import main.java.customer.Customers;
 import main.java.order.purchase.CurrentPurchaseOrders;
@@ -39,24 +43,20 @@ public class App extends JFrame
     {
         try
         {
-            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels())
-            {
-                if ("Nimbus".equals(info.getName()))
-                {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+            UIManager.getLookAndFeelDefaults().put("DesktopPane[Enabled].backgroundPainter",
+                    new DesktopPanePainter());
+            UIManager.put("control", white);
         }
-        catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex)
+        catch (UnsupportedLookAndFeelException ex)
         {
             MayfairStatic.outputMessage(null, ex);
         }
-        
+
         /* Create and display the form */
         EventQueue.invokeLater(() ->
         {
-            App jFrame  = new App();
+            App jFrame = new App();
             jFrame.setVisible(true);
             jFrame.setExtendedState(MAXIMIZED_BOTH);
         });
@@ -94,10 +94,12 @@ public class App extends JFrame
         desktop = new javax.swing.JDesktopPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Mayfair Trunk Company Ltd.");
+        setTitle("MTC Stock Control System");
 
+        panelSelection.setBackground(new java.awt.Color(255, 255, 255));
         panelSelection.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
+        btnNewSO.setBackground(new java.awt.Color(255, 255, 255));
         btnNewSO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnNewSO.setText("New Order");
         btnNewSO.addActionListener(new java.awt.event.ActionListener()
@@ -108,6 +110,7 @@ public class App extends JFrame
             }
         });
 
+        btnCurrentSO.setBackground(new java.awt.Color(255, 255, 255));
         btnCurrentSO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnCurrentSO.setText("Current");
         btnCurrentSO.addActionListener(new java.awt.event.ActionListener()
@@ -118,6 +121,7 @@ public class App extends JFrame
             }
         });
 
+        btnNewPO.setBackground(new java.awt.Color(255, 255, 255));
         btnNewPO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnNewPO.setText("New Order");
         btnNewPO.addActionListener(new java.awt.event.ActionListener()
@@ -128,6 +132,7 @@ public class App extends JFrame
             }
         });
 
+        btnCurrentPO.setBackground(new java.awt.Color(255, 255, 255));
         btnCurrentPO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnCurrentPO.setText("Current");
         btnCurrentPO.addActionListener(new java.awt.event.ActionListener()
@@ -138,6 +143,7 @@ public class App extends JFrame
             }
         });
 
+        btnProducts.setBackground(new java.awt.Color(255, 255, 255));
         btnProducts.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
         btnProducts.setText("Products");
         btnProducts.addActionListener(new java.awt.event.ActionListener()
@@ -152,6 +158,7 @@ public class App extends JFrame
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("Sales Orders");
 
+        btnCustomers.setBackground(new java.awt.Color(255, 255, 255));
         btnCustomers.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
         btnCustomers.setText("Customers");
         btnCustomers.addActionListener(new java.awt.event.ActionListener()
@@ -162,6 +169,7 @@ public class App extends JFrame
             }
         });
 
+        btnPastSO.setBackground(new java.awt.Color(255, 255, 255));
         btnPastSO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnPastSO.setText("Past");
         btnPastSO.addActionListener(new java.awt.event.ActionListener()
@@ -172,6 +180,7 @@ public class App extends JFrame
             }
         });
 
+        btnPastPO.setBackground(new java.awt.Color(255, 255, 255));
         btnPastPO.setFont(new java.awt.Font("Lucida Grande", 0, 11)); // NOI18N
         btnPastPO.setText("Past");
         btnPastPO.addActionListener(new java.awt.event.ActionListener()
@@ -182,6 +191,7 @@ public class App extends JFrame
             }
         });
 
+        btnReports.setBackground(new java.awt.Color(255, 255, 255));
         btnReports.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
         btnReports.setText("Reports");
         btnReports.addActionListener(new java.awt.event.ActionListener()
@@ -196,6 +206,7 @@ public class App extends JFrame
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setText("Purchase Orders");
 
+        btnReminders.setBackground(new java.awt.Color(255, 255, 255));
         btnReminders.setFont(new java.awt.Font("Lucida Grande", 1, 12)); // NOI18N
         btnReminders.setText("Reminders");
         btnReminders.addActionListener(new java.awt.event.ActionListener()
@@ -277,7 +288,7 @@ public class App extends JFrame
 
         getContentPane().add(panelSelection, java.awt.BorderLayout.LINE_START);
 
-        desktop.setBackground(new java.awt.Color(0, 153, 255));
+        desktop.setBackground(new java.awt.Color(255, 255, 255));
         desktop.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         javax.swing.GroupLayout desktopLayout = new javax.swing.GroupLayout(desktop);

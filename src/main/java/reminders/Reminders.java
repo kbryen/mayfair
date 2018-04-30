@@ -82,9 +82,9 @@ public class Reminders extends javax.swing.JInternalFrame
 
             MayfairStatic.fillTable(tableReminders, rs);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
-            MayfairStatic.outputMessage(this, ex);
+            MayfairStatic.outputMessage(desktop, ex);
         }
     }
 
@@ -124,9 +124,9 @@ public class Reminders extends javax.swing.JInternalFrame
             }
 
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
-            MayfairStatic.outputMessage(this, ex);
+            MayfairStatic.outputMessage(desktop, ex);
         }
     }
 
@@ -157,9 +157,9 @@ public class Reminders extends javax.swing.JInternalFrame
 
             MayfairStatic.fillTable(tablePurchase, rs);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
-            MayfairStatic.outputMessage(this, ex);
+            MayfairStatic.outputMessage(desktop, ex);
         }
     }
 

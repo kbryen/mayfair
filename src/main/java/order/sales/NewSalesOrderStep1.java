@@ -70,6 +70,7 @@ public class NewSalesOrderStep1 extends javax.swing.JInternalFrame
         jSeparator2 = new javax.swing.JSeparator();
         btnClear = new javax.swing.JButton();
 
+        setBackground(new java.awt.Color(255, 255, 255));
         setClosable(true);
         setIconifiable(true);
         setResizable(true);
@@ -77,7 +78,7 @@ public class NewSalesOrderStep1 extends javax.swing.JInternalFrame
         setToolTipText("");
 
         jLabel1.setFont(new java.awt.Font("Lucida Grande", 0, 36)); // NOI18N
-        jLabel1.setText("New Order");
+        jLabel1.setText("New Sales Order");
 
         jLabel5.setFont(new java.awt.Font("Lucida Grande", 1, 16)); // NOI18N
         jLabel5.setText("Customer Details");
@@ -149,7 +150,7 @@ public class NewSalesOrderStep1 extends javax.swing.JInternalFrame
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(36, 36, 36)
                                 .addComponent(jLabel4)))
-                        .addGap(0, 204, Short.MAX_VALUE))
+                        .addGap(0, 106, Short.MAX_VALUE))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)

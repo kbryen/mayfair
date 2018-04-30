@@ -4,45 +4,14 @@
  */
 package main.java.report;
 
-import main.java.report.reports.AvailableStockReportXls;
-import java.io.FileOutputStream;
-import java.math.RoundingMode;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
-import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.JOptionPane.QUESTION_MESSAGE;
-import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import main.java.MayfairStatic;
-import static main.java.MayfairStatic.ALL_PURCHASE_TEMPLATE;
-import static main.java.MayfairStatic.ALL_SALES_TEMPLATE;
-import static main.java.MayfairStatic.CUSTOMERS_TEMPLATE;
-import static main.java.MayfairStatic.CUSTOMER_REPORTS_DIR;
-import static main.java.MayfairStatic.OUT_OF_STOCK_REPORT_TEMPLATE;
-import static main.java.MayfairStatic.PROD_SALES_ORDERS_DIR;
-import static main.java.MayfairStatic.PROD_SALES_TEMPLATE;
-import static main.java.MayfairStatic.STOCK_REPORTS_DIR;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import static org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD;
-import static main.java.MayfairStatic.WHS_REPORT_TEMPLATE;
-import main.java.report.reports.DiscontinuedStockReportXls;
-import main.java.report.reports.XlsReport;
 
 /**
  *
@@ -52,7 +21,6 @@ public class Reports extends javax.swing.JInternalFrame
 {
 
     private final JDesktopPane desktop;
-    private final Database db = new Database();
 
     /**
      * Creates new form ViewEditProducts
@@ -61,22 +29,42 @@ public class Reports extends javax.swing.JInternalFrame
      */
     public Reports(JDesktopPane pane)
     {
+        setUpGUI();
         desktop = pane;
+    }
+
+    private void setUpGUI()
+    {
         initComponents();
+        disableButtons();
         btnCreate.setEnabled(false);
+    }
+
+    private void disableButtons()
+    {
+        btnAvailableStockReport.setSelected(false);
+        btnWarehouseStockReport.setSelected(false);
+        btnDiscontinuedStockReport.setSelected(false);
+        btnOutOfStockReport.setSelected(false);
+        btnPOMadeDate.setSelected(false);
+        btnSOMadeDate.setSelected(false);
+        btnSOMadeProd.setSelected(false);
+        btnAllCustomers.setSelected(false);
+        btnCustomers.setSelected(false);
         dateSPO.setEnabled(false);
         dateEPO.setEnabled(false);
         dateSSO.setEnabled(false);
         dateESO.setEnabled(false);
-        dateSR.setEnabled(false);
-        dateER.setEnabled(false);
-        checkAll.setEnabled(false);
         labelProduct.setEnabled(false);
         btnFindProd.setEnabled(false);
         comboProducts.setEnabled(false);
+        dateSR.setEnabled(false);
+        dateER.setEnabled(false);
+        checkAll.setEnabled(false);
         labelReference.setEnabled(false);
         btnFindCust.setEnabled(false);
         comboCustomers.setEnabled(false);
+        btnCreate.setEnabled(true);
     }
 
     /**
@@ -474,747 +462,22 @@ public class Reports extends javax.swing.JInternalFrame
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void createDiscontinuedStockReport()
-    {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a discontinued stock report?", "Discontinued Stock Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            Map<String, Integer> products = new HashMap();
-            try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                // Get a list of all discontinued products
-                ResultSet rs = statement.executeQuery("SELECT code, in_stock "
-                        + "FROM products WHERE discon = true");
-                while (rs.next())
-                {
-                    String code = rs.getString("code");
-                    int in_stock = rs.getInt("in_stock");
-                    products.put(code, in_stock);
-                }
-            }
-            catch (SQLException e)
-            {
-                JOptionPane.showMessageDialog(Reports.this, e);
-            }
-
-            DiscontinuedStockReportXls stockReport = new DiscontinuedStockReportXls();
-            stockReport.setLoggingComponent(this);
-            stockReport.setReportName("Discontinued Stock Report");
-            stockReport.setProducts(products);
-            stockReport.populateWorkbook();
-            stockReport.save(stockReport.getFilename());
-        }
-    }
-
-    private void createAvailableStockReport()
-    {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create an available stock report?", "Available Stock Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            Map<String, Map<String, Integer>> productCounts = new HashMap();
-            List<String> purchaseOrders = new ArrayList();
-            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                // Get a list of all undelivered po's
-                ResultSet rs = statement.executeQuery("SELECT ord_num "
-                        + "FROM purchase_order "
-                        + "WHERE delivered = false");
-                while (rs.next())
-                {
-                    purchaseOrders.add(rs.getString("ord_num"));
-                }
-
-                // Get a list of all products
-                Map<Integer, String> prodNumToCode = new HashMap();
-                rs = statement.executeQuery("SELECT prod_num, code, in_stock "
-                        + "FROM products");
-                while (rs.next())
-                {
-                    int prod_num = rs.getInt("prod_num");
-                    String code = rs.getString("code");
-                    prodNumToCode.put(prod_num, code);
-
-                    Map<String, Integer> productCount = new HashMap();
-                    productCounts.put(code, productCount);
-                    int in_stock = rs.getInt("in_stock");
-                    productCount.put("In Stock", in_stock);
-
-                    for (String purchaseOrder : purchaseOrders)
-                    {
-                        productCount.put(purchaseOrder, 0);
-                    }
-                }
-
-                // Update po avaliability for products
-                rs = statement.executeQuery("SELECT purchase_order_details.ord_num, prod_num, avaliable "
-                        + "FROM purchase_order_details "
-                        + "JOIN purchase_order "
-                        + "ON purchase_order_details.ord_num=purchase_order.ord_num "
-                        + "WHERE delivered = false");
-                while (rs.next())
-                {
-                    String ord_num = rs.getString("purchase_order_details.ord_num");
-                    int prod_num = rs.getInt("prod_num");
-                    int avaliable = rs.getInt("avaliable");
-
-                    String code = prodNumToCode.get(prod_num);
-                    productCounts.get(code).put(ord_num, avaliable);
-                }
-
-                // Calculate totals / out of stocks
-                List<String> outOfStocks = new ArrayList();
-                for (Map.Entry<String, Map<String, Integer>> products : productCounts.entrySet())
-                {
-                    String code = products.getKey();
-                    Map<String, Integer> counts = products.getValue();
-
-                    int total = 0;
-                    for (Integer value : counts.values())
-                    {
-                        total += value;
-                    }
-
-                    if (total != 0)
-                    {
-                        counts.put("Total", total);
-                    }
-                    else
-                    {
-                        outOfStocks.add(code);
-                    }
-                }
-
-                // Remove out of stocks
-                for (String outOfStock : outOfStocks)
-                {
-                    productCounts.remove(outOfStock);
-                }
-            }
-            catch (SQLException e)
-            {
-                JOptionPane.showMessageDialog(Reports.this, e);
-            }
-
-            AvailableStockReportXls stockReport = new AvailableStockReportXls();
-            stockReport.setLoggingComponent(this);
-            stockReport.setReportName("Available Stock Report");
-            stockReport.setProductCounts(productCounts);
-            stockReport.setPurchaseOrders(purchaseOrders);
-            stockReport.populateWorkbook();
-            stockReport.save(stockReport.getFilename());
-        }
-    }
-
-    private void createWarehouseStockReport()
-    {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a warehouse stock report?", "Warehouse Stock Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-            String fileName = STOCK_REPORTS_DIR + "Warehouse Stock Report " + date + ".xls";
-            try (FileOutputStream fileOut = new FileOutputStream(fileName))
-            {
-                HSSFWorkbook workBook = XlsReport.createHSSFWorkbook(WHS_REPORT_TEMPLATE);
-                HSSFSheet sheet = workBook.getSheet("Warehouse Stock Report");
-
-                HSSFCellStyle numberStyle = workBook.createCellStyle();
-                numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-
-                // Create bold style
-                HSSFCellStyle bold = workBook.createCellStyle();
-                HSSFFont boldFont = workBook.createFont();
-                boldFont.setBoldweight(BOLDWEIGHT_BOLD);
-                bold.setFont(boldFont);
-
-                try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-                {
-                    HSSFRow row;
-                    int rowCount = 2;
-                    HSSFCell cell;
-
-                    // Date row
-                    row = sheet.getRow(0);
-                    cell = row.getCell(1);
-                    cell.setCellValue(date);
-
-                    List<String> prodNums = new ArrayList();
-                    ResultSet rs = statement.executeQuery("SELECT prod_num FROM products");
-                    while (rs.next())
-                    {
-                        prodNums.add(rs.getString("prod_num"));
-                    }
-
-                    for (String prodNum : prodNums)
-                    {
-                        rs = statement.executeQuery("SELECT products.prod_num AS prodNum, products.code AS code, (IFNULL(SUM(sales_order_details.fromStock), 0) + products.in_stock) AS warehouseStock FROM sales_order_details LEFT JOIN sales_order ON sales_order_details.ord_num=sales_order.ord_num RIGHT JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order.dispatched = false AND sales_order.delivered = false AND products.prod_num = " + prodNum + " AND sales_order_details.prod_num = " + prodNum);
-                        HashMap<Integer, Pair<String, Integer>> products = new HashMap();
-                        while (rs.next())
-                        {
-                            int prod_num = rs.getInt("prodNum");
-                            String code = rs.getString("code");
-                            int warehouse = rs.getInt("warehouseStock");
-
-                            // Reset cell count 
-                            row = sheet.createRow(rowCount++);
-
-                            // Cell 1 - prod num
-                            cell = row.createCell(0);
-                            cell.setCellValue(prod_num);
-                            cell.setCellStyle(numberStyle);
-
-                            // Cell 2 - prod code
-                            cell = row.createCell(1);
-                            cell.setCellValue(code);
-
-                            // Cell 3 - warehouse
-                            cell = row.createCell(2);
-                            cell.setCellValue(warehouse);
-                            cell.setCellStyle(numberStyle);
-                        }
-                    }
-                }
-                catch (SQLException e)
-                {
-                    JOptionPane.showMessageDialog(Reports.this, e);
-                }
-
-                // Auto Size Columns
-                for (int i = 0; i < 3; i++)
-                {
-                    sheet.autoSizeColumn(i);
-                }
-
-                workBook.write(fileOut);
-                fileOut.flush();
-                fileOut.close();
-
-                JOptionPane.showMessageDialog(Reports.this, "<html> <b>Stock report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
-            }
-            catch (Exception e)
-            {
-                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating stock report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
-            }
-        }
-    }
-
-    private void createOutOfStockReport()
-    {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create an out of stock report?", "Out of Stock Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-            String fileName = STOCK_REPORTS_DIR + "Out of Stock Report " + date + ".xls";
-            try (FileOutputStream fileOut = new FileOutputStream(fileName))
-            {
-                HSSFWorkbook workBook = XlsReport.createHSSFWorkbook(OUT_OF_STOCK_REPORT_TEMPLATE);
-                HSSFSheet sheet = workBook.getSheet("Out of Stock Report");
-
-                HSSFCellStyle numberStyle = workBook.createCellStyle();
-                numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-
-                try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-                {
-                    HSSFRow row;
-                    int rowCount = 2;
-                    HSSFCell cell;
-
-                    // Date row
-                    row = sheet.getRow(0);
-                    cell = row.getCell(1);
-                    cell.setCellValue(date);
-
-                    ResultSet rs = statement.executeQuery("SELECT prod_num, code FROM products where in_stock = 0");
-                    while (rs.next())
-                    {
-                        row = sheet.createRow(rowCount++);
-                        cell = row.createCell(0);
-                        cell.setCellValue(rs.getInt("prod_num"));
-                        cell.setCellStyle(numberStyle);
-                        cell = row.createCell(1);
-                        cell.setCellValue(rs.getString("code"));
-                    }
-                }
-                catch (SQLException e)
-                {
-                    JOptionPane.showMessageDialog(Reports.this, e);
-                }
-
-                // Auto Size Columns
-                for (int i = 0; i < 2; i++)
-                {
-                    sheet.autoSizeColumn(i);
-                }
-
-                workBook.write(fileOut);
-                fileOut.flush();
-                fileOut.close();
-
-                JOptionPane.showMessageDialog(Reports.this, "<html> <b>Out of Stock report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
-            }
-            catch (Exception e)
-            {
-                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating out of stock report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
-            }
-        }
-    }
-
-    private void createPurchaseOrderReportByDates()
-    {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a purchase orders report?", "Purchase Orders Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                SimpleDateFormat df1 = new SimpleDateFormat("dd-MM-yy");
-                SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
-                Date startDate = dateSPO.getDate();
-                Date endDate = dateEPO.getDate();
-
-                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, purchase_order_details.quantity FROM purchase_order_details JOIN purchase_order ON purchase_order_details.ord_num = purchase_order.ord_num JOIN products ON purchase_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");
-                if (rs.isBeforeFirst())
-                {
-                    String fileName = SALES_PURCHASE_ORDERS_DIR + "Purchase Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
-                    try (FileOutputStream fileOut = new FileOutputStream(fileName))
-                    {
-                        HSSFWorkbook workBook = XlsReport.createHSSFWorkbook(ALL_PURCHASE_TEMPLATE);
-
-                        HSSFCellStyle numberStyle = workBook.createCellStyle();
-                        numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-
-                        HSSFSheet sheet = workBook.getSheet("Purchase Orders Made");
-
-                        HSSFRow row;
-                        int rowCount = 0;
-                        HSSFCell cell;
-
-                        // Start date
-                        row = sheet.getRow(rowCount++);
-                        cell = row.getCell(5);
-                        cell.setCellValue(df1.format(startDate));
-
-                        // End date
-                        row = sheet.getRow(rowCount++);
-                        cell = row.getCell(5);
-                        cell.setCellValue(df1.format(endDate));
-
-                        // Fill table
-                        while (rs.next())
-                        {
-                            // num
-                            cell = row.createCell(0);
-                            cell.setCellValue(rs.getInt("prod_num"));
-                            cell.setCellStyle(numberStyle);
-                            // code
-                            cell = row.createCell(1);
-                            cell.setCellValue(rs.getString("code"));
-                            // quant
-                            cell = row.createCell(2);
-                            cell.setCellValue(rs.getInt("quantity"));
-                            cell.setCellStyle(numberStyle);
-
-                            row = sheet.createRow(rowCount++);
-                        }
-
-                        // Auto Size Columns
-                        for (int i = 0; i < 3; i++)
-                        {
-                            sheet.autoSizeColumn(i);
-                        }
-
-                        workBook.write(fileOut);
-                        fileOut.flush();
-                        fileOut.close();
-
-                        JOptionPane.showMessageDialog(Reports.this, "<html> <b>Purchase orders report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
-                    }
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(Reports.this, "<html> No purchase orders made between <b> " + df1.format(startDate) + " </b> and <b> " + df1.format(endDate) + " </b>", "Report not created", INFORMATION_MESSAGE);
-                }
-            }
-            catch (Exception e)
-            {
-                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating purchase orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
-            }
-        }
-    }
-
-    private void createSalesOrderReportByDates()
-    {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a sales orders report?", "Sales Orders Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                SimpleDateFormat df1 = new SimpleDateFormat("dd-MM-yy");
-                SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
-                Date startDate = dateSSO.getDate();
-                Date endDate = dateESO.getDate();
-
-                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, sales_order_details.quantity FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num JOIN products ON sales_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");
-                if (rs.isBeforeFirst())
-                {
-                    String fileName = SALES_PURCHASE_ORDERS_DIR + "Sales Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
-                    try (FileOutputStream fileOut = new FileOutputStream(fileName))
-                    {
-                        HSSFWorkbook workBook = XlsReport.createHSSFWorkbook(ALL_SALES_TEMPLATE);
-                        HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
-
-                        HSSFCellStyle numberStyle = workBook.createCellStyle();
-                        numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-
-                        HSSFRow row;
-                        int rowCount = 0;
-                        HSSFCell cell;
-
-                        // Start date
-                        row = sheet.getRow(rowCount++);
-                        cell = row.getCell(5);
-                        cell.setCellValue(df1.format(startDate));
-
-                        // End date
-                        row = sheet.getRow(rowCount++);
-                        cell = row.getCell(5);
-                        cell.setCellValue(df1.format(endDate));
-
-                        // Fill table
-                        while (rs.next())
-                        {
-                            // num
-                            cell = row.createCell(0);
-                            cell.setCellValue(rs.getInt("prod_num"));
-                            cell.setCellStyle(numberStyle);
-                            // code
-                            cell = row.createCell(1);
-                            cell.setCellValue(rs.getString("code"));
-                            // quant
-                            cell = row.createCell(2);
-                            cell.setCellValue(rs.getInt("quantity"));
-                            cell.setCellStyle(numberStyle);
-
-                            row = sheet.createRow(rowCount++);
-                        }
-
-                        // Auto Size Columns
-                        for (int i = 0; i < 3; i++)
-                        {
-                            sheet.autoSizeColumn(i);
-                        }
-
-                        workBook.write(fileOut);
-                        fileOut.flush();
-                        fileOut.close();
-
-                        JOptionPane.showMessageDialog(Reports.this, "<html> <b>Sales orders report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
-                    }
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(Reports.this, "<html> No sales orders made between <b> " + df1.format(startDate) + " </b> and <b> " + df1.format(endDate) + " </b>", "Report not created", INFORMATION_MESSAGE);
-                }
-            }
-            catch (Exception e)
-            {
-                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating sales orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
-            }
-        }
-    }
-
-    private void createSalesOrderReportByProduct(String prodCode)
-    {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a sales orders report?", "Sales Orders Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                ResultSet rs = statement.executeQuery("SELECT prod_num FROM products where code = '" + prodCode + "'");
-                if (rs.next())
-                {
-                    String prodNum = rs.getString("prod_num");
-
-                    rs = statement.executeQuery("SELECT sales_order_details.ord_num, sales_order_details.quantity, sales_order.cust_num, customers.name, sales_order.ord_date, sales_order.del_date, sales_order.dispatched, sales_order.delivered FROM sales_order JOIN sales_order_details ON sales_order.ord_num=sales_order_details.ord_num JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order_details.prod_num = " + prodNum);
-                    if (rs.isBeforeFirst())
-                    {
-                        String fileName = PROD_SALES_ORDERS_DIR + "Sales Orders " + prodCode.replaceAll("/", "") + ".xls";
-                        try (FileOutputStream fileOut = new FileOutputStream(fileName))
-                        {
-
-                            HSSFWorkbook workBook = XlsReport.createHSSFWorkbook(PROD_SALES_TEMPLATE);
-                            HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
-
-                            HSSFCellStyle numberStyle = workBook.createCellStyle();
-                            numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-
-                            HSSFRow row;
-                            int rowCount = 3;
-                            HSSFCell cell;
-
-                            // Prod code
-                            row = sheet.getRow(0);
-                            cell = row.getCell(1);
-                            cell.setCellValue(prodCode);
-
-                            // Fill table
-                            while (rs.next())
-                            {
-                                row = sheet.createRow(rowCount++);
-
-                                cell = row.createCell(0);
-                                cell.setCellValue(rs.getInt("ord_num"));
-                                cell.setCellStyle(numberStyle);
-
-                                cell = row.createCell(1);
-                                cell.setCellValue(rs.getString("name"));
-                                cell = row.createCell(2);
-                                cell.setCellValue(rs.getString("ord_date"));
-
-                                cell = row.createCell(3);
-                                cell.setCellValue(rs.getString("del_date"));
-
-                                cell = row.createCell(4);
-                                if (rs.getInt("dispatched") == 1)
-                                {
-                                    cell.setCellValue("yes");
-                                }
-                                else
-                                {
-                                    cell.setCellValue("no");
-                                }
-
-                                cell = row.createCell(5);
-                                if (rs.getInt("delivered") == 1)
-                                {
-                                    cell.setCellValue("yes");
-                                }
-                                else
-                                {
-                                    cell.setCellValue("no");
-                                }
-
-                                cell = row.createCell(6);
-                                cell.setCellValue(rs.getInt("quantity"));
-                                cell.setCellStyle(numberStyle);
-                            }
-
-                            // Auto Size Columns
-                            for (int i = 0; i < 7; i++)
-                            {
-                                sheet.autoSizeColumn(i);
-                            }
-
-                            workBook.write(fileOut);
-                            fileOut.flush();
-                            fileOut.close();
-
-                            JOptionPane.showMessageDialog(Reports.this, "<html> <b>Sales orders report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
-                        }
-                    }
-                    else
-                    {
-                        JOptionPane.showMessageDialog(Reports.this, "<html> No sales orders made for <b> " + prodCode + " </b>", "Report not created", INFORMATION_MESSAGE);
-                    }
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(Reports.this, "<html>Product does not exist - <b>" + prodCode + "</b> \nPlease select from drop down box", "Unknown Product", WARNING_MESSAGE);
-                }
-            }
-            catch (Exception e)
-            {
-                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating sales orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
-            }
-        }
-    }
-
-    private void createCustomerReport()
-    {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a customer report?", "Customer Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            if (!btnCustomers.isSelected())
-            {
-                JOptionPane.showMessageDialog(Reports.this, "<html><b>WARNING:</b>This report can take up to <b>3 minutes</b> to create.</html>\nPlease do not use the system and ensure no one else is while the report is created.", "Warning", WARNING_MESSAGE);
-            }
-
-            try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                SimpleDateFormat df1 = new SimpleDateFormat("dd-MM-yy");
-                SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
-                Date startDate = dateSR.getDate();
-                Date endDate = dateER.getDate();
-
-                StringBuilder fileName = new StringBuilder();
-                fileName.append(CUSTOMER_REPORTS_DIR).append("Customer Report");
-
-                String whereClauseReference = "";
-                if (btnCustomers.isSelected())
-                {
-                    fileName.append(" - ").append(labelReference.getText());
-                    whereClauseReference = " WHERE reference = '" + labelReference.getText() + "'";
-                }
-
-                String whereClauseDates = "";
-                if (!checkAll.isSelected())
-                {
-                    fileName.append(" - ").append(df1.format(startDate)).append(" ").append(df1.format(endDate));
-                    whereClauseDates = " AND del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'";
-                }
-
-                fileName.append(".xls");
-
-                try (FileOutputStream fileOut = new FileOutputStream(fileName.toString()))
-                {
-                    HSSFWorkbook workBook = XlsReport.createHSSFWorkbook(CUSTOMERS_TEMPLATE);
-                    HSSFSheet sheet = workBook.getSheet("Customers");
-
-                    HSSFRow row;
-                    HSSFCell cell;
-
-                    // Products
-                    int rowCount = 1;
-                    Map<Integer, Integer> prodCellIndexes = new HashMap();
-                    Map<Integer, String> disconProds = new HashMap();
-                    ResultSet rs = statement.executeQuery("SELECT prod_num, code, sales_price, purchase_price, discon FROM products ORDER BY prod_num");
-                    while (rs.next())
-                    {
-                        int prodNum = rs.getInt("prod_num");
-                        String code = rs.getString("code");
-                        String salesPrice = "£" + rs.getBigDecimal("sales_price").setScale(2, RoundingMode.CEILING).toPlainString();
-                        String purchasePrice = "£" + rs.getBigDecimal("purchase_price").setScale(2, RoundingMode.CEILING).toPlainString();
-                        boolean discon = rs.getBoolean("discon");
-
-                        if (discon)
-                        {
-                            disconProds.put(prodNum, code + "," + salesPrice + "," + purchasePrice);
-                        }
-                        else
-                        {
-                            prodCellIndexes.put(prodNum, rowCount);
-
-                            row = sheet.createRow(rowCount++);
-                            cell = row.createCell(0);
-                            cell.setCellValue(prodNum);
-                            cell = row.createCell(1);
-                            cell.setCellValue(code);
-                            cell = row.createCell(2);
-                            cell.setCellValue(salesPrice);
-                            cell = row.createCell(3);
-                            cell.setCellValue(purchasePrice);
-                        }
-                    }
-
-                    // Discontinuted                  
-                    rowCount++;
-                    row = sheet.createRow(rowCount++);
-                    cell = row.createCell(0);
-                    cell.setCellValue("DISCONTINUED");
-                    rowCount++;
-                    for (Map.Entry<Integer, String> discon : disconProds.entrySet())
-                    {
-                        int prodNum = discon.getKey();
-                        prodCellIndexes.put(prodNum, rowCount);
-
-                        String prod = discon.getValue();
-                        row = sheet.createRow(rowCount++);
-                        int cellCount = 0;
-
-                        cell = row.createCell(cellCount++);
-                        cell.setCellValue(prodNum);
-                        for (String info : prod.split(","))
-                        {
-                            cell = row.createCell(cellCount++);
-                            cell.setCellValue(info);
-                        }
-                    }
-
-                    // Auto Size Columns
-                    for (int i = 0; i < 5; i++)
-                    {
-                        sheet.autoSizeColumn(i);
-                    }
-
-                    // Customers
-                    row = sheet.getRow(0);
-                    HSSFCellStyle rotate = workBook.createCellStyle();
-                    rotate.setRotation((short) 90);
-                    int columnCount = 5;
-                    Map<Integer, Integer> custCellIndexes = new HashMap();
-                    rs = statement.executeQuery("SELECT cust_num, name FROM customers" + whereClauseReference + " ORDER BY cust_num");
-                    while (rs.next())
-                    {
-                        int custNum = rs.getInt("cust_num");
-                        String name = rs.getString("name");
-                        custCellIndexes.put(custNum, columnCount);
-                        cell = row.createCell(columnCount++);
-                        cell.setCellValue(custNum + " - " + name);
-                        cell.setCellStyle(rotate);
-                        sheet.autoSizeColumn(columnCount - 1);
-                    }
-
-                    // Orders made
-                    for (Map.Entry<Integer, Integer> product : prodCellIndexes.entrySet())
-                    {
-                        int prodNum = product.getKey();
-                        int rowNum = product.getValue();
-                        int total = 0;
-                        for (Map.Entry<Integer, Integer> customer : custCellIndexes.entrySet())
-                        {
-                            int custNum = customer.getKey();
-                            int columnNum = customer.getValue();
-                            rs = statement.executeQuery("SELECT SUM(quantity) AS total FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num WHERE sales_order_details.prod_num = " + prodNum + " AND sales_order.cust_num = " + custNum + whereClauseDates);
-                            if (rs.isBeforeFirst())
-                            {
-                                rs.next();
-                                int quantity = rs.getInt("total");
-                                if (quantity != 0)
-                                {
-                                    cell = sheet.getRow(rowNum).createCell(columnNum);
-                                    cell.setCellValue(quantity);
-                                    total += quantity;
-                                }
-                            }
-                        }
-                        cell = sheet.getRow(rowNum).createCell(4);
-                        cell.setCellValue(total);
-                    }
-
-                    workBook.write(fileOut);
-                    fileOut.flush();
-                    fileOut.close();
-
-                    JOptionPane.showMessageDialog(Reports.this, "<html> <b>Customer report created successfully.</b> \n<html> <i> " + fileName.toString() + " </i>", "Report Created", INFORMATION_MESSAGE);
-                }
-            }
-            catch (Exception e)
-            {
-                JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating customer report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
-            }
-        }
-    }
-
     private void btnCreateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCreateActionPerformed
         if (btnAvailableStockReport.isSelected())
         {
-            createAvailableStockReport();
+            ReportGenerator.createAvailableStockReport(this);
         }
         if (btnWarehouseStockReport.isSelected())
         {
-            createWarehouseStockReport();
+            ReportGenerator.createWarehouseStockReport(this);
         }
         if (btnOutOfStockReport.isSelected())
         {
-            createOutOfStockReport();
+            ReportGenerator.createOutOfStockReport(this);
         }
         if (btnDiscontinuedStockReport.isSelected())
         {
-            createDiscontinuedStockReport();
+            ReportGenerator.createDiscontinuedStockReport(this);
         }
         if (btnPOMadeDate.isSelected())
         {
@@ -1224,7 +487,7 @@ public class Reports extends javax.swing.JInternalFrame
             }
             else
             {
-                createPurchaseOrderReportByDates();
+                ReportGenerator.createPurchaseOrderReportByDates(this, dateSPO.getDate(), dateEPO.getDate());
             }
         }
         if (btnSOMadeDate.isSelected())
@@ -1235,20 +498,18 @@ public class Reports extends javax.swing.JInternalFrame
             }
             else
             {
-                createSalesOrderReportByDates();
+                ReportGenerator.createSalesOrderReportByDates(this, dateSSO.getDate(), dateESO.getDate());
             }
         }
         if (btnSOMadeProd.isSelected())
         {
-            String prodCode = labelProduct.getText();
-
-            if (prodCode.isEmpty())
+            if (labelProduct.getText().isEmpty())
             {
                 JOptionPane.showMessageDialog(Reports.this, "Please select a product", "Missing information", QUESTION_MESSAGE);
             }
             else
             {
-                createSalesOrderReportByProduct(prodCode);
+                ReportGenerator.createSalesOrderReportByProduct(this, labelProduct.getText());
             }
         }
         if (btnAllCustomers.isSelected())
@@ -1259,221 +520,65 @@ public class Reports extends javax.swing.JInternalFrame
             }
             else
             {
-                createCustomerReport();
+                ReportGenerator.createCustomerReport(this, dateSR.getDate(), dateER.getDate(), "");
             }
         }
         if (btnCustomers.isSelected())
         {
-            String reference = labelReference.getText();
             if (!checkAll.isSelected() && (dateSR.getDate() == null || dateER.getDate() == null))
             {
                 JOptionPane.showMessageDialog(Reports.this, "Please select start and end date or 'All Dates'", "Missing information", QUESTION_MESSAGE);
             }
-            else if (reference.isEmpty())
+            else if (labelReference.getText().isEmpty())
             {
                 JOptionPane.showMessageDialog(Reports.this, "Please select a customer reference", "Missing information", QUESTION_MESSAGE);
             }
             else
             {
-                createCustomerReport();
+                ReportGenerator.createCustomerReport(this, dateSR.getDate(), dateER.getDate(), labelReference.getText());
             }
         }
     }//GEN-LAST:event_btnCreateActionPerformed
 
     private void btnAvailableStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAvailableStockReportActionPerformed
+        disableButtons();
         btnAvailableStockReport.setSelected(true);
-        btnWarehouseStockReport.setSelected(false);
-        btnDiscontinuedStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(false);
-        btnAllCustomers.setSelected(false);
-        btnCustomers.setSelected(false);
-
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-
-        labelProduct.setEnabled(false);
-        btnFindProd.setEnabled(false);
-        comboProducts.setEnabled(false);
-
-        dateSR.setEnabled(false);
-        dateER.setEnabled(false);
-        checkAll.setEnabled(false);
-
-        labelReference.setEnabled(false);
-        btnFindCust.setEnabled(false);
-        comboCustomers.setEnabled(false);
-
-        btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnAvailableStockReportActionPerformed
 
     private void btnWarehouseStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnWarehouseStockReportActionPerformed
-        btnAvailableStockReport.setSelected(false);
+        disableButtons();
         btnWarehouseStockReport.setSelected(true);
-        btnDiscontinuedStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(false);
-        btnAllCustomers.setSelected(false);
-        btnCustomers.setSelected(false);
-
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-
-        labelProduct.setEnabled(false);
-        btnFindProd.setEnabled(false);
-        comboProducts.setEnabled(false);
-
-        dateSR.setEnabled(false);
-        dateER.setEnabled(false);
-        checkAll.setEnabled(false);
-
-        labelReference.setEnabled(false);
-        btnFindCust.setEnabled(false);
-        comboCustomers.setEnabled(false);
-
-        btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnWarehouseStockReportActionPerformed
 
     private void btnOutOfStockReportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOutOfStockReportActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
-        btnDiscontinuedStockReport.setSelected(false);
+        disableButtons();
         btnOutOfStockReport.setSelected(true);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(false);
-        btnAllCustomers.setSelected(false);
-        btnCustomers.setSelected(false);
-
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-
-        labelProduct.setEnabled(false);
-        btnFindProd.setEnabled(false);
-        comboProducts.setEnabled(false);
-
-        dateSR.setEnabled(false);
-        dateER.setEnabled(false);
-        checkAll.setEnabled(false);
-
-        labelReference.setEnabled(false);
-        btnFindCust.setEnabled(false);
-        comboCustomers.setEnabled(false);
-
-        btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnOutOfStockReportActionPerformed
 
     private void btnPOMadeDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPOMadeDateActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
-        btnDiscontinuedStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
+        disableButtons();
         btnPOMadeDate.setSelected(true);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(false);
-        btnAllCustomers.setSelected(false);
-        btnCustomers.setSelected(false);
-
         dateSPO.setEnabled(true);
         dateEPO.setEnabled(true);
-
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-
-        labelProduct.setEnabled(false);
-        btnFindProd.setEnabled(false);
-        comboProducts.setEnabled(false);
-
-        dateSR.setEnabled(false);
-        dateER.setEnabled(false);
-        checkAll.setEnabled(false);
-
-        labelReference.setEnabled(false);
-        btnFindCust.setEnabled(false);
-        comboCustomers.setEnabled(false);
-
-        btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnPOMadeDateActionPerformed
 
     private void btnSOMadeDateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSOMadeDateActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
-        btnDiscontinuedStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(false);
+        disableButtons();
         btnSOMadeDate.setSelected(true);
-        btnSOMadeProd.setSelected(false);
-        btnAllCustomers.setSelected(false);
-        btnCustomers.setSelected(false);
-
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-
         dateSSO.setEnabled(true);
         dateESO.setEnabled(true);
-
-        labelProduct.setEnabled(false);
-        btnFindProd.setEnabled(false);
-        comboProducts.setEnabled(false);
-
-        dateSR.setEnabled(false);
-        dateER.setEnabled(false);
-        checkAll.setEnabled(false);
-
-        labelReference.setEnabled(false);
-        btnFindCust.setEnabled(false);
-        comboCustomers.setEnabled(false);
-
-        btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnSOMadeDateActionPerformed
 
     private void btnSOMadeProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSOMadeProdActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
-        btnDiscontinuedStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(false);
+        disableButtons();
         btnSOMadeProd.setSelected(true);
-        btnAllCustomers.setSelected(false);
-        btnCustomers.setSelected(false);
-
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-
         labelProduct.setEnabled(true);
         btnFindProd.setEnabled(true);
         comboProducts.setEnabled(true);
-
-        dateSR.setEnabled(false);
-        dateER.setEnabled(false);
-        checkAll.setEnabled(false);
-
-        labelReference.setEnabled(false);
-        btnFindCust.setEnabled(false);
-        comboCustomers.setEnabled(false);
-
-        btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnSOMadeProdActionPerformed
 
     private void btnFindProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindProdActionPerformed
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             ArrayList<String> products = new ArrayList<>();
             ResultSet rs = statement.executeQuery("SELECT code FROM products WHERE code LIKE '%" + labelProduct.getText() + "%' ORDER BY code ASC");
@@ -1497,91 +602,30 @@ public class Reports extends javax.swing.JInternalFrame
     }//GEN-LAST:event_comboProductsActionPerformed
 
     private void btnAllCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAllCustomersActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
-        btnDiscontinuedStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(false);
+        disableButtons();
         btnAllCustomers.setSelected(true);
-        btnCustomers.setSelected(false);
-
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-
-        labelProduct.setEnabled(false);
-        btnFindProd.setEnabled(false);
-        comboProducts.setEnabled(false);
-
-        if (!checkAll.isSelected())
-        {
-            dateSR.setEnabled(true);
-            dateER.setEnabled(true);
-        }
         checkAll.setEnabled(true);
-
-        labelReference.setEnabled(false);
-        btnFindCust.setEnabled(false);
-        comboCustomers.setEnabled(false);
-
-        btnCreate.setEnabled(true);
+        checkAllActionPerformed(null);
     }//GEN-LAST:event_btnAllCustomersActionPerformed
 
     private void checkAllActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkAllActionPerformed
-        if (checkAll.isSelected())
-        {
-            dateSR.setEnabled(false);
-            dateER.setEnabled(false);
-        }
-        else
-        {
-            dateSR.setEnabled(true);
-            dateER.setEnabled(true);
-        }
+        dateSR.setEnabled(!checkAll.isSelected());
+        dateER.setEnabled(!checkAll.isSelected());
     }//GEN-LAST:event_checkAllActionPerformed
 
     private void btnCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCustomersActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
-        btnDiscontinuedStockReport.setSelected(false);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(false);
-        btnAllCustomers.setSelected(false);
+        disableButtons();
         btnCustomers.setSelected(true);
-
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-
-        labelProduct.setEnabled(false);
-        btnFindProd.setEnabled(false);
-        comboProducts.setEnabled(false);
-
-        if (!checkAll.isSelected())
-        {
-            dateSR.setEnabled(true);
-            dateER.setEnabled(true);
-        }
         checkAll.setEnabled(true);
-
         labelReference.setEnabled(true);
         btnFindCust.setEnabled(true);
         comboCustomers.setEnabled(true);
-
-        btnCreate.setEnabled(true);
+        checkAllActionPerformed(null);
     }//GEN-LAST:event_btnCustomersActionPerformed
 
     private void btnFindCustActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindCustActionPerformed
         ArrayList<String> customers = new ArrayList<>();
-        try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
+        try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
             ResultSet rs = statement.executeQuery("SELECT distinct reference FROM customers WHERE reference LIKE '%" + labelReference.getText() + "%' ORDER BY reference ASC");
             while (rs.next())
@@ -1599,40 +643,13 @@ public class Reports extends javax.swing.JInternalFrame
     }//GEN-LAST:event_btnFindCustActionPerformed
 
     private void comboCustomersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCustomersActionPerformed
-        labelReference.setText((String) comboCustomers.getSelectedItem());
+        labelReference.setText(String.valueOf(comboCustomers.getSelectedItem()));
     }//GEN-LAST:event_comboCustomersActionPerformed
 
     private void btnDiscontinuedStockReportActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_btnDiscontinuedStockReportActionPerformed
     {//GEN-HEADEREND:event_btnDiscontinuedStockReportActionPerformed
-        btnAvailableStockReport.setSelected(false);
-        btnWarehouseStockReport.setSelected(false);
+        disableButtons();
         btnDiscontinuedStockReport.setSelected(true);
-        btnOutOfStockReport.setSelected(false);
-        btnPOMadeDate.setSelected(false);
-        btnSOMadeDate.setSelected(false);
-        btnSOMadeProd.setSelected(false);
-        btnAllCustomers.setSelected(false);
-        btnCustomers.setSelected(false);
-
-        dateSPO.setEnabled(false);
-        dateEPO.setEnabled(false);
-
-        dateSSO.setEnabled(false);
-        dateESO.setEnabled(false);
-
-        labelProduct.setEnabled(false);
-        btnFindProd.setEnabled(false);
-        comboProducts.setEnabled(false);
-
-        dateSR.setEnabled(false);
-        dateER.setEnabled(false);
-        checkAll.setEnabled(false);
-
-        labelReference.setEnabled(false);
-        btnFindCust.setEnabled(false);
-        comboCustomers.setEnabled(false);
-
-        btnCreate.setEnabled(true);
     }//GEN-LAST:event_btnDiscontinuedStockReportActionPerformed
 
 

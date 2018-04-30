@@ -76,13 +76,9 @@ public class DispatchNoteXls extends XlsReport
         }
 
         // Products
+        rowCount = 19;
         int maxProdsPerPage = 41;
         int prodsCount = 12;
-
-        rowCount = 19;
-//        row = sheet.createRow(rowCount++);
-//        addProductsHeader(row);
-
         for (Entry<String, Integer> product : products.entrySet())
         {
             prodsCount++;
@@ -118,8 +114,6 @@ public class DispatchNoteXls extends XlsReport
         cell = row.createCell(1);
         cell.setCellStyle(getStyle(BOLD + RIGHT));
         cell.setCellValue(products.values().stream().mapToInt(Integer::intValue).sum());
-
-//        autoSizeColumns(sheet, 4);
     }
 
     public void setDel_date(String del_date)

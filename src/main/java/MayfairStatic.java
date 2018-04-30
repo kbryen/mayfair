@@ -4,8 +4,20 @@
  */
 package main.java;
 
+import java.awt.Color;
+import static java.awt.Color.white;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import static java.awt.print.Printable.NO_SUCH_PAGE;
+import static java.awt.print.Printable.PAGE_EXISTS;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.beans.PropertyVetoException;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
@@ -20,6 +32,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
+import javax.imageio.ImageIO;
+import javax.swing.JComponent;
+import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -27,7 +42,10 @@ import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.QUESTION_MESSAGE;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
+import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.Painter;
+import javax.swing.RepaintManager;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -171,6 +189,8 @@ public class MayfairStatic
     public static final String PORT = "3306";
     public static final String URL = "jdbc:mysql://" + IP + ":" + PORT + "/" + MAYFAIR;
 
+    public static final String BACKGROUND_PNG = MAYFAIR_DIR + "dist/Background.png";
+
     public static final SimpleDateFormat CAL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
     public static final DateTimeFormatter SQL_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy EEE");
     public static final Comparator DATE_COMPARATOR = (Comparator) (Object o1, Object o2)
@@ -201,6 +221,7 @@ public class MayfairStatic
             MayfairStatic.outputMessage(null, ex);
         }
     }
+
     public static void fillTable(JTable table, ResultSet rs) throws SQLException
     {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -228,7 +249,7 @@ public class MayfairStatic
 
     public static String sqlDateFormat(String date, String format)
     {
-        return "DATE_FORMAT(" + date + ", '" + format + "') AS " + date;
+        return "DATE_FORMAT(" + date + ", '" + format + "')";
     }
 
     public static void setMaximum(JInternalFrame jframe)
@@ -349,6 +370,104 @@ public class MayfairStatic
                         + PO_TOTALUNITS + " = " + total_units + " "
                         + "WHERE " + PO_ORDNUM + " = '" + ord_num + "'");
             }
+        }
+    }
+
+    public static class JPanelPrinter implements Printable
+    {
+
+        private final JPanel jPanel;
+
+        public static void printComponent(JPanel jPanel)
+        {
+            new JPanelPrinter(jPanel).print();
+        }
+
+        public JPanelPrinter(JPanel jPanel)
+        {
+            this.jPanel = jPanel;
+        }
+
+        public void print()
+        {
+            PrinterJob printJob = PrinterJob.getPrinterJob();
+            PageFormat pf = printJob.defaultPage();
+            pf.setOrientation(PageFormat.PORTRAIT);
+            printJob.setPrintable(this, pf);
+            if (printJob.printDialog())
+            {
+                try
+                {
+                    printJob.print();
+                }
+                catch (PrinterException ex)
+                {
+                    MayfairStatic.outputMessage(null, ex);
+                }
+            }
+        }
+
+        @Override
+        public int print(Graphics g, PageFormat pageFormat, int pageIndex)
+        {
+            if (pageIndex > 0)
+            {
+                return (NO_SUCH_PAGE);
+            }
+            else
+            {
+
+                try
+                {
+                    Graphics2D g2d = (Graphics2D) g;
+                    g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+                    disableDoubleBuffering(jPanel);
+                    jPanel.paint(g2d);
+                    enableDoubleBuffering(jPanel);
+                    return (PAGE_EXISTS);
+                }
+                catch (Exception ex)
+                {
+                    MayfairStatic.outputMessage(null, ex);
+                    return (NO_SUCH_PAGE);
+                }
+            }
+        }
+
+        public static void disableDoubleBuffering(JPanel jPanel)
+        {
+            RepaintManager currentManager = RepaintManager.currentManager(jPanel);
+            currentManager.setDoubleBufferingEnabled(false);
+        }
+
+        public static void enableDoubleBuffering(JPanel jPanel)
+        {
+            RepaintManager currentManager = RepaintManager.currentManager(jPanel);
+            currentManager.setDoubleBufferingEnabled(true);
+        }
+    }
+
+    public static class DesktopPanePainter implements Painter<JDesktopPane>
+    {
+
+        private Image image;
+
+        public DesktopPanePainter()
+        {
+            try
+            {
+                image = ImageIO.read(new File(BACKGROUND_PNG));
+            }
+            catch (IOException ex)
+            {
+                MayfairStatic.outputMessage(null, ex);
+            }
+        }
+
+        @Override
+        public void paint(Graphics2D g, JDesktopPane object, int width, int height)
+        {
+            g.drawImage(image, 0, 0, width, height, null);
         }
     }
 }
