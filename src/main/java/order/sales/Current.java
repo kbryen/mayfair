@@ -10,20 +10,15 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.ERROR_MESSAGE;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.JOptionPane.YES_NO_OPTION;
-import javax.swing.JTable;
-import javax.swing.table.TableRowSorter;
 import main.java.Database;
 import main.java.Main;
 import main.java.MayfairConstants;
@@ -32,6 +27,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 
 /**
@@ -59,7 +55,10 @@ public class Current extends javax.swing.JInternalFrame
         btnExcelSummary.setVisible(false);
         btnFindActionPerformed(null);
         table.setAutoCreateRowSorter(true);
-        MayfairConstants.addDateSorter(table, new int[]{2,3,7});
+        MayfairConstants.addDateSorter(table, new int[]
+        {
+            2, 3, 7
+        });
     }
 
     /**
@@ -648,7 +647,7 @@ public class Current extends javax.swing.JInternalFrame
             }
 
             // Select Products
-            Map<String, Integer> products = new HashMap();
+            Map<String, Integer> products = new TreeMap();
             try (Statement statement = db.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
                 ResultSet rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity "
@@ -741,17 +740,20 @@ public class Current extends javax.swing.JInternalFrame
                     cell.setCellValue("Quantity");
 
                     int i = 7;
+                    Map<String, Integer> products = new TreeMap();
                     rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity FROM sales_order_details JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + ordNum);
                     while (rs.next())
                     {
-                        String code = rs.getString("code");
-                        int quantity = rs.getInt("quantity");
-
+                        products.put(rs.getString("products.code"), rs.getInt("sales_order_details.quantity"));
+                    }
+                    
+                    for (Map.Entry<String, Integer> product : products.entrySet())
+                    {
                         row = worksheet.createRow((short) i);
                         cell = row.createCell(0);
-                        cell.setCellValue(code);
+                        cell.setCellValue(product.getKey());
                         cell = row.createCell(1);
-                        cell.setCellValue(quantity);
+                        cell.setCellValue(product.getValue());
 
                         i++;
                     }

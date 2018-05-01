@@ -42,6 +42,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import static org.apache.poi.ss.usermodel.Font.BOLDWEIGHT_BOLD;
 import static main.java.MayfairConstants.WHS_REPORT_TEMPLATE;
+import org.apache.poi.ss.util.CellReference;
 
 /**
  *
@@ -1081,13 +1082,14 @@ public class Reports extends javax.swing.JInternalFrame
                         cell.setCellStyle(rotate);
                         sheet.autoSizeColumn(columnCount - 1);
                     }
+                    String minLetter = "F";
+                    String maxLetter = CellReference.convertNumToColString(columnCount);
 
                     // Orders made
                     for (Map.Entry<Integer, Integer> product : prodCellIndexes.entrySet())
                     {
                         int prodNum = product.getKey();
                         int rowNum = product.getValue();
-                        int total = 0;
                         for (Map.Entry<Integer, Integer> customer : custCellIndexes.entrySet())
                         {
                             int custNum = customer.getKey();
@@ -1101,12 +1103,12 @@ public class Reports extends javax.swing.JInternalFrame
                                 {
                                     cell = sheet.getRow(rowNum).createCell(columnNum);
                                     cell.setCellValue(quantity);
-                                    total += quantity;
                                 }
                             }
                         }
                         cell = sheet.getRow(rowNum).createCell(4);
-                        cell.setCellValue(total);
+                        cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
+                        cell.setCellFormula("SUM(" + minLetter + (rowNum+1) + ":" + maxLetter + (rowNum+1) + ")");
                     }
 
                     workBook.write(fileOut);
