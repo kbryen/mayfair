@@ -20,20 +20,7 @@ import main.java.MayfairStatic;
 public class Reports extends javax.swing.JInternalFrame
 {
 
-    private final JDesktopPane desktop;
-
-    /**
-     * Creates new form ViewEditProducts
-     *
-     * @param pane Desktop Pane
-     */
     public Reports(JDesktopPane pane)
-    {
-        setUpGUI();
-        desktop = pane;
-    }
-
-    private void setUpGUI()
     {
         initComponents();
         disableButtons();

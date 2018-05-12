@@ -18,7 +18,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
  *
  * @author kian_bryen
  */
-public class OutOfStockReportXls extends XlsReport
+public class OutOfStockReportXls extends ReportXls
 {
 
     private final String outputDir = STOCK_REPORTS_DIR;

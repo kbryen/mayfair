@@ -4,8 +4,6 @@
  */
 package main.java;
 
-import java.awt.Color;
-import static java.awt.Color.white;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -29,11 +27,11 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import javax.imageio.ImageIO;
-import javax.swing.JComponent;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
@@ -161,7 +159,7 @@ public class MayfairStatic
     public static final String STOCK_REPORT_TEMPLATE = TEMPLATES_DIR + "StockReport.xls";
     public static final String WHS_REPORT_TEMPLATE = TEMPLATES_DIR + "WarehouseStockReport.xls";
     public static final String PROD_SALES_TEMPLATE = TEMPLATES_DIR + "ProdSalesOrders.xls";
-    public static final String CUSTOMERS_TEMPLATE = TEMPLATES_DIR + "Customers.xls";
+    public static final String CUSTOMERS_REPORT_TEMPLATE = TEMPLATES_DIR + "Customers.xls";
 
     public static final String DISPATCH_NOTE_TEMPLATE_XLSX = TEMPLATES_DIR + "DispatchNoteTemplateV3.xlsx";
     public static final String ALL_PURCHASE_TEMPLATE_XLSX = TEMPLATES_DIR + "AllPurchaseOrders.xlsx";
@@ -192,6 +190,7 @@ public class MayfairStatic
     public static final String BACKGROUND_PNG = MAYFAIR_DIR + "dist/Background.png";
 
     public static final SimpleDateFormat CAL_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+    public static final SimpleDateFormat FILE_DATE_FORMAT = new SimpleDateFormat("ddMMyy");
     public static final DateTimeFormatter SQL_DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy EEE");
     public static final Comparator DATE_COMPARATOR = (Comparator) (Object o1, Object o2)
             -> LocalDate.parse(o1.toString(), SQL_DATE_FORMAT).compareTo(LocalDate.parse(o2.toString(), SQL_DATE_FORMAT));
@@ -266,7 +265,12 @@ public class MayfairStatic
 
     public static void outputMessage(Component component, Exception ex)
     {
-        outputMessage(component, "Message for Kian", ex.getLocalizedMessage(), ERROR_MESSAGE);
+        StringBuilder message = new StringBuilder(ex.getLocalizedMessage());
+        for (StackTraceElement stackTraceElement : ex.getStackTrace())
+        {
+            message.append("\n").append(stackTraceElement.toString());
+        }
+        outputMessage(component, "Message for Kian", message.toString(), ERROR_MESSAGE);
     }
 
     public static void outputMessage(Component component, String title, String message, int type)

@@ -16,7 +16,7 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
  *
  * @author kian_bryen
  */
-public class DispatchNoteXls extends XlsReport
+public class DispatchNoteXls extends ReportXls
 {
 
     private final String outputDir = DISPATCH_NOTES_DIR;
@@ -31,7 +31,7 @@ public class DispatchNoteXls extends XlsReport
 
     public DispatchNoteXls()
     {
-        super(XlsReport.createHSSFWorkbook(DISPATCH_NOTE_TEMPLATE));
+        super(ReportXls.createHSSFWorkbook(DISPATCH_NOTE_TEMPLATE));
     }
 
     @Override

@@ -1,3 +1,7 @@
+/*
+ * Mayfair Stock Control.
+ *
+ */
 package main.java.report.reports;
 
 import java.awt.Component;
@@ -7,8 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import main.java.MayfairStatic;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -22,13 +24,13 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
  *
  * @author Kian
  */
-public abstract class XlsReport implements Report
+public abstract class ReportXls implements Report
 {
 
     private final HSSFWorkbook workBook;
     public static final String EXTENSION = ".xls";
     private String reportName = "Report";
-    
+
     private final Map<String, HSSFCellStyle> styles = new HashMap();
     public static final String BOLD = "bold";
     public static final String ITALIC = "italic";
@@ -37,8 +39,9 @@ public abstract class XlsReport implements Report
     public static final String NUMBER = "number";
     public static final String BORDER = "border";
     public static final String BOTTOM = "bottom";
+    public static final String ROTATE = "bottom";
 
-    public XlsReport(HSSFWorkbook workBook)
+    public ReportXls(HSSFWorkbook workBook)
     {
         this.workBook = workBook;
         createStyles();
@@ -117,6 +120,16 @@ public abstract class XlsReport implements Report
         boldLeftBorderBottomStyle.setAlignment(CellStyle.VERTICAL_TOP);
         boldLeftBorderBottomStyle.setAlignment(CellStyle.ALIGN_LEFT);
         styles.put(BOLD + LEFT + BORDER + BOTTOM, boldLeftBorderBottomStyle);
+
+        // Rotate 90 degrees
+        HSSFCellStyle rotate = workBook.createCellStyle();
+        rotate.setRotation((short) 90);
+        styles.put(ROTATE, rotate);
+        
+        // Bold rotate 90 degrees
+        HSSFCellStyle boldRotate = workBook.createCellStyle();
+        boldRotate.setRotation((short) 90);
+        styles.put(BOLD + ROTATE, boldRotate);
     }
 
     @Override
@@ -151,7 +164,7 @@ public abstract class XlsReport implements Report
             workBook.write(fileOut);
             fileOut.flush();
             fileOut.close();
-            MayfairStatic.outputMessage(loggingComponent, reportName + " Created", "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + filename + " </i>", INFORMATION_MESSAGE);
+//            MayfairStatic.outputMessage(loggingComponent, reportName + " Created", "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + filename + " </i>", INFORMATION_MESSAGE);
         }
         catch (IOException ex)
         {

@@ -16,7 +16,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
  *
  * @author kian_bryen
  */
-public class PurchaseOrderSummaryReportXls extends XlsReport
+public class PurchaseOrderSummaryReportXls extends ReportXls
 {
 
     private final String outputDir = PURCHASE_ORDERS_DIR;

@@ -6,8 +6,8 @@ package main.java.report.reports;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import static main.java.MayfairStatic.STOCK_REPORTS_DIR;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -18,15 +18,16 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
  *
  * @author kian_bryen
  */
-public class DiscontinuedStockReportXls extends ReportXls
+public class StockReportXls extends ReportXls
 {
 
     private final String outputDir = STOCK_REPORTS_DIR;
     private final String date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy"));
+    // Header name -> value
+    private Set<Map<String, String>> products;
+    private String[] headers;
 
-    private Map<String, Integer> products = new HashMap();
-
-    public DiscontinuedStockReportXls()
+    public StockReportXls()
     {
         super(new HSSFWorkbook());
     }
@@ -38,7 +39,7 @@ public class DiscontinuedStockReportXls extends ReportXls
         int rowCount = 0;
         HSSFRow row = sheet.createRow(rowCount++);
         int cellCount = 0;
-        HSSFCell cell = row.createCell(cellCount);
+        HSSFCell cell = row.createCell(0);
 
         // Title
         cell.setCellValue(getReportName() + " " + date);
@@ -46,28 +47,26 @@ public class DiscontinuedStockReportXls extends ReportXls
 
         // Headings
         row = sheet.createRow(rowCount++);
-        cell = row.createCell(cellCount++);
-        cell.setCellValue("Product Code");
-        cell.setCellStyle(getStyle(BOLD));
-        
-        cell = row.createCell(cellCount++);
-        cell.setCellValue("In Stock");
-        cell.setCellStyle(getStyle(BOLD));
+        for (String header : headers)
+        {
+            cell = row.createCell(cellCount++);
+            cell.setCellValue(header);
+            cell.setCellStyle(getStyle(BOLD));
+        }
 
         // Products
-        for (Map.Entry<String, Integer> product : products.entrySet())
+        for (Map<String, String> product : products)
         {
             row = sheet.createRow(rowCount++);
-            
+            for (String header : headers)
+            {
+                cell = row.createCell(cellCount++);
+                cell.setCellValue(product.get(header));
+            }
             cellCount = 0;
-            cell = row.createCell(cellCount++);
-            cell.setCellValue(product.getKey());
-            
-            cell = row.createCell(cellCount++);
-            cell.setCellValue(product.getValue());
         }
-        
-        autoSizeColumns(sheet, cellCount);
+
+        autoSizeColumns(sheet, 3);
     }
 
     @Override
@@ -76,9 +75,14 @@ public class DiscontinuedStockReportXls extends ReportXls
         return outputDir + getReportName() + " " + date + EXTENSION;
     }
 
-    public void setProducts(Map<String, Integer> products)
+    public void setProducts(Set<Map<String, String>> products)
     {
         this.products = products;
+    }
+
+    public void setHeaders(String[] headers)
+    {
+        this.headers = headers;
     }
 
 }

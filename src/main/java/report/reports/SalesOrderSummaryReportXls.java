@@ -5,10 +5,10 @@
 package main.java.report.reports;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 import static main.java.MayfairStatic.SALES_ORDERS_DIR;
-import static main.java.report.reports.XlsReport.BOLD;
-import static main.java.report.reports.XlsReport.EXTENSION;
+import static main.java.report.reports.ReportXls.BOLD;
+import static main.java.report.reports.ReportXls.EXTENSION;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -18,7 +18,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
  *
  * @author kian_bryen
  */
-public class SalesOrderSummaryReportXls extends XlsReport
+public class SalesOrderSummaryReportXls extends ReportXls
 {
 
     private final String outputDir = SALES_ORDERS_DIR;
@@ -29,7 +29,7 @@ public class SalesOrderSummaryReportXls extends XlsReport
     private String cust_name;
     private int total_units;
     private double total_price;
-    private List<String[]> products = new ArrayList();
+    private Set<String[]> products;
 
     public SalesOrderSummaryReportXls()
     {
@@ -153,7 +153,7 @@ public class SalesOrderSummaryReportXls extends XlsReport
         this.total_price = total_price;
     }
 
-    public void setProducts(List<String[]> products)
+    public void setProducts(Set<String[]> products)
     {
         this.products = products;
     }

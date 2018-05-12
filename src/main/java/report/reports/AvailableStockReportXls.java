@@ -20,7 +20,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
  *
  * @author kian_bryen
  */
-public class AvailableStockReportXls extends XlsReport
+public class AvailableStockReportXls extends ReportXls
 {
 
     private final String outputDir = STOCK_REPORTS_DIR;
