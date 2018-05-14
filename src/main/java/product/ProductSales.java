@@ -227,7 +227,7 @@ public class ProductSales extends javax.swing.JInternalFrame
                 lavelTS.setVisible(true);
                 labelMS.setVisible(true);
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }

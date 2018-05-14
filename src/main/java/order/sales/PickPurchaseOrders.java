@@ -5,18 +5,40 @@
 package main.java.order.sales;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Date;
 import java.util.Map;
 import javafx.util.Pair;
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
-import javax.swing.JOptionPane;
 import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import main.java.MayfairStatic;
+import static main.java.MayfairStatic.POD_AVALIABLE;
+import static main.java.MayfairStatic.POD_ORDNUM;
+import static main.java.MayfairStatic.POD_PRODNUM;
+import static main.java.MayfairStatic.PO_DELDATE;
+import static main.java.MayfairStatic.PO_ORDNUM;
+import static main.java.MayfairStatic.PRODUCTS_TABLE;
+import static main.java.MayfairStatic.PRODUCT_INORDER;
+import static main.java.MayfairStatic.PRODUCT_PRODNUM;
+import static main.java.MayfairStatic.PRODUCT_SALESPRICE;
+import static main.java.MayfairStatic.PS_CODE;
+import static main.java.MayfairStatic.PS_PONUM;
+import static main.java.MayfairStatic.PS_PRODNUM;
+import static main.java.MayfairStatic.PS_QUANTITY;
+import static main.java.MayfairStatic.PS_SONUM;
+import static main.java.MayfairStatic.PURCHASE_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
+import static main.java.MayfairStatic.PURCHASE_SALES_ORDER_TABLE;
 import static main.java.MayfairStatic.SALES_ORDER_DETAILS_TABLE;
+import static main.java.MayfairStatic.SOD_CODE;
+import static main.java.MayfairStatic.SOD_FROMORDER;
+import static main.java.MayfairStatic.SOD_FROMSTOCK;
+import static main.java.MayfairStatic.SOD_ORDNUM;
+import static main.java.MayfairStatic.SOD_PRICE;
+import static main.java.MayfairStatic.SOD_PRODNUM;
+import static main.java.MayfairStatic.SOD_QUANTITY;
 import static main.java.MayfairStatic.SO_ORDNUM;
 
 /**
@@ -72,7 +94,6 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
         labelAvaliable.setVisible(enable);
         labelQuantity.setVisible(enable);
         fieldQuantity.setVisible(enable);
-
         btnAdd.setVisible(enable);
     }
 
@@ -81,12 +102,17 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
         try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
         {
 
-            ResultSet rs = statement.executeQuery("SELECT purchase_sales_order.po_num, purchase_order.del_date, purchase_sales_order.quantity FROM purchase_sales_order JOIN purchase_order ON purchase_sales_order.po_num = purchase_order.ord_num WHERE purchase_sales_order.so_num = " + so_ordnum + " AND purchase_sales_order.prod_num = " + prod_num);
+            ResultSet rs = statement.executeQuery("SELECT " + PS_PONUM + ", " + PO_DELDATE + ", " + PS_QUANTITY + " "
+                    + "FROM " + PURCHASE_SALES_ORDER_TABLE + " "
+                    + "JOIN " + PURCHASE_ORDER_TABLE + " "
+                    + "ON " + PS_PONUM + "=" + PO_ORDNUM + " "
+                    + "WHERE " + PS_SONUM + " = " + so_ordnum + " "
+                    + "AND " + PS_PRODNUM + " = " + prod_num);
             MayfairStatic.fillTable(table, rs);
         }
-        catch (SQLException e)
+        catch (Exception ex)
         {
-            JOptionPane.showMessageDialog(PickPurchaseOrders.this, e.getMessage());
+            MayfairStatic.outputMessage(this, ex);
         }
     }
 
@@ -333,10 +359,10 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
                         try (Statement updateStatement = MayfairStatic.getConnection().createStatement())
                         {
                             // UPDATE PURCHASE ORDER DETAILS
-                            String sql = "UPDATE purchase_order_details "
-                                    + "SET avaliable = " + avaliable + " "
-                                    + "WHERE prod_num = " + prod_num + " "
-                                    + "AND ord_num = '" + po_ordnum + "'";
+                            String sql = "UPDATE " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                                    + "SET " + POD_AVALIABLE + " = " + avaliable + " "
+                                    + "WHERE " + POD_PRODNUM + " = " + prod_num + " "
+                                    + "AND " + POD_ORDNUM + " = '" + po_ordnum + "'";
                             updateStatement.executeUpdate(sql);
                             MayfairStatic.writeToLog(sql);
                             if (avaliable > 0)
@@ -349,59 +375,82 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
                             }
 
                             // UPDATE PURCHASE_SALES_ORDER
-                            ResultSet rs = selectStatement.executeQuery("SELECT code, quantity "
-                                    + "FROM purchase_sales_order "
-                                    + "WHERE po_num = '" + po_ordnum + "' "
-                                    + "AND so_num = " + so_ordnum + " "
-                                    + "AND prod_num = " + prod_num);
+                            ResultSet rs = selectStatement.executeQuery("SELECT " + PS_CODE + ", " + PS_QUANTITY + " "
+                                    + "FROM " + PURCHASE_SALES_ORDER_TABLE + " "
+                                    + "WHERE " + PS_PONUM + " = '" + po_ordnum + "' "
+                                    + "AND " + PS_SONUM + " = " + so_ordnum + " "
+                                    + "AND " + PS_PRODNUM + " = " + prod_num);
                             if (rs.next())
                             {
-                                int quantity = rs.getInt("quantity") + quantToAdd;
-                                int code = rs.getInt("code");
-                                sql = "UPDATE purchase_sales_order SET quantity = " + quantity + " "
-                                        + "WHERE code = " + code;
+                                int quantity = rs.getInt(PS_QUANTITY) + quantToAdd;
+                                int code = rs.getInt(PS_CODE);
+                                sql = "UPDATE " + PURCHASE_SALES_ORDER_TABLE + " "
+                                        + "SET " + PS_QUANTITY + " = " + quantity + " "
+                                        + "WHERE " + PS_CODE + " = " + code;
                             }
                             else
                             {
-                                sql = "INSERT INTO purchase_sales_order (po_num, so_num, prod_num, quantity) "
-                                        + "VALUES ('" + po_ordnum + "', " + so_ordnum + ", " + prod_num + ", " + quantToAdd + ")";
+                                sql = "INSERT INTO " + PURCHASE_SALES_ORDER_TABLE + " (" 
+                                        + PS_PONUM + ", " 
+                                        + PS_SONUM + ", " 
+                                        + PS_PRODNUM + ", " 
+                                        + PS_QUANTITY + ") "
+                                        + "VALUES ('" 
+                                        + po_ordnum + "', " 
+                                        + so_ordnum + ", " 
+                                        + prod_num + ", " 
+                                        + quantToAdd + ")";
                             }
                             updateStatement.executeUpdate(sql);
                             MayfairStatic.writeToLog(sql);
 
                             // UPDATE PRODUCTS
-                            rs = selectStatement.executeQuery("SELECT in_order, sales_price "
-                                    + "FROM products "
-                                    + "WHERE prod_num = " + prod_num);
+                            rs = selectStatement.executeQuery("SELECT " + PRODUCT_INORDER + ", " + PRODUCT_SALESPRICE + " "
+                                    + "FROM " + PRODUCTS_TABLE + " "
+                                    + "WHERE " + PRODUCT_PRODNUM + " = " + prod_num);
                             rs.next();
-                            double sales_price = rs.getDouble("sales_price");
-                            int in_order = rs.getInt("in_order") - quantToAdd;
-                            sql = "UPDATE products "
-                                    + "SET in_order = " + in_order + " "
-                                    + "WHERE prod_num = " + prod_num;
+                            double sales_price = rs.getDouble(PRODUCT_SALESPRICE);
+                            int in_order = rs.getInt(PRODUCT_INORDER) - quantToAdd;
+                            sql = "UPDATE " + PRODUCTS_TABLE + " "
+                                    + "SET " + PRODUCT_INORDER + " = " + in_order + " "
+                                    + "WHERE " + PRODUCT_PRODNUM + " = " + prod_num;
                             updateStatement.executeUpdate(sql);
                             MayfairStatic.writeToLog(sql);
 
                             // UPDATE SALES ORDER DETAILS
-                            rs = selectStatement.executeQuery("SELECT code, quantity, fromOrder "
-                                    + "FROM sales_order_details "
-                                    + "WHERE prod_num = " + prod_num + " "
-                                    + "AND ord_num = " + so_ordnum);
+                            rs = selectStatement.executeQuery("SELECT " + SOD_CODE + ", " + SOD_QUANTITY + ", " + SOD_FROMORDER + " "
+                                    + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                                    + "WHERE " + SOD_PRODNUM + " = " + prod_num + " "
+                                    + "AND " + SOD_ORDNUM + " = " + so_ordnum);
                             if (rs.next())
                             {
-                                int quantity = rs.getInt("quantity") + quantToAdd;
-                                int code = rs.getInt("code");
-                                int fromOrder = rs.getInt("fromOrder") + quantToAdd;
+                                int quantity = rs.getInt(SOD_QUANTITY) + quantToAdd;
+                                int code = rs.getInt(SOD_CODE);
+                                int fromOrder = rs.getInt(SOD_FROMORDER) + quantToAdd;
                                 double price = quantity * sales_price;
-                                sql = "UPDATE sales_order_details "
-                                        + "SET quantity = " + quantity + ", price = " + price + ", fromOrder = " + fromOrder + " "
-                                        + "WHERE code = " + code;
+                                sql = "UPDATE " + SALES_ORDER_DETAILS_TABLE + " "
+                                        + "SET " + SOD_QUANTITY + " = " + quantity + ", "
+                                        + SOD_PRICE + " = " + price + ", "
+                                        + SOD_FROMORDER + " = " + fromOrder + " "
+                                        + "WHERE " + SOD_CODE + " = " + code;
                             }
                             else
                             {
                                 double price = quantToAdd * sales_price;
-                                sql = "INSERT INTO sales_order_details (ord_num, prod_num, quantity, price, fromStock, fromOrder) "
-                                        + "VALUES (" + so_ordnum + ", " + prod_num + ", " + quantToAdd + ", " + price + ", 0, " + quantToAdd + ")";
+                                sql = "INSERT INTO " + SALES_ORDER_DETAILS_TABLE + " ("
+                                        + SOD_ORDNUM + ", "
+                                        + SOD_PRODNUM + ", "
+                                        + SOD_QUANTITY + ", "
+                                        + SOD_PRICE + ", "
+                                        + SOD_FROMSTOCK + ", "
+                                        + SOD_FROMORDER + ") "
+                                        + "VALUES (" 
+                                        + so_ordnum + ", " 
+                                        + prod_num + ", " 
+                                        + quantToAdd + ", " 
+                                        + price 
+                                        + ", 0, " 
+                                        + quantToAdd + ")";
                             }
                             updateStatement.executeUpdate(sql);
                             MayfairStatic.writeToLog(sql);
@@ -429,7 +478,7 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
                             this.dispose();
                         }
                     }
-                    catch (SQLException ex)
+                    catch (Exception ex)
                     {
                         MayfairStatic.outputMessage(this, ex);
                     }
@@ -476,7 +525,7 @@ public class PickPurchaseOrders extends javax.swing.JInternalFrame
             jFrame.show();
             this.dispose();
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }

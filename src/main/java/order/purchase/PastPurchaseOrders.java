@@ -270,7 +270,7 @@ public class PastPurchaseOrders extends javax.swing.JInternalFrame
             MayfairStatic.fillTable(table, statement.executeQuery(sql));
             btnViewSummary.setEnabled(false);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }

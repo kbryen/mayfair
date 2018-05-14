@@ -372,7 +372,7 @@ public final class ViewPurchaseOrderSummary extends javax.swing.JInternalFrame
                     + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'");
             MayfairStatic.fillTable(table, rs);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }

@@ -82,7 +82,7 @@ public class NewPurchaseOrderStep2 extends javax.swing.JInternalFrame
                     + "WHERE " + POD_ORDNUM + " = '" + ord_num + "'");
             MayfairStatic.fillTable(orderDetailsTable, rs);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -384,7 +384,7 @@ public class NewPurchaseOrderStep2 extends javax.swing.JInternalFrame
                 jFrame.show();
                 this.dispose();
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }
@@ -406,7 +406,7 @@ public class NewPurchaseOrderStep2 extends javax.swing.JInternalFrame
                 jFrame.show();
                 this.dispose();
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }
@@ -432,7 +432,7 @@ public class NewPurchaseOrderStep2 extends javax.swing.JInternalFrame
             getContentPane().validate();
             getContentPane().repaint();
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }

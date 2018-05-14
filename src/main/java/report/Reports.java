@@ -474,7 +474,7 @@ public class Reports extends javax.swing.JInternalFrame
             }
             else
             {
-                ReportGenerator.createPurchaseOrderReportByDates(this, dateSPO.getDate(), dateEPO.getDate());
+                ReportGenerator.createOrdersPerProductReport(this, "Purchase", dateSPO.getDate(), dateEPO.getDate());
             }
         }
         if (btnSOMadeDate.isSelected())
@@ -485,7 +485,7 @@ public class Reports extends javax.swing.JInternalFrame
             }
             else
             {
-                ReportGenerator.createSalesOrderReportByDates(this, dateSSO.getDate(), dateESO.getDate());
+                ReportGenerator.createOrdersPerProductReport(this, "Sales", dateSSO.getDate(), dateESO.getDate());
             }
         }
         if (btnSOMadeProd.isSelected())

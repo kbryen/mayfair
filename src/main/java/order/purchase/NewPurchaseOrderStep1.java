@@ -121,7 +121,7 @@ public class NewPurchaseOrderStep1 extends javax.swing.JInternalFrame
             jFrame.show();
             this.dispose();
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             if (ex.getMessage().contains("Duplicate"))
             {

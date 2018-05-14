@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import main.java.MayfairStatic;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.usermodel.HSSFFont;
@@ -157,14 +158,14 @@ public abstract class ReportXls implements Report
     }
 
     @Override
-    public void save(String filename, Component loggingComponent)
+    public void save(Component loggingComponent)
     {
-        try (FileOutputStream fileOut = new FileOutputStream(filename))
+        try (FileOutputStream fileOut = new FileOutputStream(getFilename()))
         {
             workBook.write(fileOut);
             fileOut.flush();
             fileOut.close();
-//            MayfairStatic.outputMessage(loggingComponent, reportName + " Created", "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + filename + " </i>", INFORMATION_MESSAGE);
+            MayfairStatic.outputMessage(loggingComponent, reportName + " Created", "<html> <b>" + reportName + " created successfully.</b> \n<html> <i> " + getFilename() + " </i>", INFORMATION_MESSAGE);
         }
         catch (IOException ex)
         {

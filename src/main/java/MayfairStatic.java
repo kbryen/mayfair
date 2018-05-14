@@ -27,7 +27,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
@@ -172,10 +171,9 @@ public class MayfairStatic
 
     // ----------------------- REPORTS ----------------------- 
     public static final String REPORTS_DIR = "S://STOCK SYSTEM/";
-    public static final String PROD_SALES_ORDERS_DIR = REPORTS_DIR + "Product Sales Orders/" + Calendar.getInstance().get(Calendar.YEAR) + "/";
+    public static final String PROD_ANALYSIS_DIR = REPORTS_DIR + "Product Analysis/" + Calendar.getInstance().get(Calendar.YEAR) + "/";
     public static final String PURCHASE_ORDERS_DIR = REPORTS_DIR + "Purchase Orders/" + Calendar.getInstance().get(Calendar.YEAR) + "/";
-    public static final String SALES_ORDERS_DIR = REPORTS_DIR + "Purchase Orders/" + Calendar.getInstance().get(Calendar.YEAR) + "/";
-//    public static final String SALES_PURCHASE_ORDERS_DIR = REPORTS_DIR + "Sales & Purchase Order Reports/" + Calendar.getInstance().get(Calendar.YEAR) + "/";
+    public static final String SALES_ORDERS_DIR = REPORTS_DIR + "Sales Orders/" + Calendar.getInstance().get(Calendar.YEAR) + "/";
     public static final String STOCK_REPORTS_DIR = REPORTS_DIR + "Stock Reports/" + Calendar.getInstance().get(Calendar.YEAR) + "/";
     public static final String DISPATCH_NOTES_DIR = REPORTS_DIR + "Dispatch Notes/" + Calendar.getInstance().get(Calendar.YEAR) + "/";
     public static final String CUSTOMER_REPORTS_DIR = REPORTS_DIR + "Customer Reports/" + Calendar.getInstance().get(Calendar.YEAR) + "/";

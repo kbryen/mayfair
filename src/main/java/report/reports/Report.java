@@ -21,7 +21,7 @@ public interface Report
     
     public void populateWorkbook();
     
-    public void save(String filename, Component loggingComponent);
+    public void save(Component loggingComponent);
     
     public void setReportName(String reportName);
     
@@ -38,7 +38,7 @@ public interface Report
         try
         {
             populateWorkbook();
-            save(getFilename(), loggingComponent);
+            save(loggingComponent);
         }
         catch (Exception ex)
         {

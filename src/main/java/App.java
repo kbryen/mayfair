@@ -4,13 +4,11 @@
  */
 package main.java;
 
-import java.awt.Color;
 import static java.awt.Color.white;
 import java.awt.EventQueue;
 import static java.awt.Frame.MAXIMIZED_BOTH;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import main.java.MayfairStatic.DesktopPanePainter;
 import main.java.product.Products;
@@ -47,19 +45,19 @@ public class App extends JFrame
             UIManager.getLookAndFeelDefaults().put("DesktopPane[Enabled].backgroundPainter",
                     new DesktopPanePainter());
             UIManager.put("control", white);
+
+            /* Create and display the form */
+            EventQueue.invokeLater(() ->
+            {
+                App jFrame = new App();
+                jFrame.setVisible(true);
+                jFrame.setExtendedState(MAXIMIZED_BOTH);
+            });
         }
-        catch (UnsupportedLookAndFeelException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(null, ex);
         }
-
-        /* Create and display the form */
-        EventQueue.invokeLater(() ->
-        {
-            App jFrame = new App();
-            jFrame.setVisible(true);
-            jFrame.setExtendedState(MAXIMIZED_BOTH);
-        });
     }
 
     /**

@@ -211,7 +211,7 @@ public class NewSalesOrderStep1 extends javax.swing.JInternalFrame
             }
             enableButtons(true);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -243,7 +243,7 @@ public class NewSalesOrderStep1 extends javax.swing.JInternalFrame
                     this.dispose();
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }
@@ -270,7 +270,7 @@ public class NewSalesOrderStep1 extends javax.swing.JInternalFrame
                 MayfairStatic.outputMessage(this, "Pro Forma Alert", "<html><b>WARNING:</b> " + fieldCustomerName.getText() + " is a pro forma.</html>\nDo not send stock before the pro forma invoice is sent.", WARNING_MESSAGE);
             }
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }

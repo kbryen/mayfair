@@ -110,7 +110,7 @@ public class EditPurchaseOrderStep1 extends javax.swing.JInternalFrame
 
             MayfairStatic.writeToLog("EDIT PURCHASE ORDER " + ord_num);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -451,7 +451,7 @@ public class EditPurchaseOrderStep1 extends javax.swing.JInternalFrame
                     MayfairStatic.outputMessage(this, "Invalid quantity", "New Quantity must be at least " + onSalesOrder + " as there are active sales orders for this product.", WARNING_MESSAGE);
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }

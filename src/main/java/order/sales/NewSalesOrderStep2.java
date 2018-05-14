@@ -101,7 +101,7 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
                     + "WHERE " + SOD_ORDNUM + " = " + ord_num);
             MayfairStatic.fillTable(orderDetailsTable, rs);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -446,7 +446,7 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
                     MayfairStatic.outputMessage(this, "Invalid quantity", "Not enough avaliable on purchase orders, please reduce quantity or take from stock.", WARNING_MESSAGE);
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }
@@ -468,7 +468,7 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
                 jFrame.show();
                 this.dispose();
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }
@@ -494,7 +494,7 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
             getContentPane().validate();
             getContentPane().repaint();
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -534,7 +534,7 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
                 MayfairStatic.outputMessage(this, "Order " + action, "Order number " + ord_num + " successfully " + action.toLowerCase() + ".", INFORMATION_MESSAGE);
                 this.dispose();
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }
@@ -612,7 +612,7 @@ public class NewSalesOrderStep2 extends javax.swing.JInternalFrame
                     MayfairStatic.outputMessage(this, "Invalid quantity", "Not enough avaliable in stock, please reduce quantity or take from purchase order.", WARNING_MESSAGE);
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }

@@ -5,11 +5,9 @@
 package main.java.report;
 
 import java.awt.Component;
-import java.io.FileOutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,12 +19,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import javafx.util.Pair;
 import javax.swing.JOptionPane;
-import static javax.swing.JOptionPane.ERROR_MESSAGE;
-import static javax.swing.JOptionPane.INFORMATION_MESSAGE;
 import static javax.swing.JOptionPane.WARNING_MESSAGE;
 import main.java.MayfairStatic;
-import static main.java.MayfairStatic.ALL_PURCHASE_TEMPLATE;
-import static main.java.MayfairStatic.ALL_SALES_TEMPLATE;
 import static main.java.MayfairStatic.CAL_DATE_FORMAT;
 import static main.java.MayfairStatic.CUSTOMERS_TABLE;
 import static main.java.MayfairStatic.CUSTOMER_CUSTNUM;
@@ -51,36 +45,32 @@ import static main.java.MayfairStatic.PRODUCT_INSTOCK;
 import static main.java.MayfairStatic.PRODUCT_PRODNUM;
 import static main.java.MayfairStatic.PRODUCT_PURCHASEPRICE;
 import static main.java.MayfairStatic.PRODUCT_SALESPRICE;
-import static main.java.MayfairStatic.PROD_SALES_ORDERS_DIR;
-import static main.java.MayfairStatic.PROD_SALES_TEMPLATE;
 import static main.java.MayfairStatic.PURCHASE_ORDER_DETAILS_TABLE;
 import static main.java.MayfairStatic.PURCHASE_ORDER_TABLE;
 import static main.java.MayfairStatic.SALES_ORDER_DETAILS_TABLE;
 import static main.java.MayfairStatic.SALES_ORDER_TABLE;
+import static main.java.MayfairStatic.SOD_FROMSTOCK;
 import static main.java.MayfairStatic.SOD_ORDNUM;
 import static main.java.MayfairStatic.SOD_PRICE;
 import static main.java.MayfairStatic.SOD_PRODNUM;
 import static main.java.MayfairStatic.SOD_QUANTITY;
 import static main.java.MayfairStatic.SO_CUSTNUM;
 import static main.java.MayfairStatic.SO_DELDATE;
+import static main.java.MayfairStatic.SO_DELIVERED;
+import static main.java.MayfairStatic.SO_DISPATCHED;
+import static main.java.MayfairStatic.SO_ORDDATE;
 import static main.java.MayfairStatic.SO_ORDNUM;
 import static main.java.MayfairStatic.SO_PRICE;
 import static main.java.MayfairStatic.SO_TOTALUNITS;
 import main.java.report.reports.AvailableStockReportXls;
 import main.java.report.reports.CustomerReportXls;
-import main.java.report.reports.DiscontinuedStockReportXls;
 import main.java.report.reports.DispatchNoteXls;
 import main.java.report.reports.OutOfStockReportXls;
 import main.java.report.reports.PurchaseOrderSummaryReportXls;
 import main.java.report.reports.SalesOrderSummaryReportXls;
 import main.java.report.reports.StockReportXls;
-import main.java.report.reports.ReportXls;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFDataFormat;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import main.java.report.reports.OrdersPerProductReportXls;
+import main.java.report.reports.SalesOrdersForProductReportXls;
 
 /**
  *
@@ -139,7 +129,7 @@ public class ReportGenerator
 
                 summaryReport.generate(component);
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(component, ex);
             }
@@ -185,7 +175,7 @@ public class ReportGenerator
                 dispatchNote.setCust_name(cust_name);
                 dispatchNote.generate(component);
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(component, ex);
             }
@@ -240,7 +230,7 @@ public class ReportGenerator
 
                 summaryReport.generate(component);
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(component, ex);
             }
@@ -255,7 +245,9 @@ public class ReportGenerator
             try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
                 // Get a list of all discontinued products
-                ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_PRODNUM + ", " + PRODUCT_CODE + ", " + PRODUCT_INSTOCK + " "
+                ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_PRODNUM + ", " 
+                        + PRODUCT_CODE + ", " 
+                        + PRODUCT_INSTOCK + " "
                         + "FROM " + PRODUCTS_TABLE + " "
                         + "WHERE " + PRODUCT_DISCON + " = true");
                 while (rs.next())
@@ -366,11 +358,11 @@ public class ReportGenerator
                     productCounts.remove(outOfStock);
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(component, ex);
             }
-            
+
             AvailableStockReportXls stockReport = new AvailableStockReportXls();
             stockReport.setReportName("Available Stock Report");
             stockReport.setProductCounts(productCounts);
@@ -387,37 +379,38 @@ public class ReportGenerator
             try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
                 List<String> prod_nums = new ArrayList();
-                ResultSet rs = statement.executeQuery("SELECT prod_num FROM products");
+                ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_PRODNUM + " "
+                        + "FROM " + PRODUCTS_TABLE);
                 while (rs.next())
                 {
-                    prod_nums.add(rs.getString("prod_num"));
+                    prod_nums.add(rs.getString(PRODUCT_PRODNUM));
                 }
 
                 for (String prod_num : prod_nums)
                 {
-                    rs = statement.executeQuery("SELECT products.prod_num, "
-                            + "products.code, "
-                            + "(IFNULL(SUM(sales_order_details.fromStock), 0) + products.in_stock) AS warehouseStock,"
-                            + "products.in_stock "
-                            + "FROM sales_order_details "
-                            + "JOIN sales_order "
-                            + "ON sales_order_details.ord_num=sales_order.ord_num "
-                            + "JOIN products "
-                            + "ON sales_order_details.prod_num=products.prod_num "
-                            + "WHERE sales_order.dispatched = false "
-                            + "AND sales_order.delivered = false "
-                            + "AND products.prod_num = " + prod_num + " "
-                            + "AND sales_order_details.prod_num = " + prod_num);
+                    rs = statement.executeQuery("SELECT " + PRODUCT_PRODNUM + ", "
+                             + PRODUCT_CODE + ", "
+                            + "(IFNULL(SUM(" + SOD_FROMSTOCK + "), 0) + " + PRODUCT_INSTOCK + ") AS warehouseStock,"
+                            + PRODUCT_INSTOCK + " "
+                            + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                            + "JOIN " + SALES_ORDER_TABLE + " "
+                            + "ON " + SOD_ORDNUM + "=" + SO_ORDNUM + " "
+                            + "JOIN " + PRODUCTS_TABLE + " "
+                            + "ON " + SOD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                            + "WHERE " + SO_DISPATCHED + " = false "
+                            + "AND " + SO_DELIVERED + " = false "
+                            + "AND " + PRODUCT_PRODNUM + " = " + prod_num + " "
+                            + "AND " + SOD_PRODNUM + " = " + prod_num);
                     rs.next();
                     Map<String, String> product = new HashMap();
-                    product.put("Product Number", rs.getString("prod_num"));
-                    product.put("Product Code", rs.getString("code"));
+                    product.put("Product Number", rs.getString(PRODUCT_PRODNUM));
+                    product.put("Product Code", rs.getString(PRODUCT_CODE));
                     product.put("Warehouse Stock", rs.getString("warehouseStock"));
-                    product.put("Avaliable", rs.getString("in_stock"));
+                    product.put("Avaliable", rs.getString(PRODUCT_INSTOCK));
                     products.add(product);
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(component, ex);
             }
@@ -448,7 +441,7 @@ public class ReportGenerator
                     products.put(rs.getInt(PRODUCT_PRODNUM), rs.getString(PRODUCT_CODE));
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(component, ex);
             }
@@ -460,270 +453,125 @@ public class ReportGenerator
         }
     }
 
-    public static void createPurchaseOrderReportByDates(Component component, Date startDate, Date endDate)
+    public static void createOrdersPerProductReport(Component component, String type, Date startDate, Date endDate)
     {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a purchase orders report?", "Purchase Orders Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
+        if (MayfairStatic.outputConfirm(component, type + " Orders Made Report", "Are you sure you want to create a " + type.toLowerCase() + " orders made report?") == JOptionPane.YES_OPTION)
         {
+            Set<String[]> products = new HashSet();
+            String quantity;
+            String sql = "SELECT " + PRODUCT_PRODNUM + ", " + PRODUCT_CODE + ", ";
+            if (type.equals("Sales"))
+            {
+                quantity = SOD_QUANTITY;
+                sql += quantity + " FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                        + "JOIN " + SALES_ORDER_TABLE + " "
+                        + "ON " + SOD_ORDNUM + "=" + SO_ORDNUM + " "
+                        + "JOIN " + PRODUCTS_TABLE + " "
+                        + "ON " + SOD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                        + "WHERE " + SO_DELDATE + " ";
+            }
+            else
+            {
+                quantity = POD_QUANTITY;
+                sql += quantity + " FROM " + PURCHASE_ORDER_DETAILS_TABLE + " "
+                        + "JOIN " + PURCHASE_ORDER_TABLE + " "
+                        + "ON " + POD_ORDNUM + "=" + PO_ORDNUM + " "
+                        + "JOIN " + PRODUCTS_TABLE + " "
+                        + "ON " + POD_PRODNUM + "=" + PRODUCT_PRODNUM + " "
+                        + "WHERE " + PO_DELDATE + " ";
+            }
+            sql += "BETWEEN '" + CAL_DATE_FORMAT.format(startDate) + "' AND '" + CAL_DATE_FORMAT.format(endDate) + "'";
+
             try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                SimpleDateFormat df1 = new SimpleDateFormat("dd-MM-yy");
-                SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
-
-                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, purchase_order_details.quantity FROM purchase_order_details JOIN purchase_order ON purchase_order_details.ord_num = purchase_order.ord_num JOIN products ON purchase_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");
-                if (rs.isBeforeFirst())
+                ResultSet rs = statement.executeQuery(sql);
+                while (rs.next())
                 {
-                    String fileName = "S&PDIR" + "Purchase Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
-                    try (FileOutputStream fileOut = new FileOutputStream(fileName))
+                    products.add(new String[]
                     {
-                        HSSFWorkbook workBook = ReportXls.createHSSFWorkbook(ALL_PURCHASE_TEMPLATE);
-
-                        HSSFCellStyle numberStyle = workBook.createCellStyle();
-                        numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-
-                        HSSFSheet sheet = workBook.getSheet("Purchase Orders Made");
-
-                        HSSFRow row;
-                        int rowCount = 0;
-                        HSSFCell cell;
-
-                        // Start date
-                        row = sheet.getRow(rowCount++);
-                        cell = row.getCell(5);
-                        cell.setCellValue(df1.format(startDate));
-
-                        // End date
-                        row = sheet.getRow(rowCount++);
-                        cell = row.getCell(5);
-                        cell.setCellValue(df1.format(endDate));
-
-                        // Fill table
-                        while (rs.next())
-                        {
-                            // num
-                            cell = row.createCell(0);
-                            cell.setCellValue(rs.getInt("prod_num"));
-                            cell.setCellStyle(numberStyle);
-                            // code
-                            cell = row.createCell(1);
-                            cell.setCellValue(rs.getString("code"));
-                            // quant
-                            cell = row.createCell(2);
-                            cell.setCellValue(rs.getInt("quantity"));
-                            cell.setCellStyle(numberStyle);
-
-                            row = sheet.createRow(rowCount++);
-                        }
-
-                        // Auto Size Columns
-                        for (int i = 0; i < 3; i++)
-                        {
-                            sheet.autoSizeColumn(i);
-                        }
-
-                        workBook.write(fileOut);
-                        fileOut.flush();
-                        fileOut.close();
-
-                        JOptionPane.showMessageDialog(component, "<html> <b>Purchase orders report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
-                    }
+                        rs.getString(PRODUCT_PRODNUM),
+                        rs.getString(PRODUCT_CODE),
+                        rs.getString(quantity)
+                    });
                 }
-                else
-                {
-                    JOptionPane.showMessageDialog(component, "<html> No purchase orders made between <b> " + df1.format(startDate) + " </b> and <b> " + df1.format(endDate) + " </b>", "Report not created", INFORMATION_MESSAGE);
-                }
+
+                OrdersPerProductReportXls ordersPerReport = new OrdersPerProductReportXls();
+                ordersPerReport.setReportName(type + " Orders Made");
+                ordersPerReport.setProducts(products);
+                ordersPerReport.setStartDate(FILE_DATE_FORMAT.format(startDate));
+                ordersPerReport.setEndDate(FILE_DATE_FORMAT.format(endDate));
+                ordersPerReport.generate(component);
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                JOptionPane.showMessageDialog(component, "<html> Error while creating purchase orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(component, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
-            }
-        }
-    }
-
-    public static void createSalesOrderReportByDates(Component component, Date startDate, Date endDate)
-    {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a sales orders report?", "Sales Orders Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
-        {
-            try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
-            {
-                SimpleDateFormat df1 = new SimpleDateFormat("dd-MM-yy");
-                SimpleDateFormat df2 = new SimpleDateFormat("yyyy-MM-dd");
-
-                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, sales_order_details.quantity FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num JOIN products ON sales_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");
-                if (rs.isBeforeFirst())
-                {
-                    String fileName = "S&PDIR" + "Sales Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
-                    try (FileOutputStream fileOut = new FileOutputStream(fileName))
-                    {
-                        HSSFWorkbook workBook = ReportXls.createHSSFWorkbook(ALL_SALES_TEMPLATE);
-                        HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
-
-                        HSSFCellStyle numberStyle = workBook.createCellStyle();
-                        numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-
-                        HSSFRow row;
-                        int rowCount = 0;
-                        HSSFCell cell;
-
-                        // Start date
-                        row = sheet.getRow(rowCount++);
-                        cell = row.getCell(5);
-                        cell.setCellValue(df1.format(startDate));
-
-                        // End date
-                        row = sheet.getRow(rowCount++);
-                        cell = row.getCell(5);
-                        cell.setCellValue(df1.format(endDate));
-
-                        // Fill table
-                        while (rs.next())
-                        {
-                            // num
-                            cell = row.createCell(0);
-                            cell.setCellValue(rs.getInt("prod_num"));
-                            cell.setCellStyle(numberStyle);
-                            // code
-                            cell = row.createCell(1);
-                            cell.setCellValue(rs.getString("code"));
-                            // quant
-                            cell = row.createCell(2);
-                            cell.setCellValue(rs.getInt("quantity"));
-                            cell.setCellStyle(numberStyle);
-
-                            row = sheet.createRow(rowCount++);
-                        }
-
-                        // Auto Size Columns
-                        for (int i = 0; i < 3; i++)
-                        {
-                            sheet.autoSizeColumn(i);
-                        }
-
-                        workBook.write(fileOut);
-                        fileOut.flush();
-                        fileOut.close();
-
-                        JOptionPane.showMessageDialog(component, "<html> <b>Sales orders report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
-                    }
-                }
-                else
-                {
-                    JOptionPane.showMessageDialog(component, "<html> No sales orders made between <b> " + df1.format(startDate) + " </b> and <b> " + df1.format(endDate) + " </b>", "Report not created", INFORMATION_MESSAGE);
-                }
-            }
-            catch (Exception e)
-            {
-                JOptionPane.showMessageDialog(component, "<html> Error while creating sales orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(component, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+                MayfairStatic.outputMessage(component, ex);
             }
         }
     }
 
     public static void createSalesOrderReportByProduct(Component component, String prodCode)
     {
-        int selectedOption = JOptionPane.showConfirmDialog(null, "Are you sure you want to create a sales orders report?", "Sales Orders Report", JOptionPane.YES_NO_OPTION);
-        if (selectedOption == JOptionPane.YES_OPTION)
+        if (MayfairStatic.outputConfirm(component, "Sales Orders Made Report", "<html>Are you sure you want to create a sales orders made for <b>" + prodCode + "</b> report?") == JOptionPane.YES_OPTION)
         {
             try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
             {
-                ResultSet rs = statement.executeQuery("SELECT prod_num FROM products where code = '" + prodCode + "'");
+                ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_PRODNUM + " "
+                        + "FROM " + PRODUCTS_TABLE + " "
+                        + "WHERE " + PRODUCT_CODE + " = '" + prodCode + "'");
                 if (rs.next())
                 {
-                    String prodNum = rs.getString("prod_num");
+                    String prod_num = rs.getString(PRODUCT_PRODNUM);
 
-                    rs = statement.executeQuery("SELECT sales_order_details.ord_num, sales_order_details.quantity, sales_order.cust_num, customers.name, sales_order.ord_date, sales_order.del_date, sales_order.dispatched, sales_order.delivered FROM sales_order JOIN sales_order_details ON sales_order.ord_num=sales_order_details.ord_num JOIN customers ON sales_order.cust_num=customers.cust_num WHERE sales_order_details.prod_num = " + prodNum);
+                    rs = statement.executeQuery("SELECT " + SOD_ORDNUM + ", "
+                            + SOD_QUANTITY + ", "
+                            + SO_CUSTNUM + ", "
+                            + CUSTOMER_NAME + ", "
+                            + MayfairStatic.sqlDateFormat(SO_ORDDATE, "%d/%m/%Y") + ", "
+                            + MayfairStatic.sqlDateFormat(SO_DELDATE, "%d/%m/%Y") + ", "
+                            + SO_DISPATCHED + ", "
+                            + SO_DELIVERED + " "
+                            + "FROM " + SALES_ORDER_TABLE + " "
+                            + "JOIN " + SALES_ORDER_DETAILS_TABLE + " "
+                            + "ON " + SO_ORDNUM + "=" + SOD_ORDNUM + " "
+                            + "JOIN " + CUSTOMERS_TABLE + " "
+                            + "ON " + SO_CUSTNUM + "=" + CUSTOMER_CUSTNUM + " "
+                            + "WHERE " + SOD_PRODNUM + " = " + prod_num);
                     if (rs.isBeforeFirst())
                     {
-                        String fileName = PROD_SALES_ORDERS_DIR + "Sales Orders " + prodCode.replaceAll("/", "") + ".xls";
-                        try (FileOutputStream fileOut = new FileOutputStream(fileName))
+                        Set<String[]> orders = new HashSet();
+                        while (rs.next())
                         {
-
-                            HSSFWorkbook workBook = ReportXls.createHSSFWorkbook(PROD_SALES_TEMPLATE);
-                            HSSFSheet sheet = workBook.getSheet("Sales Orders Made");
-
-                            HSSFCellStyle numberStyle = workBook.createCellStyle();
-                            numberStyle.setDataFormat(HSSFDataFormat.getBuiltinFormat("0"));
-
-                            HSSFRow row;
-                            int rowCount = 3;
-                            HSSFCell cell;
-
-                            // Prod code
-                            row = sheet.getRow(0);
-                            cell = row.getCell(1);
-                            cell.setCellValue(prodCode);
-
-                            // Fill table
-                            while (rs.next())
+                            orders.add(new String[]
                             {
-                                row = sheet.createRow(rowCount++);
-
-                                cell = row.createCell(0);
-                                cell.setCellValue(rs.getInt("ord_num"));
-                                cell.setCellStyle(numberStyle);
-
-                                cell = row.createCell(1);
-                                cell.setCellValue(rs.getString("name"));
-                                cell = row.createCell(2);
-                                cell.setCellValue(rs.getString("ord_date"));
-
-                                cell = row.createCell(3);
-                                cell.setCellValue(rs.getString("del_date"));
-
-                                cell = row.createCell(4);
-                                if (rs.getInt("dispatched") == 1)
-                                {
-                                    cell.setCellValue("yes");
-                                }
-                                else
-                                {
-                                    cell.setCellValue("no");
-                                }
-
-                                cell = row.createCell(5);
-                                if (rs.getInt("delivered") == 1)
-                                {
-                                    cell.setCellValue("yes");
-                                }
-                                else
-                                {
-                                    cell.setCellValue("no");
-                                }
-
-                                cell = row.createCell(6);
-                                cell.setCellValue(rs.getInt("quantity"));
-                                cell.setCellStyle(numberStyle);
-                            }
-
-                            // Auto Size Columns
-                            for (int i = 0; i < 7; i++)
-                            {
-                                sheet.autoSizeColumn(i);
-                            }
-
-                            workBook.write(fileOut);
-                            fileOut.flush();
-                            fileOut.close();
-
-                            JOptionPane.showMessageDialog(component, "<html> <b>Sales orders report created successfully.</b> \n<html> <i> " + fileName + " </i>", "Report Created", INFORMATION_MESSAGE);
+                                rs.getString(SOD_ORDNUM),
+                                rs.getString(CUSTOMER_NAME),
+                                rs.getString(SO_ORDDATE),
+                                rs.getString(SO_DELDATE),
+                                rs.getBoolean(SO_DISPATCHED) ? "yes" : "no",
+                                rs.getBoolean(SO_DELIVERED) ? "yes" : "no",
+                                rs.getString(SOD_QUANTITY)
+                            });
                         }
+
+                        SalesOrdersForProductReportXls ordersPerReport = new SalesOrdersForProductReportXls();
+                        ordersPerReport.setReportName("Sales Orders Made");
+                        ordersPerReport.setProdCode(prodCode);
+                        ordersPerReport.setOrders(orders);
+                        ordersPerReport.generate(component);
                     }
                     else
                     {
-                        JOptionPane.showMessageDialog(component, "<html> No sales orders made for <b> " + prodCode + " </b>", "Report not created", INFORMATION_MESSAGE);
+                        MayfairStatic.outputMessage(component, "Report not created", "<html> No sales orders made for <b> " + prodCode + " </b>", WARNING_MESSAGE);
                     }
                 }
                 else
                 {
-                    JOptionPane.showMessageDialog(component, "<html>Product does not exist - <b>" + prodCode + "</b> \nPlease select from drop down box", "Unknown Product", WARNING_MESSAGE);
+                    MayfairStatic.outputMessage(component, "Unknown Product", "<html>Product does not exist - <b>" + prodCode + "</b> \nPlease select from drop down box", WARNING_MESSAGE);
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                JOptionPane.showMessageDialog(component, "<html> Error while creating sales orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(component, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+                MayfairStatic.outputMessage(component, ex);
             }
         }
     }
@@ -737,23 +585,25 @@ public class ReportGenerator
             {
                 try (Statement statement = MayfairStatic.getConnection().createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE))
                 {
-                    long elapsedTime = 0 - System.nanoTime();
-
-                    // Products
                     Map<Integer, String[]> products = new TreeMap();
                     Map<Integer, String[]> disconProducts = new TreeMap();
-                    ResultSet rs = statement.executeQuery("SELECT prod_num, code, sales_price, purchase_price, discon FROM products");
+                    ResultSet rs = statement.executeQuery("SELECT " + PRODUCT_PRODNUM + ", " 
+                            + PRODUCT_CODE + ", " 
+                            + PRODUCT_SALESPRICE + ", " 
+                            + PRODUCT_PURCHASEPRICE + ", " 
+                            + PRODUCT_DISCON + " "
+                            + "FROM " + PRODUCTS_TABLE + "");
                     while (rs.next())
                     {
-                        int prod_num = rs.getInt("prod_num");
+                        int prod_num = rs.getInt(PRODUCT_PRODNUM);
                         String[] details = new String[]
                         {
-                            rs.getString("code"),
-                            "£" + rs.getString("sales_price"),
-                            "£" + rs.getString("purchase_price")
+                            rs.getString(PRODUCT_CODE),
+                            "£" + rs.getString(PRODUCT_SALESPRICE),
+                            "£" + rs.getString(PRODUCT_PURCHASEPRICE)
                         };
-                        boolean discon = rs.getBoolean("discon");
-                        if (discon)
+                        
+                        if (rs.getBoolean(PRODUCT_DISCON))
                         {
                             disconProducts.put(prod_num, details);
                         }
@@ -768,72 +618,61 @@ public class ReportGenerator
                     if (!reference.isEmpty())
                     {
                         fileNameExtras.append(" - ").append(reference);
-                        whereClauseReference = " WHERE reference = '" + reference + "'";
+                        whereClauseReference = " WHERE " + CUSTOMER_REFERENCE + " = '" + reference + "'";
                     }
 
                     Map<Integer, Pair<String, Map<Integer, Integer>>> customers = new TreeMap();
-                    rs = statement.executeQuery("SELECT cust_num, name FROM customers" + whereClauseReference);
+                    rs = statement.executeQuery("SELECT " + CUSTOMER_CUSTNUM + ", " + CUSTOMER_NAME + " "
+                            + "FROM " + CUSTOMERS_TABLE 
+                            + whereClauseReference);
                     while (rs.next())
                     {
-                        customers.put(rs.getInt("cust_num"), new Pair(rs.getString("name"), new TreeMap()));
+                        customers.put(rs.getInt(CUSTOMER_CUSTNUM), new Pair(rs.getString(CUSTOMER_NAME), new TreeMap()));
                     }
 
-                    // BUILD SQL
-                    StringBuilder sql = new StringBuilder("SELECT ");
-                    for (Integer customer : customers.keySet())
-                    {
-                        for (Integer product : products.keySet())
-                        {
-                            sql.append("SUM(CASE WHEN sales_order.cust_num = ")
-                                    .append(customer)
-                                    .append(" AND sales_order_details.prod_num = ")
-                                    .append(product)
-                                    .append(" THEN quantity ELSE 0 END) AS C")
-                                    .append(customer)
-                                    .append("P")
-                                    .append(product)
-                                    .append(", ");
-                        }
-                        for (Integer product : disconProducts.keySet())
-                        {
-                            sql.append("SUM(CASE WHEN sales_order.cust_num = ")
-                                    .append(customer)
-                                    .append(" AND sales_order_details.prod_num = ")
-                                    .append(product)
-                                    .append(" THEN quantity ELSE 0 END) AS C")
-                                    .append(customer)
-                                    .append("P")
-                                    .append(product)
-                                    .append(", ");
-                        }
-                    }
-                    sql.deleteCharAt(sql.length() - 2);
-                    sql.append("FROM sales_order_details "
-                            + "JOIN sales_order "
-                            + "ON sales_order_details.ord_num = sales_order.ord_num");
+                    String sqlStart = "SELECT SUM(" + SOD_QUANTITY + ") AS quantity "
+                            + "FROM " + SALES_ORDER_DETAILS_TABLE + " "
+                            + "JOIN " + SALES_ORDER_TABLE + " "
+                            + "ON " + SOD_ORDNUM + "=" + SO_ORDNUM + " ";
+
+                    String sqlEnd = "";
                     if (startDate != null && endDate != null)
                     {
-                        fileNameExtras.append(" - ").append(FILE_DATE_FORMAT.format(startDate)).append(" ").append(FILE_DATE_FORMAT.format(endDate));
-                        sql.append(" AND del_date >= '")
-                                .append(CAL_DATE_FORMAT.format(startDate))
-                                .append("' AND del_date <= '")
-                                .append(CAL_DATE_FORMAT.format(endDate))
-                                .append("'");
+                        fileNameExtras.append(" - ")
+                                .append(FILE_DATE_FORMAT.format(startDate))
+                                .append(" ")
+                                .append(FILE_DATE_FORMAT.format(endDate));
+                        sqlEnd += " AND " + SO_DELDATE + " >= '"
+                                + CAL_DATE_FORMAT.format(startDate)
+                                + "' AND " + SO_DELDATE + " <= '"
+                                + CAL_DATE_FORMAT.format(endDate) + "'";
                     }
 
-                    rs = statement.executeQuery(sql.toString());
-                    rs.next();
                     for (Map.Entry<Integer, Pair<String, Map<Integer, Integer>>> customer : customers.entrySet())
                     {
                         int cust_num = customer.getKey();
                         Map<Integer, Integer> prodCounts = customer.getValue().getValue();
-                        for (Integer prod_num : products.keySet())
+                        for (Integer product : products.keySet())
                         {
-                            prodCounts.put(prod_num, rs.getInt("C" + cust_num + "P" + prod_num));
+                            rs = statement.executeQuery(sqlStart
+                                    + "WHERE " + SO_CUSTNUM + " = "
+                                    + cust_num
+                                    + " AND " + SOD_PRODNUM + " = "
+                                    + product
+                                    + sqlEnd);
+                            rs.next();
+                            prodCounts.put(product, rs.getInt("quantity"));
                         }
-                        for (Integer prod_num : disconProducts.keySet())
+                        for (Integer product : disconProducts.keySet())
                         {
-                            prodCounts.put(prod_num, rs.getInt("C" + cust_num + "P" + prod_num));
+                            rs = statement.executeQuery(sqlStart
+                                    + "WHERE " + SO_CUSTNUM + " = "
+                                    + cust_num
+                                    + " AND " + SOD_PRODNUM + " = "
+                                    + product
+                                    + sqlEnd);
+                            rs.next();
+                            prodCounts.put(product, rs.getInt("quantity"));
                         }
                     }
 
@@ -844,9 +683,6 @@ public class ReportGenerator
                     customerReport.setCustomers(customers);
                     customerReport.setFileNameExtras(fileNameExtras.toString());
                     customerReport.generate(component);
-
-                    elapsedTime += System.nanoTime();
-                    MayfairStatic.outputMessage(component, "Report Time", "Report completed in:\n" + elapsedTime, INFORMATION_MESSAGE);
                 }
                 catch (Exception ex)
                 {

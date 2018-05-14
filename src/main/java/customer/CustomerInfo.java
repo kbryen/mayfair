@@ -488,9 +488,9 @@ public class CustomerInfo extends javax.swing.JInternalFrame
                 MayfairStatic.outputMessage(this, "No Customer", "Customer does not exist - " + custNum, ERROR_MESSAGE);
             }
         }
-        catch (SQLException e)
+        catch (Exception ex)
         {
-            MayfairStatic.outputMessage(this, e);
+            MayfairStatic.outputMessage(this, ex);
         }
     }
 
@@ -580,9 +580,9 @@ public class CustomerInfo extends javax.swing.JInternalFrame
                     MayfairStatic.writeToLog(MayfairStatic.LOG_SEPERATOR);
                     this.dispose();
                 }
-                catch (SQLException e)
+                catch (Exception ex)
                 {
-                    MayfairStatic.outputMessage(this, e);
+                    MayfairStatic.outputMessage(this, ex);
                 }
             }
             else

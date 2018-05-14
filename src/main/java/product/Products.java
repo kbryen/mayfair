@@ -364,7 +364,7 @@ public class Products extends javax.swing.JInternalFrame
             }
             enableButtons(false);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -410,7 +410,7 @@ public class Products extends javax.swing.JInternalFrame
                     btnFindActionPerformed(null);
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }
@@ -476,7 +476,7 @@ public class Products extends javax.swing.JInternalFrame
                     MayfairStatic.outputMessage(this, "Delete Product", "Cannot delete " + code + ":\n" + on_sales_order + " - on Sales Orders\n" + on_purchase_order + " - on Purchase Orders", WARNING_MESSAGE);
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }

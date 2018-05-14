@@ -269,7 +269,7 @@ public class Customers extends javax.swing.JInternalFrame
             getContentPane().repaint();
             btnEdit.setEnabled(false);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }

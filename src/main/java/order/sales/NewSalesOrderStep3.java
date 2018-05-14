@@ -154,7 +154,7 @@ public class NewSalesOrderStep3 extends javax.swing.JInternalFrame
                 this.dispose();
             }
         }
-        catch (SQLException | ParseException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }

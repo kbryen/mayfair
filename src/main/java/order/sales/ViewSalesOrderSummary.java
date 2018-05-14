@@ -389,7 +389,7 @@ public final class ViewSalesOrderSummary extends javax.swing.JInternalFrame
                     + "WHERE " + SOD_ORDNUM + " = " + ord_num);
             MayfairStatic.fillTable(table, rs);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }

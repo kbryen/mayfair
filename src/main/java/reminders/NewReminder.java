@@ -138,7 +138,7 @@ public class NewReminder extends javax.swing.JInternalFrame
 
                 MayfairStatic.outputMessage(this, "New Reminder", "Reminder successfully added.", INFORMATION_MESSAGE);
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }

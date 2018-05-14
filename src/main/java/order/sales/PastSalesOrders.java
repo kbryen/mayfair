@@ -290,7 +290,7 @@ public class PastSalesOrders extends javax.swing.JInternalFrame
 
             MayfairStatic.fillTable(table, statement.executeQuery(sql));
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -319,9 +319,9 @@ public class PastSalesOrders extends javax.swing.JInternalFrame
                 btnClearActionPerformed(null);
                 btnFindActionPerformed(null);
             }
-            catch (SQLException e)
+            catch (Exception ex)
             {
-                JOptionPane.showMessageDialog(PastSalesOrders.this, e.getMessage());
+                MayfairStatic.outputMessage(this, ex);
             }
         }
     }//GEN-LAST:event_btnMarkUndeliveredActionPerformed

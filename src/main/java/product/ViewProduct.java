@@ -122,7 +122,7 @@ public class ViewProduct extends javax.swing.JInternalFrame
             onSalesOrderStock = rs.getInt("total");
             warehouseStock = inStock + onSalesOrderStock;
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }

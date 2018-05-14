@@ -379,7 +379,7 @@ public class CurrentPurchaseOrders extends javax.swing.JInternalFrame
             MayfairStatic.fillTable(table, statement.executeQuery(sql));
             enableButtons(false);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -488,7 +488,7 @@ public class CurrentPurchaseOrders extends javax.swing.JInternalFrame
                     MayfairStatic.outputMessage(this, "Warning", message.toString(), WARNING_MESSAGE);
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }
@@ -530,7 +530,7 @@ public class CurrentPurchaseOrders extends javax.swing.JInternalFrame
                 MayfairStatic.outputMessage(this, "Order Updated", ord_num + " marked as " + status, INFORMATION_MESSAGE);
                 btnClearActionPerformed(null);
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }
@@ -601,7 +601,7 @@ public class CurrentPurchaseOrders extends javax.swing.JInternalFrame
                         prods.put(prod_num, new Pair(in_stock, in_order));
                     }
                 }
-                catch (SQLException ex)
+                catch (Exception ex)
                 {
                     MayfairStatic.outputMessage(this, ex);
                 }
@@ -672,7 +672,7 @@ public class CurrentPurchaseOrders extends javax.swing.JInternalFrame
                     btnClearActionPerformed(null);
                     btnFindActionPerformed(null);
                 }
-                catch (SQLException ex)
+                catch (Exception ex)
                 {
                     MayfairStatic.outputMessage(this, ex);
                 }

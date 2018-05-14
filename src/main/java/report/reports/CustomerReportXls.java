@@ -119,7 +119,7 @@ public class CustomerReportXls extends ReportXls
     @Override
     public String getFilename()
     {
-        return outputDir + getReportName() + fileNameExtras + "-test" + EXTENSION;
+        return outputDir + getReportName() + fileNameExtras + EXTENSION;
     }
 
     public void setFileNameExtras(String fileNameExtras)

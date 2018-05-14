@@ -218,7 +218,7 @@ public class EditPurchaseOrderStep2 extends javax.swing.JInternalFrame
                     + "ORDER BY " + PRODUCT_PRODNUM + " ASC");
             MayfairStatic.fillTable(table, rs);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -292,7 +292,7 @@ public class EditPurchaseOrderStep2 extends javax.swing.JInternalFrame
                     this.dispose();
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }

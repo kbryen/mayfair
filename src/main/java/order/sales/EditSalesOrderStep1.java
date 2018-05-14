@@ -122,7 +122,7 @@ public class EditSalesOrderStep1 extends javax.swing.JInternalFrame
             MayfairStatic.fillTable(table, rs);
             MayfairStatic.writeToLog("EDIT SALES ORDER " + ord_num);
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -568,7 +568,7 @@ public class EditSalesOrderStep1 extends javax.swing.JInternalFrame
                     fillLables();
                 }
             }
-            catch (SQLException ex)
+            catch (Exception ex)
             {
                 MayfairStatic.outputMessage(this, ex);
             }
@@ -595,7 +595,7 @@ public class EditSalesOrderStep1 extends javax.swing.JInternalFrame
                 this.dispose();
             }
         }
-        catch (SQLException | ParseException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }

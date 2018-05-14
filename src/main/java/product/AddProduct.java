@@ -365,7 +365,7 @@ public class AddProduct extends javax.swing.JInternalFrame
                     MayfairStatic.outputMessage(this, "Saved", "Product successfully added.", INFORMATION_MESSAGE);
                     this.dispose();
                 }
-                catch (SQLException ex)
+                catch (Exception ex)
                 {
                     if (ex.getMessage().contains("Duplicate"))
                     {

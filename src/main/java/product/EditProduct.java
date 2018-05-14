@@ -123,7 +123,7 @@ public class EditProduct extends javax.swing.JInternalFrame
             onSalesOrderStock = rs.getInt("total");
             warehouseStock = inStock + onSalesOrderStock;
         }
-        catch (SQLException ex)
+        catch (Exception ex)
         {
             MayfairStatic.outputMessage(this, ex);
         }
@@ -599,7 +599,7 @@ public class EditProduct extends javax.swing.JInternalFrame
                         MayfairStatic.outputMessage(this, "Product Saved", "Changes to product saved.", INFORMATION_MESSAGE);
                         this.dispose();
                     }
-                    catch (SQLException ex)
+                    catch (Exception ex)
                     {
                         MayfairStatic.outputMessage(this, ex);
                     }
