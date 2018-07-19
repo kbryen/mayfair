@@ -619,7 +619,7 @@ public class Reports extends javax.swing.JInternalFrame
             catch (Exception e)
             {
                 JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating stock report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getLocalizedMessage(), "Message for Kian:", ERROR_MESSAGE);
             }
         }
     }
@@ -681,7 +681,7 @@ public class Reports extends javax.swing.JInternalFrame
             catch (Exception e)
             {
                 JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating out of stock report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getLocalizedMessage(), "Message for Kian:", ERROR_MESSAGE);
             }
         }
     }
@@ -764,7 +764,7 @@ public class Reports extends javax.swing.JInternalFrame
             catch (Exception e)
             {
                 JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating purchase orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getLocalizedMessage(), "Message for Kian:", ERROR_MESSAGE);
             }
         }
     }
@@ -781,10 +781,15 @@ public class Reports extends javax.swing.JInternalFrame
                 Date startDate = dateSSO.getDate();
                 Date endDate = dateESO.getDate();
 
-                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, sales_order_details.quantity FROM sales_order_details JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num JOIN products ON sales_order_details.prod_num = products.prod_num WHERE del_date >= '" + df2.format(startDate) + "' AND del_date <= '" + df2.format(endDate) + "'");
+                ResultSet rs = statement.executeQuery("SELECT products.prod_num, products.code, sum(sales_order_details.quantity) AS quantity "
+                        + "FROM sales_order_details "
+                        + "JOIN sales_order ON sales_order_details.ord_num = sales_order.ord_num "
+                        + "JOIN products ON sales_order_details.prod_num = products.prod_num "
+                        + "WHERE del_date BETWEEN '" + df2.format(startDate) + "' AND '" + df2.format(endDate) + "' "
+                        + "GROUP BY 1,2 ORDER BY 2");
                 if (rs.isBeforeFirst())
                 {
-                    String fileName = SALES_PURCHASE_ORDERS_DIR + "Sales Orders " + df1.format(startDate) + " " + df1.format(endDate) + ".xls";
+                    String fileName = SALES_PURCHASE_ORDERS_DIR + "Sales Orders " + df1.format(startDate) + " " + df1.format(endDate) + "-test.xls";
                     try (FileOutputStream fileOut = new FileOutputStream(fileName))
                     {
                         HSSFWorkbook workBook = db.getHSSFWorkbook(ALL_SALES_TEMPLATE);
@@ -846,7 +851,7 @@ public class Reports extends javax.swing.JInternalFrame
             catch (Exception e)
             {
                 JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating sales orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getLocalizedMessage(), "Message for Kian:", ERROR_MESSAGE);
             }
         }
     }
@@ -953,7 +958,7 @@ public class Reports extends javax.swing.JInternalFrame
             catch (Exception e)
             {
                 JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating sales orders report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getLocalizedMessage(), "Message for Kian:", ERROR_MESSAGE);
             }
         }
     }
@@ -1108,7 +1113,7 @@ public class Reports extends javax.swing.JInternalFrame
                         }
                         cell = sheet.getRow(rowNum).createCell(4);
                         cell.setCellType(HSSFCell.CELL_TYPE_FORMULA);
-                        cell.setCellFormula("SUM(" + minLetter + (rowNum+1) + ":" + maxLetter + (rowNum+1) + ")");
+                        cell.setCellFormula("SUM(" + minLetter + (rowNum + 1) + ":" + maxLetter + (rowNum + 1) + ")");
                     }
 
                     workBook.write(fileOut);
@@ -1121,7 +1126,7 @@ public class Reports extends javax.swing.JInternalFrame
             catch (Exception e)
             {
                 JOptionPane.showMessageDialog(Reports.this, "<html> Error while creating customer report, please try again.\n<html> <i> If error continues to happen please contact Kian. </i>", "Error", ERROR_MESSAGE);
-                JOptionPane.showMessageDialog(Reports.this, e.getStackTrace(), "Message for Kian:", ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(Reports.this, e.getLocalizedMessage(), "Message for Kian:", ERROR_MESSAGE);
             }
         }
     }

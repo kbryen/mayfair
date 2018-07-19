@@ -738,23 +738,37 @@ public class Current extends javax.swing.JInternalFrame
                     cell.setCellValue("Product Code");
                     cell = row.createCell(1);
                     cell.setCellValue("Quantity");
+                    cell = row.createCell(2);
+                    cell.setCellValue("Warehouse Stock");
+                    cell = row.createCell(3);
+                    cell.setCellValue("PO Stock");
 
                     int i = 7;
-                    Map<String, Integer> products = new TreeMap();
-                    rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity FROM sales_order_details JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + ordNum);
+                    Map<String, int[]> products = new TreeMap();
+                    rs = statement.executeQuery("SELECT products.code, sales_order_details.quantity, sales_order_details.fromStock, sales_order_details.fromOrder FROM sales_order_details JOIN products ON sales_order_details.prod_num=products.prod_num WHERE sales_order_details.ord_num = " + ordNum);
                     while (rs.next())
                     {
-                        products.put(rs.getString("products.code"), rs.getInt("sales_order_details.quantity"));
+                        products.put(rs.getString("products.code"),
+                                new int[]
+                                {
+                                    rs.getInt("sales_order_details.quantity"),
+                                    rs.getInt("sales_order_details.fromStock"),
+                                    rs.getInt("sales_order_details.fromOrder")
+                                });
                     }
-                    
-                    for (Map.Entry<String, Integer> product : products.entrySet())
+
+                    for (Map.Entry<String, int[]> product : products.entrySet())
                     {
+                        int[] stockCounts = product.getValue();
                         row = worksheet.createRow((short) i);
                         cell = row.createCell(0);
                         cell.setCellValue(product.getKey());
                         cell = row.createCell(1);
-                        cell.setCellValue(product.getValue());
-
+                        cell.setCellValue(stockCounts[0]);
+                        cell = row.createCell(2);
+                        cell.setCellValue(stockCounts[1]);
+                        cell = row.createCell(3);
+                        cell.setCellValue(stockCounts[2]);
                         i++;
                     }
 
@@ -774,7 +788,7 @@ public class Current extends javax.swing.JInternalFrame
                     cell.setCellValue(rs.getInt("total"));
 
                     // Auto Size Columns
-                    for (int k = 0; k < 2; k++)
+                    for (int k = 0; k < 4; k++)
                     {
                         worksheet.autoSizeColumn(k);
                         worksheet.setDefaultColumnStyle(i + 4, editableStyle);
