@@ -263,12 +263,13 @@ public class MayfairStatic
 
     public static void outputMessage(Component component, Exception ex)
     {
-        StringBuilder message = new StringBuilder(ex.getLocalizedMessage());
+        outputMessage(component, "Message for Kian - Part 1/2", ex.getLocalizedMessage(), ERROR_MESSAGE);
+        StringBuilder message = new StringBuilder();
         for (StackTraceElement stackTraceElement : ex.getStackTrace())
         {
             message.append("\n").append(stackTraceElement.toString());
         }
-        outputMessage(component, "Message for Kian", message.toString(), ERROR_MESSAGE);
+        outputMessage(component, "Message for Kian - Part 2/2", message.toString(), ERROR_MESSAGE);
     }
 
     public static void outputMessage(Component component, String title, String message, int type)
